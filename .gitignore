@@ -1,0 +1,54 @@
+# OSX System Files
+.DS_Store
+
+
+# virtualenv
+.venv
+
+# Compiled Python Files
+*.pyc
+
+
+# Compiled package output
+/build/
+/dist/
+/power_shovel.egg-info/
+.builder
+
+# Emacs
+.\#*
+*~
+\#*\#
+.dir-locals.el
+
+# Vim
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+# Pycharm
+.idea/
+
+# Make
+.sentinel
+nosetests.xml
+coverage/
+
+# test output
+shared
+cover
+
+# Dotenv file
+/.env
+
+# Test cover files
+cover/
+
+# Ipython local settings
+.ipython
+
+# local bash history
+.bash_history
