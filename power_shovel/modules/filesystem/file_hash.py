@@ -94,7 +94,8 @@ class FileHash(MultiValueChecker):
     def keys(self):
         """Returns paths, expanding any wildcards into matches."""
         _keys = super(FileHash, self).keys
-        expanded = (glob(CONFIG.format(pattern)) for pattern in _keys)
+        formatted = [CONFIG.format(pattern) for pattern in _keys]
+        expanded = (glob(pattern) for pattern in formatted)
         return list(chain(*expanded))
 
     def state(self):

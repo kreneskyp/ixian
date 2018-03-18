@@ -112,6 +112,6 @@ class MultiValueChecker(Checker):
         return hash_object(self.keys)
 
     def clone(self):
-        return type(self)(self.keys)
+        return type(self)(*self._keys)
 
 
