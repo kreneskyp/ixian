@@ -1,29 +1,48 @@
 import functools
 
 import shovel
-#task = shovel.task
 shovel_task = shovel.task
 
 
-TARGETS = {}
+TASKS = {}
 
 
-def decorate_task(func, target=None, depends=None, check=None, clean=None):
+def decorate_task(func, parent=None, depends=None, check=None, clean=None):
+    """Decorate a function turning it into a power_shovel task.
+
+    `depends` may be a single function or a list of tasks. Dependencies are run
+    before the task unless their `check` function indicates they are complete.
+
+    `parent` specifies a parent task to add this task to. The task will be
+    registered as a dependency so it will run when the parent is called. If no
+    task exists with this name, a VirtualTask will be created as a placeholder.
+    This allows modules to contribute to common tasks like cleanup.
+
+    `clean` specifies the function to call when the task is run with --clean or
+    --clean-all. If no function is specified then nothing will happen.
+
+    `check` may be a single Checker or a list of Checkers. Checkers verify that
+    a task is complete. This allows tasks execution to be skipped when not
+    needed. Checks may be ignored by using --force or --clean.
+
+    Checks cascade. If a dependency fails it's check then both the dependency
+    and parent task will run. Dependency checks may be bypassed with
+    --force-all or --clean-all
+
+    :param func: function to decorate
+    :param parent: a virtual target to add the function to.
+    :param depends: list of tasks that must run before this task.
+    :param check: list of Checkers that indicate the task is already complete.
+    :param clean: Cleanup function to run if task is run with --clean
+    :return: decorated task.
+    """
+
     power_shovel_task = Task(
         func=func,
         depends=depends,
         check=check,
-        clean=clean)
-
-    # TODO: targets
-    """
-    if target:
-        try:
-            target_task = TARGETS[target]
-        except:
-            target_task = Task()
-        target_task.add_dependency(power_shovel_task)
-    """
+        clean=clean,
+        parent=parent)
 
     # Register with shovel. Shovel expects a function so create another wrapper
     # function around the power_shovel_task.
@@ -57,7 +76,13 @@ class Task(object):
     such as dependencies and check functions.
     """
 
-    def __init__(self, func=None, depends=None, check=None, clean=None):
+    def __init__(self,
+        func=None,
+        depends=None,
+        check=None,
+        clean=None,
+        parent=None
+    ):
         self.func = func
         self.depends = depends or []
         if check:
@@ -69,12 +94,60 @@ class Task(object):
             self.checkers = None
         self.clean = clean
 
+        # add task to task-group if a group is specified
+        if parent:
+            self.add_to_parent(parent)
+
+        # Add task to global registry. Inherit virtual targets if they exist.
+        name = func.__name__
+        if name in TASKS:
+            task_instance = TASKS[name]
+            if isinstance(task_instance, VirtualTarget):
+                self.add_dependency(*task_instance.depends)
+            else:
+                # warning
+                print('Duplicate task definition: {}'.format(name))
+        else:
+            task_instance = self
+        TASKS[name] = task_instance
+
+    def __str__(self):
+        return '<{}@{} func={}>'.format(
+            type(self).__name__, id(self), self.func.__name__)
+
+    def __unicode__(self):
+        return '<{}@{} func={}>'.format(
+            type(self).__name__, id(self), self.func.__name__)
+
+    def __repr__(self):
+        return '<{}@{} func={}>'.format(
+            type(self).__name__, id(self), self.func.__name__)
+
+    def add_to_parent(self, name):
+        """Add a task to as a dependency of a another task.
+
+        This is a grouping method that allows modules to inject
+        dependencies into common targets.
+
+        If the target task is not defined a no-op task will be created to wrap
+        the added tasks.
+
+        :param name: name of parent task to add task to
+        :return: parent task
+        """
+        try:
+            parent = TASKS[name]
+        except KeyError:
+            parent = VirtualTarget()
+            TASKS[name] = parent
+        parent.add_dependency(self)
+        return parent
+
     def __call__(self, *args, **kwargs):
         try:
             self.execute(*args, **kwargs)
         except AlreadyComplete:
             print('Already complete. Override with --force or --force-all')
-
 
     def execute(self, *args, **kwargs):
         # TODO: need to replace shovel since it hooks --help
@@ -136,8 +209,8 @@ class Task(object):
                 passes = all(checks)
         return passes, checkers
 
-    def add_dependency(self, power_shovel_task):
-        self.depends.append(power_shovel_task)
+    def add_dependency(self, *tasks):
+        self.depends.extend(tasks)
 
     def render_help(self):
         help(self.func)
@@ -162,7 +235,6 @@ class Task(object):
                 name=task.func.__name__,
                 spacer=spacer
             ))
-
             for dependency in task.depends:
                 render_task(dependency, indent=indent+1)
 
@@ -177,3 +249,7 @@ class Task(object):
             'name': self.__name__,
             'dependencies': dependencies
         }
+
+
+class VirtualTarget(Task):
+    pass
