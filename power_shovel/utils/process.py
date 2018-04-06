@@ -10,7 +10,7 @@ def execute(command, fail_silent=True):
         raise Exception('command returned non-zero code: %s' % code)
 
 
-def format_args(*args):
+def format_args(*args, **kwargs):
     """format args for shell command"""
     return ' '.join(list(args))
 
