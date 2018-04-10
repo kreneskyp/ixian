@@ -65,7 +65,7 @@ class Checker(object):
         :return: path
         """
         return CONFIG.format(
-            '{BUILDER}/{file_name}',
+            '{BUILDER}/checks/{file_name}',
             file_name=self.filename())
 
     def filename(self):
@@ -94,6 +94,9 @@ class SingleKeyChecker(Checker):
     def filename(self):
         """"Generate file path using keys of the data dict."""
         return hashlib.sha256(self.key).hexdigest()
+
+    def clone(self):
+        return type(self)(self.key)
 
 
 class MultiValueChecker(Checker):

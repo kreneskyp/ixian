@@ -4,6 +4,7 @@ Powershovel is a modular task tool written in python3. It is intended to be a
 replacement for Make, emulating and expanding on some of it's most useful 
 features.
 
+
 ## Installation
 
 
@@ -40,7 +41,7 @@ $ shovel my_task arg1 arg2 --flag --flag=2
 
 ## Advanced Usage
 
-
-TODO 
-* what information should be shown here? 
-* what informatino should link to more detailed docs?
+* [Tasks](docs/tasks.md)
+* [Config](docs/config.md)
+* [Checks](docs/check.md)
+* [Modules](docs/modules.md)

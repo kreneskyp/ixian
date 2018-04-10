@@ -93,6 +93,10 @@ class FileHash(MultiValueChecker):
     @property
     def keys(self):
         """Returns paths, expanding any wildcards into matches."""
+        # TODO don't expand wildcards here. Expanded set of files are not static
+        # files may be removed or created. This would cause a different set of
+        # keys and a different filename. The filename should just be raw keys
+        # and expand them below.
         _keys = super(FileHash, self).keys
         formatted = [CONFIG.format(pattern) for pattern in _keys]
         expanded = (glob(pattern) for pattern in formatted)

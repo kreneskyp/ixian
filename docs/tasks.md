@@ -16,19 +16,27 @@ Run the task regardless of whether checkers determine the task is complete.
 
 ##### --force-all
 
-Run the full dependency tree regardless of checkers.
+Run the full dependency tree regardless of completion state.
 
-##### --clean [TODO]
+##### --clean
 
-Clean up task artifacts before running it.
+Clean up task artifacts before running the task. This implies `--force`
 
-##### --clean-all [TODO]
+##### --clean-all
 
-Clean up all dependencies before running them.
+Clean up all dependencies before running the dependencies. This implies 
+`--force-all`.
 
-##### --show [TODO]
+##### --show
 
 Display the dependency tree including which tasks pass their checks.
+
+##### --zhelp 
+
+Display task docstring and other information about the task.
+
+**deprecation:** shovel catches the `--help` flag hence the naming of this flag. 
+Eventually shovel will be replaced and `--zhelp` with be deprecated
 
 
 
@@ -67,7 +75,7 @@ Checkers are specified with the decorator.
 from power_shovel import task
 from power_shovel.modules.filesystem.file_hash import FileHash
 
-@task(checkers=[
+@task(check=[
     FileHash('/input_file'), 
     FileHash('/output_file')])
 def my_task():
@@ -75,7 +83,7 @@ def my_task():
     pass
 ```
 
-See the [Checker documentation]() for more detail.
+See the [Checker documentation](check.md) for more detail.
 
 
 ### Dependencies
@@ -93,7 +101,7 @@ def my_task():
     pass
 
 
-@task(dependencies=[my_task])
+@task(depends=[my_task])
 def my_other_task():
     # this task will execute `my_task` first.
     pass
