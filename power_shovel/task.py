@@ -69,7 +69,6 @@ class AlreadyComplete(Exception):
     Exception thrown when a Task executes but it's checks indicate complete.
     """
 
-
 class Task(object):
     """
     A task is a wrapper around functions that adds in various functionality
