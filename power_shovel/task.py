@@ -188,7 +188,7 @@ class Task(object):
         # Execute function if there is one. Targets may not have a function.
         if self.func:
             passes, checkers = self.check(force)
-            if passes:
+            if depends_complete and passes:
                 raise AlreadyComplete()
 
             else:
