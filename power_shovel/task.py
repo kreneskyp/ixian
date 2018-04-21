@@ -177,11 +177,13 @@ class Task(object):
             'clean-all': clean_all,
             'force-all': force_all
         }
-        try:
-            for dependency in self.depends:
+        depends_complete = True
+        for dependency in self.depends:
+            try:
                 dependency.execute(**dependency_kwargs)
-        except AlreadyComplete:
-            pass
+                depends_complete = False
+            except AlreadyComplete:
+                pass
 
         # Execute function if there is one. Targets may not have a function.
         if self.func:
