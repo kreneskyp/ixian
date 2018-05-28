@@ -1,9 +1,9 @@
 import re
 from importlib import import_module
-
 from power_shovel.config import CONFIG
 
 CLASS_PATH_PATTERN = re.compile(r'(?P<module_path>.*)\.(?P<classname>.+)')
+MODULES = []
 
 
 def load_module(module_path):
@@ -39,13 +39,8 @@ def load_module(module_path):
     if tasks_module_path:
         import_module(tasks_module_path)
 
-    # TODO this is a docker specific feature. Should probably make a loading
-    # hook system so this power_shovel can remain agnostic.
-    # load docker environment
-    CONFIG.DOCKER.VOLUMES.extend(MODULE_CONFIG.get('volumes', []))
-    CONFIG.DOCKER.ENV.update(MODULE_CONFIG.get('environment', {}))
-    CONFIG.DOCKER.DEV_VOLUMES.extend(MODULE_CONFIG.get('dev_volumes', []))
-    CONFIG.DOCKER.DEV_ENV.update(MODULE_CONFIG.get('dev_environment', {}))
+    # add config to global so downstream utils/modules may use it
+    MODULES.append(MODULE_CONFIG)
 
 
 def load_modules(*module_paths):
