@@ -214,9 +214,17 @@ class Task(object):
         self.depends.extend(tasks)
 
     def render_help(self):
+        """render the "help" command
+
+        Displays the builtin python help.
+        """
         help(self.func)
 
     def render_show(self):
+        """render the "show" command.
+
+        Display the dependency tree for the command.
+        """
         OK_GREEN = '\033[92m'
         ENDC = '\033[0m'
 
@@ -253,4 +261,8 @@ class Task(object):
 
 
 class VirtualTarget(Task):
+    """
+    A virtual target is a placeholder task that is used for targets that
+    don't have a real task registered.
+    """
     pass
