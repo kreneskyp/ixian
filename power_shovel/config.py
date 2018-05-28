@@ -94,9 +94,9 @@ class Config(object):
         return value.format(**expanded)
 
 
-    # =============================================================================
+    # =========================================================================
     #  Base config
-    # =============================================================================
+    # =========================================================================
     @classproperty
     def POWER_SHOVEL(cls):
         """Directory where shovel is installed"""
@@ -110,8 +110,12 @@ class Config(object):
 
     PROJECT_NAME = None
 
+    # ENV - build environment PRODUCTION or DEV
+    ENV = 'DEV'
+
     # Local store for task runtime data.
-    BUILDER = '{PWD}/.builder'
+    BUILDER_DIR = '.builder'
+    BUILDER = '{PWD}/{BUILDER_DIR}'
 
 
 CONFIG = Config()
