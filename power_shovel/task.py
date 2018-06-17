@@ -1,13 +1,20 @@
 import functools
-
+import logging
 import shovel
 shovel_task = shovel.task
 
-
+logger = logging.getLogger(__name__)
 TASKS = {}
 
 
-def decorate_task(func, parent=None, depends=None, check=None, clean=None):
+def decorate_task(
+    func,
+    parent=None,
+    depends=None,
+    check=None,
+    clean=None,
+    auto_help=True
+):
     """Decorate a function turning it into a power_shovel task.
 
     `depends` may be a single function or a list of tasks. Dependencies are run
@@ -34,6 +41,9 @@ def decorate_task(func, parent=None, depends=None, check=None, clean=None):
     :param depends: list of tasks that must run before this task.
     :param check: list of Checkers that indicate the task is already complete.
     :param clean: Cleanup function to run if task is run with --clean
+    :param auto_help: --help directs to shovel task help instead of passing
+        through to the task. Set to False for tasks like eslint that have
+        their own internal help.
     :return: decorated task.
     """
 
@@ -42,7 +52,8 @@ def decorate_task(func, parent=None, depends=None, check=None, clean=None):
         depends=depends,
         check=check,
         clean=clean,
-        parent=parent)
+        parent=parent,
+        auto_help=auto_help)
 
     # Register with shovel. Shovel expects a function so create another wrapper
     # function around the power_shovel_task.
@@ -153,7 +164,7 @@ class Task(object):
             print('Already complete. Override with --force or --force-all')
 
     def execute(self, args, **kwargs):
-        if '--help' in args or '-h' in args and self.auto_help:
+        if ('--help' in args or '-h' in args) and self.auto_help:
             return self.render_help()
         if '--show' in args or '-h' in args:
             return self.render_show()
