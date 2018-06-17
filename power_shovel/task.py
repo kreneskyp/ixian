@@ -37,7 +37,7 @@ def decorate_task(
     --force-all or --clean-all
 
     :param func: function to decorate
-    :param parent: a virtual target to add the function to.
+    :param parent: virtual targets to add the function to (string or list).
     :param depends: list of tasks that must run before this task.
     :param check: list of Checkers that indicate the task is already complete.
     :param clean: Cleanup function to run if task is run with --clean
@@ -79,6 +79,7 @@ class AlreadyComplete(Exception):
     """
     Exception thrown when a Task executes but it's checks indicate complete.
     """
+
 
 class Task(object):
     """
