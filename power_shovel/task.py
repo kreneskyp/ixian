@@ -9,11 +9,12 @@ TASKS = {}
 
 def decorate_task(
     func,
-    parent=None,
-    depends=None,
+    auto_help=True,
+    category=None,
     check=None,
     clean=None,
-    auto_help=True
+    depends=None,
+    parent = None,
 ):
     """Decorate a function turning it into a power_shovel task.
 
@@ -37,6 +38,8 @@ def decorate_task(
     --force-all or --clean-all
 
     :param func: function to decorate
+    :param category: category name to add task to. Category is only used for
+        group tasks in the help menu.
     :param parent: virtual targets to add the function to (string or list).
     :param depends: list of tasks that must run before this task.
     :param check: list of Checkers that indicate the task is already complete.
@@ -49,6 +52,7 @@ def decorate_task(
 
     power_shovel_task = Task(
         func=func,
+        category=category,
         depends=depends,
         check=check,
         clean=clean,
@@ -89,6 +93,7 @@ class Task(object):
 
     def __init__(self,
         func=None,
+        category=None,
         name=None,
         depends=None,
         check=None,
@@ -99,6 +104,8 @@ class Task(object):
         self.func = func
         self.auto_help = auto_help
         self.depends = depends or []
+        self.category = category.upper() if category else None
+        self.clean = clean
 
         # determine task name
         if func is not None:
@@ -133,7 +140,6 @@ class Task(object):
                 self.checkers = [check]
         else:
             self.checkers = None
-        self.clean = clean
 
     def __str__(self):
         return '<{}@{} func={}>'.format(
