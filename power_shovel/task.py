@@ -88,6 +88,7 @@ class Task(object):
 
     def __init__(self,
         func=None,
+        name=None,
         depends=None,
         check=None,
         clean=None,
@@ -110,10 +111,17 @@ class Task(object):
         if parent:
             self.add_to_parent(parent)
 
+        # determine task name
+        if func is not None:
+            self.name = func.__name__
+        elif name is not None:
+            self.name = name
+        else:
+            raise Exception('Either func or name must be given.')
+
         # Add task to global registry. Inherit virtual targets if they exist.
-        name = func.__name__
-        if name in TASKS:
-            task_instance = TASKS[name]
+        if self.name in TASKS:
+            task_instance = TASKS[self.name]
             if isinstance(task_instance, VirtualTarget):
                 self.add_dependency(*task_instance.depends)
             else:
@@ -121,19 +129,19 @@ class Task(object):
                 print('Duplicate task definition: {}'.format(name))
         else:
             task_instance = self
-        TASKS[name] = task_instance
+        TASKS[self.name] = task_instance
 
     def __str__(self):
         return '<{}@{} func={}>'.format(
-            type(self).__name__, id(self), self.func.__name__)
+            type(self).__name__, id(self), self.name)
 
     def __unicode__(self):
-        return '<{}@{} func={}>'.format(
-            type(self).__name__, id(self), self.func.__name__)
+        return '<{}@{} name={}>'.format(
+            type(self).__name__, id(self), self.name)
 
     def __repr__(self):
-        return '<{}@{} func={}>'.format(
-            type(self).__name__, id(self), self.func.__name__)
+        return '<{}@{} name={}>'.format(
+            type(self).__name__, id(self), self.name)
 
     def add_to_parent(self, name):
         """Add a task to as a dependency of a another task.
@@ -150,7 +158,7 @@ class Task(object):
         try:
             parent = TASKS[name]
         except KeyError:
-            parent = VirtualTarget()
+            parent = VirtualTarget(name=name)
             TASKS[name] = parent
         parent.add_dependency(self)
         return parent
