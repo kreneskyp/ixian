@@ -1,4 +1,11 @@
 #! /Users/pkrenesky/_wrk/led_prototyper_service/.venv/bin/python
-from power_shovel.runner import init, run
+# PYTHON_ARGCOMPLETE_OK
+
+import argcomplete
+from power_shovel.runner import run, build_parser
+
+parser = build_parser()
+argcomplete.autocomplete(parser)
+args = parser.parse_args()
 
 run()
