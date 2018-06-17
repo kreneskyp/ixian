@@ -1,9 +1,14 @@
 import argparse
 import importlib
+import io
 import os
 import sys
 
+from collections import defaultdict
+
+
 from power_shovel.modules.filesystem import utils as file_utils
+from power_shovel.utils.color_codes import RED, ENDC
 
 
 def shovel_path():
@@ -49,21 +54,36 @@ def init():
     return MODULES, TASKS, CONFIG
 
 
-def build_epilog():
-    return (
-        """Tasks:
-            foo - bar
-            foo - bar
-        """
-    )
+def build_epilog(tasks):
+    categories = defaultdict(list)
+    for task in tasks.values():
+        categories[task.category].append(task)
+    padding = max(len(task.name) for task in tasks.values())
+
+    output = io.StringIO()
+    for name, tasks in categories.items():
+        output.write('{RED}[ {category} ]{ENDC}\n'.format(
+            category=name.capitalize() if name else 'Misc',
+            RED=RED,
+            ENDC=ENDC,
+        ))
+        for task in sorted(tasks, key=lambda t: t.name.upper()):
+            line ='  {task}    {help}\n'
+            output.write(line.format(
+                task=task.name.ljust(padding, ' '),
+                help='TODO HELP TEXT'
+            ))
+        output.write('\n')
+
+    return output.getvalue()
 
 
-def build_parser():
+def build_parser(tasks):
     parser = argparse.ArgumentParser(
         prog="power_shovel",
         description='Run a power_shovel task.',
         formatter_class=argparse.RawTextHelpFormatter,
-        epilog=build_epilog())
+        epilog=build_epilog(tasks))
     # TODO: try to fix formatting for choices
     parser.add_argument('--log',
                             type=str,
@@ -85,11 +105,11 @@ def setup_logging(level):
 
 
 def run():
-    # parse args
-    args = build_parser().parse_args()
-
     # initialize
     modules, tasks, config = init()
+
+    # parse args
+    args = build_parser(tasks).parse_args()
 
     # get command to run:
     #  - default to `help` task if no command specified.
