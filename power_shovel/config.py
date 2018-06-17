@@ -10,7 +10,7 @@ class MissingConfiguration(AssertionError):
 
     def __init__(self, value, key):
         super(MissingConfiguration, self).__init__(
-            'Missing config.md while rendering %s: %s' % (value, key))
+            'Missing config while rendering %s: %s' % (value, key))
 
 
 def requires_config(*properties):
