@@ -201,7 +201,7 @@ class Task(object):
         depends_complete = True
         for dependency in self.depends:
             try:
-                dependency.execute(**dependency_kwargs)
+                dependency.execute([], **dependency_kwargs)
                 depends_complete = False
             except AlreadyComplete:
                 pass
