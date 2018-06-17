@@ -99,7 +99,7 @@ class Config(object):
     # =========================================================================
     @classproperty
     def POWER_SHOVEL(cls):
-        """Directory where shovel is installed"""
+        """Directory where power_shovel is installed"""
         import power_shovel
         return os.path.dirname(os.path.realpath(power_shovel.__file__))
 
