@@ -1,18 +1,16 @@
+import logging
 import subprocess
+
+logger = logging.getLogger(__name__)
 
 
 def execute(command, fail_silent=True):
     """Execute a shell command"""
+    print(command)
     args = [arg for arg in command.split(' ') if arg]
-    print(' '.join(args))
     code = subprocess.call(args)
     if not fail_silent and code:
         raise Exception('command returned non-zero code: %s' % code)
-
-
-def format_args(*args, **kwargs):
-    """format args for shell command"""
-    return ' '.join(list(args))
 
 
 def get_dev_uid():
