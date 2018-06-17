@@ -80,9 +80,11 @@ class Task(object):
         depends=None,
         check=None,
         clean=None,
-        parent=None
+        parent=None,
+        auto_help=True
     ):
         self.func = func
+        self.auto_help = auto_help
         self.depends = depends or []
         if check:
             if isinstance(check, (list, tuple)):
@@ -144,18 +146,19 @@ class Task(object):
 
     def __call__(self, *args, **kwargs):
         try:
-            self.execute(*args, **kwargs)
+            self.execute(args, **kwargs)
         except AlreadyComplete:
+            logger.info(
+                'Already complete. Override with --force or --force-all')
             print('Already complete. Override with --force or --force-all')
 
-    def execute(self, *args, **kwargs):
-        # TODO: need to replace shovel since it hooks --help
-        if 'zhelp' in kwargs:
+    def execute(self, args, **kwargs):
+        if '--help' in args or '-h' in args and self.auto_help:
             return self.render_help()
-        if 'show' in kwargs:
+        if '--show' in args or '-h' in args:
             return self.render_show()
 
-        clean = kwargs.pop('clean', False)
+        clean = kwargs.get('clean', False)
         clean_all = kwargs.pop('clean-all', False)
         force = kwargs.pop('force', False)
         force_all = kwargs.pop('force-all', False)
@@ -191,7 +194,7 @@ class Task(object):
                 raise AlreadyComplete()
 
             else:
-                return_value = self.func(*args, **kwargs)
+                return_value = self.func(*args)
                 # save checker only after function has completed successfully
                 if checkers:
                     for checker in checkers:

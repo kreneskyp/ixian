@@ -1,0 +1,4 @@
+#! /Users/pkrenesky/_wrk/led_prototyper_service/.venv/bin/python
+from power_shovel.runner import init, run
+
+run()
