@@ -93,13 +93,13 @@ class Task(object):
 
     def __init__(self,
         func=None,
+        auto_help=True,
         category=None,
-        name=None,
-        depends=None,
         check=None,
         clean=None,
+        depends=None,
+        name=None,
         parent=None,
-        auto_help=True
     ):
         self.func = func
         self.auto_help = auto_help
