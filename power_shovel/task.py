@@ -98,19 +98,6 @@ class Task(object):
         self.func = func
         self.auto_help = auto_help
         self.depends = depends or []
-        if check:
-            if isinstance(check, (list, tuple)):
-                self.checkers = check
-            else:
-                self.checkers = [check]
-        else:
-            self.checkers = None
-        self.clean = clean
-
-        # add task to VirtualTarget if a parent is specified
-        if parent:
-            for parent in parent if isinstance(parent, list) else [parent]:
-                self.add_to_parent(parent)
 
         # determine task name
         if func is not None:
@@ -131,6 +118,21 @@ class Task(object):
         else:
             task_instance = self
         TASKS[self.name] = task_instance
+
+        # add task to VirtualTargets if a parent is specified
+        if parent:
+            for parent in parent if isinstance(parent, list) else [parent]:
+                self.add_to_parent(parent)
+
+        # Setup checkers, clean method
+        if check:
+            if isinstance(check, (list, tuple)):
+                self.checkers = check
+            else:
+                self.checkers = [check]
+        else:
+            self.checkers = None
+        self.clean = clean
 
     def __str__(self):
         return '<{}@{} func={}>'.format(
