@@ -107,9 +107,10 @@ class Task(object):
             self.checkers = None
         self.clean = clean
 
-        # add task to task-group if a group is specified
+        # add task to VirtualTarget if a parent is specified
         if parent:
-            self.add_to_parent(parent)
+            for parent in parent if isinstance(parent, list) else [parent]:
+                self.add_to_parent(parent)
 
         # determine task name
         if func is not None:
