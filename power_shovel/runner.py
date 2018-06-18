@@ -59,8 +59,11 @@ def build_epilog(tasks):
     for task in tasks.values():
         categories[task.category].append(task)
     padding = max(len(task.name) for task in tasks.values())
-
     output = io.StringIO()
+    output.write("""Type 's2 help <subcommand>' for help on a specific """
+                 """subcommand.\n\n""")
+    output.write("""Available subcommands:\n\n""")
+
     for name, tasks in categories.items():
         output.write('{RED}[ {category} ]{ENDC}\n'.format(
             category=name.capitalize() if name else 'Misc',
@@ -117,8 +120,13 @@ def help_parser(tasks):
 def task_parser(tasks):
     """Parser for parsing task execution"""
     parser = base_parser(tasks)
-    parser.add_argument('task', type=str, default='help')
-    parser.add_argument('arg', nargs=argparse.REMAINDER)
+    parser.add_argument('task',
+                        type=str,
+                        default='help',
+                        help='task to run')
+    parser.add_argument('arg',
+                        nargs=argparse.REMAINDER,
+                        help='arguments for task.')
     return parser
 
 
