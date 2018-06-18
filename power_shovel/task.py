@@ -1,6 +1,10 @@
 import functools
 import logging
+
+import io
+
 import shovel
+
 shovel_task = shovel.task
 
 logger = logging.getLogger(__name__)
@@ -256,12 +260,21 @@ class Task(object):
 
         Displays the builtin python help.
         """
-        help(self.func)
+        from power_shovel.config import CONFIG
+        buffer = io.StringIO()
+        buffer.write('{task}:\n'.format(task=self.name))
+        buffer.write(CONFIG.format(self.func.__doc__))
+        buffer.write('\n\nStatus:\n')
+        self.render_status(buffer)
+        print(buffer.getvalue())
+        buffer.close()
 
-    def render_show(self):
-        """render the "show" command.
+        #help(self.func)
 
-        Display the dependency tree for the command.
+    def render_status(self, buffer):
+        """render task status.
+
+        Display the dependency tree for the task.
         """
         OK_GREEN = '\033[92m'
         ENDC = '\033[0m'
@@ -277,7 +290,7 @@ class Task(object):
             else:
                 spacer = ''
 
-            print('{spacer}[{check}] {name}'.format(
+            buffer.write('{spacer}[{check}] {name}\n'.format(
                 check=rendered_check,
                 name=task.func.__name__,
                 spacer=spacer
@@ -285,7 +298,7 @@ class Task(object):
             for dependency in task.depends:
                 render_task(dependency, indent=indent+1)
 
-        render_task(self)
+        render_task(self, 2)
 
     def tree_status(self):
         """Return a tree structure of dependencies and check status"""
