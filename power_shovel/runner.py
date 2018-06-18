@@ -78,23 +78,45 @@ def build_epilog(tasks):
     return output.getvalue()
 
 
-def build_parser(tasks):
+def base_parser(tasks):
+    """Return an instance of the base parser.
+
+    The base parser has the internal flags but not tasks.
+    :return:
+    """
     parser = argparse.ArgumentParser(
+        add_help=False,
         prog="power_shovel",
         description='Run a power_shovel task.',
         formatter_class=argparse.RawTextHelpFormatter,
         epilog=build_epilog(tasks))
     # TODO: try to fix formatting for choices
+    parser.add_argument('--help',
+                        help='Display this help or help for command',
+                        action='store_true')
     parser.add_argument('--log',
-                            type=str,
-                            help='Log level (DEBUG|INFO|WARN|ERROR)',
-                            default='DEBUG')
+                        type=str,
+                        help='Log level (DEBUG|INFO|WARN|ERROR)',
+                        default='DEBUG')
     parser.add_argument('--force',
-                            help='force task execution',
-                            action='store_true')
+                        help='force task execution',
+                        action='store_true')
     parser.add_argument('--clean',
-                            help='clean before running task',
-                            action='store_true')
+                        help='clean before running task',
+                        action='store_true')
+    return parser
+
+
+def help_parser(tasks):
+    """Parser for parsing just the help"""
+    parser = base_parser(tasks)
+    parser.add_argument('arg', nargs=argparse.REMAINDER)
+    return parser
+
+
+def task_parser(tasks):
+    """Parser for parsing task execution"""
+    parser = base_parser(tasks)
     parser.add_argument('task', type=str, default='help')
     parser.add_argument('arg', nargs=argparse.REMAINDER)
     return parser
@@ -104,25 +126,49 @@ def setup_logging(level):
     pass
 
 
+def general_help(tasks):
+    """General shovel help"""
+    parser = task_parser(tasks)
+    parser.print_help()
+
+
 def run():
     # initialize
     modules, tasks, config = init()
 
-    # parse args
-    args = build_parser(tasks).parse_args()
+    def resolve_task(key):
+        # get command to run:
+        #  - default to `help` task if no command specified.
+        try:
+            return tasks[key]
+        except KeyError:
+            print('Unknown task, run with --help for list of commands')
+            sys.exit(-1)
 
-    # get command to run:
-    #  - default to `help` task if no command specified.
-    try:
-        task = tasks[args.task]
-    except KeyError:
-        print('Unknown task, run with --help for list of commands')
-        sys.exit(-1)
+    # parse args - the custom help handling means --help won't work without the
+    # task as a positional arg. Use a separate parser to check help.
+    if sys.argv:
+        # Run help if --help is present.
+        help_args = help_parser(tasks).parse_args()
+        if help_args.help:
+            if help_args.arg:
+                task = resolve_task(help_args.arg[0])
+                task.render_help()
+            else:
+                general_help(tasks)
+            sys.exit(0)
+
+        # parse args for regular task
+        args = task_parser(tasks).parse_args()
+    else:
+        # still run task parser to trigger error handling message
+        task_parser(tasks).parse_args()
 
     setup_logging(args.log)
 
     # format all args with config
     formatted_args = [config.format(arg) for arg in args.arg]
 
-    # run command
+    # run task
+    task = resolve_task(args.task)
     task.execute(formatted_args, clean=args.clean, force=args.force)
