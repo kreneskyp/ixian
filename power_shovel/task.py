@@ -14,7 +14,8 @@ def decorate_task(
     check=None,
     clean=None,
     depends=None,
-    parent = None,
+    parent=None,
+    short_description=None,
 ):
     """Decorate a function turning it into a power_shovel task.
 
@@ -47,17 +48,20 @@ def decorate_task(
     :param auto_help: --help directs to shovel task help instead of passing
         through to the task. Set to False for tasks like eslint that have
         their own internal help.
+    :param short_description: help text shown in main --help screen
     :return: decorated task.
     """
 
     power_shovel_task = Task(
         func=func,
+        auto_help=auto_help,
         category=category,
-        depends=depends,
         check=check,
         clean=clean,
+        depends=depends,
         parent=parent,
-        auto_help=auto_help)
+        short_description=short_description,
+    )
 
     # Register with shovel. Shovel expects a function so create another wrapper
     # function around the power_shovel_task.
@@ -100,12 +104,14 @@ class Task(object):
         depends=None,
         name=None,
         parent=None,
+        short_description=None,
     ):
         self.func = func
         self.auto_help = auto_help
         self.depends = depends or []
         self.category = category.upper() if category else None
         self.clean = clean
+        self.short_description = short_description or ''
 
         # determine task name
         if func is not None:

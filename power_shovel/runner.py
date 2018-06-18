@@ -71,7 +71,7 @@ def build_epilog(tasks):
             line ='  {task}    {help}\n'
             output.write(line.format(
                 task=task.name.ljust(padding, ' '),
-                help='TODO HELP TEXT'
+                help=task.short_description
             ))
         output.write('\n')
 
