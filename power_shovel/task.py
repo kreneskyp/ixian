@@ -13,7 +13,6 @@ TASKS = {}
 
 def decorate_task(
     func,
-    auto_help=True,
     category=None,
     check=None,
     clean=None,
@@ -49,16 +48,12 @@ def decorate_task(
     :param depends: list of tasks that must run before this task.
     :param check: list of Checkers that indicate the task is already complete.
     :param clean: Cleanup function to run if task is run with --clean
-    :param auto_help: --help directs to shovel task help instead of passing
-        through to the task. Set to False for tasks like eslint that have
-        their own internal help.
     :param short_description: help text shown in main --help screen
     :return: decorated task.
     """
 
     power_shovel_task = Task(
         func=func,
-        auto_help=auto_help,
         category=category,
         check=check,
         clean=clean,
@@ -101,7 +96,6 @@ class Task(object):
 
     def __init__(self,
         func=None,
-        auto_help=True,
         category=None,
         check=None,
         clean=None,
@@ -111,7 +105,6 @@ class Task(object):
         short_description=None,
     ):
         self.func = func
-        self.auto_help = auto_help
         self.depends = depends or []
         self.category = category.upper() if category else None
         self.clean = clean
@@ -192,11 +185,6 @@ class Task(object):
             print('Already complete. Override with --force or --force-all')
 
     def execute(self, args, **kwargs):
-        if ('--help' in args or '-h' in args) and self.auto_help:
-            return self.render_help()
-        if '--show' in args or '-h' in args:
-            return self.render_show()
-
         clean = kwargs.get('clean', False)
         clean_all = kwargs.pop('clean_all', False)
         force = kwargs.pop('force', False)
