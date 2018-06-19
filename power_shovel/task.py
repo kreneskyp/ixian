@@ -198,9 +198,9 @@ class Task(object):
             return self.render_show()
 
         clean = kwargs.get('clean', False)
-        clean_all = kwargs.pop('clean-all', False)
+        clean_all = kwargs.pop('clean_all', False)
         force = kwargs.pop('force', False)
-        force_all = kwargs.pop('force-all', False)
+        force_all = kwargs.pop('force_all', False)
 
         if clean:
             force = True
@@ -215,8 +215,8 @@ class Task(object):
 
         # execute dependencies. Ignore completed.
         dependency_kwargs = {
-            'clean-all': clean_all,
-            'force-all': force_all
+            'clean_all': clean_all,
+            'force_all': force_all
         }
         depends_complete = True
         for dependency in self.depends:

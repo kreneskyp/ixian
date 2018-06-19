@@ -100,8 +100,14 @@ def get_parser(tasks):
     parser.add_argument('--force',
                         help='force task execution',
                         action='store_true')
+    parser.add_argument('--force-all',
+                        help='force execution including task dependencies',
+                        action='store_true')
     parser.add_argument('--clean',
                         help='clean before running task',
+                        action='store_true')
+    parser.add_argument('--clean-all',
+                        help='clean all dependencies before running task',
                         action='store_true')
     parser.add_argument('task',
                         type=str,
@@ -152,4 +158,10 @@ def run():
 
     # run task
     task = resolve_task(args.task)
-    task.execute(formatted_args, clean=args.clean, force=args.force)
+    task.execute(
+        formatted_args,
+        clean=args.clean,
+        clean_all=args.clean_all,
+        force=args.force,
+        force_all=args.force_all,
+    )
