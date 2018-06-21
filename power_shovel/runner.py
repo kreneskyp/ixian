@@ -8,6 +8,7 @@ from collections import defaultdict
 
 
 from power_shovel.modules.filesystem import utils as file_utils
+from power_shovel.task import AlreadyComplete
 from power_shovel.utils.color_codes import RED, ENDC
 
 
@@ -158,10 +159,13 @@ def run():
 
     # run task
     task = resolve_task(args.task)
-    task.execute(
-        formatted_args,
-        clean=args.clean,
-        clean_all=args.clean_all,
-        force=args.force,
-        force_all=args.force_all,
-    )
+    try:
+        task.execute(
+            formatted_args,
+            clean=args.clean,
+            clean_all=args.clean_all,
+            force=args.force,
+            force_all=args.force_all,
+        )
+    except AlreadyComplete:
+        print('Already complete. Override with --force or --force-all')
