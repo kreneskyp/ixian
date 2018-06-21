@@ -49,6 +49,11 @@ class Config(object):
     }
 
     def __getattribute__(self, key):
+        """
+        Overloaded to implement recursive lazy evaluation of properties.
+        :param key: key to get
+        :return: value if exists.
+        """
         try:
             value = super(Config, self).__getattribute__(key)
         except ValueError:
@@ -63,16 +68,26 @@ class Config(object):
     def add(self, key, child_config):
         """
         Add a child config
-        :param key:
-        :param child_config:
-        :return:
+        :param key: Key to add child config as. e.g. "PYTHON"
+        :param child_config: config to add.
         """
         self.__dict__[key] = child_config
         child_config.root = self
 
     def format(self, value, key=None, **kwargs):
         """
-        format variables in strings recursively.
+        Format strings using CONFIG object.
+
+        This method uses python's built-in `str.format()` method. All root
+        properties in CONFIG are passed in as kwargs. The properties lazy
+        evaluate and recursively expand.
+
+        Example:
+            "{HOST}:{PORT}" may be formatted "0.0.0.0:8000"
+
+        :param value: string to format
+        :param key: TODO: is this needed?
+        :param **kwargs: additional kwargs to format
         """
         if not isinstance(value, str):
             return value
