@@ -265,11 +265,11 @@ class Task(object):
         OK_GREEN = '\033[92m'
         ENDC = '\033[0m'
 
-        def render_task(task, indent=0):
+        def render_task(node, indent=0):
             if indent > 4:
                 return
 
-            passes, _ = task.check()
+            passes = node['passes']
             rendered_check = OK_GREEN + 'x' + ENDC if passes else ' '
             if indent:
                 spacer = ''.join([' ' for _ in range(indent * 2)])
@@ -278,21 +278,25 @@ class Task(object):
 
             buffer.write('{spacer}[{check}] {name}\n'.format(
                 check=rendered_check,
-                name=task.func.__name__,
+                name=node['name'],
                 spacer=spacer
             ))
-            for dependency in task.depends:
+            for dependency in node['dependencies']:
                 render_task(dependency, indent=indent+1)
+            return passes
 
-        render_task(self, 2)
+        render_task(self.tree_status(), 2)
 
     def tree_status(self):
         """Return a tree structure of dependencies and check status"""
         dependencies = [dependency.tree_status()
                         for dependency in self.depends]
+
+        passes, checkers = self.check()
         return {
-            'check': self.check(),
-            'name': self.__name__,
+            'passes': passes and all((d['passes'] for d in dependencies)),
+            'checkers': checkers,
+            'name': self.name,
             'dependencies': dependencies
         }
 
