@@ -2,10 +2,14 @@
 # PYTHON_ARGCOMPLETE_OK
 
 import argcomplete
-from power_shovel.runner import run, build_parser
+from power_shovel.runner import init, run, get_parser
 
-parser = build_parser()
+MODULES, TASKS, CONFIG = init()
+
+# setup autocomplete
+parser = get_parser(TASKS)
 argcomplete.autocomplete(parser)
 args = parser.parse_args()
 
-run()
+# run power_shovel
+run(MODULES, TASKS, CONFIG)

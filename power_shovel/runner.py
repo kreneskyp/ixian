@@ -17,7 +17,7 @@ def shovel_path():
 
 
 def import_shovel():
-    """Imports shovel module"""
+    """Imports a shovel module and returns it."""
     path = shovel_path()
     spec = importlib.util.spec_from_file_location('shovel', path)
     shovel_module = importlib.util.module_from_spec(spec)
@@ -130,9 +130,7 @@ def general_help(tasks):
     parser.print_help()
 
 
-def run():
-    # initialize
-    modules, tasks, config = init()
+def run(modules, tasks, config):
 
     def resolve_task(key):
         # get command to run:
