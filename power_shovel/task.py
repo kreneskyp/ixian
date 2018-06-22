@@ -257,8 +257,6 @@ class Task(object):
         print(buffer.getvalue())
         buffer.close()
 
-        #help(self.func)
-
     def render_status(self, buffer):
         """render task status.
 
