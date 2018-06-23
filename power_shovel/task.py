@@ -185,6 +185,22 @@ class Task(object):
             print('Already complete. Override with --force or --force-all')
 
     def execute(self, args, **kwargs):
+        """Execute this task.
+
+        Executes this task including any dependencies that fail their checks.
+        If a dependency fails it's check then this task will execute even if
+        it's own checks pass.
+
+        Tasks and dependencies may be forced by passing `force=True` or
+        `force-all=True` as kwargs.
+
+        Tasks and dependency clean methods may be run by passing `clean=True`
+        or `clean-all=False` as kwargs. Clean implies `force=True`.
+
+        :param args: args to pass through to the task
+        :param kwargs: options for task execution
+        :return: return value from task function
+        """
         clean = kwargs.get('clean', False)
         clean_all = kwargs.pop('clean_all', False)
         force = kwargs.pop('force', False)
@@ -229,6 +245,13 @@ class Task(object):
                 return return_value
 
     def check(self, force=False):
+        """Return True if the task is complete based on configured checks.
+
+        If the task does not have a checker this method always returns `False`.
+
+        :param force: override the check and return True if True.
+        :return:
+        """
         checkers = None
         passes = False
         if self.checkers:
@@ -246,7 +269,17 @@ class Task(object):
     def render_help(self):
         """render the "help" command
 
-        Displays the builtin python help.
+        Renders shovel internal help for the task. This help should explain
+        how to use the task via shovel.
+
+        Many tasks are proxies to other tools (e.g. npm, pipenv, etc). This
+        help shouldn't try to replace that. Proxy tasks should indicate as such
+        and include an example how to reach the tool's built-in help (--help)
+
+        combines:
+          - Name of task
+          - Docstring as length description
+          - task status tree
         """
         from power_shovel.config import CONFIG
         buffer = io.StringIO()
