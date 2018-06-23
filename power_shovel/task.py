@@ -4,6 +4,7 @@ import logging
 import io
 
 import shovel
+from power_shovel.utils.color_codes import BOLD_WHITE, ENDC
 
 shovel_task = shovel.task
 
@@ -283,9 +284,21 @@ class Task(object):
         """
         from power_shovel.config import CONFIG
         buffer = io.StringIO()
-        buffer.write('{task}:\n'.format(task=self.name))
+        buffer.write(BOLD_WHITE)
+        buffer.write('NAME\n')
+        buffer.write(ENDC)
+        buffer.write('    {task} -- {short_description}\n'.format(
+            task=self.name,
+            short_description=self.short_description
+        ))
+        buffer.write(BOLD_WHITE)
+        buffer.write('\nDESCRIPTION\n')
+        buffer.write(ENDC)
         buffer.write(CONFIG.format(self.func.__doc__))
-        buffer.write('\n\nStatus:\n')
+        buffer.write(BOLD_WHITE)
+        buffer.write('\n\nSTATUS\n')
+        buffer.write(ENDC)
+
         self.render_status(buffer)
         print(buffer.getvalue())
         buffer.close()
