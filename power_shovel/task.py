@@ -261,6 +261,10 @@ class Task(object):
         """render task status.
 
         Display the dependency tree for the task.
+
+        Formatting/Readability optimizations:
+         - Tree trimming: Redundant nodes are trimmed from the status tree.
+            If A and B both depend on C then C will only be shown once.
         """
         OK_GREEN = '\033[92m'
         ENDC = '\033[0m'
