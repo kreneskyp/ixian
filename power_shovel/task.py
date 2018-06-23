@@ -265,10 +265,10 @@ class Task(object):
         OK_GREEN = '\033[92m'
         ENDC = '\033[0m'
 
-        def render_task(node, indent=0):
-            if indent > 4:
-                return
+        seen = set()
 
+        def render_task(node, indent=0):
+            seen.add(node['name'])
             passes = node['passes']
             rendered_check = OK_GREEN + 'x' + ENDC if passes else ' '
             if indent:
@@ -282,7 +282,8 @@ class Task(object):
                 spacer=spacer
             ))
             for dependency in node['dependencies']:
-                render_task(dependency, indent=indent+1)
+                if dependency['name'] not in seen:
+                    render_task(dependency, indent=indent+1)
             return passes
 
         render_task(self.tree_status(), 2)
