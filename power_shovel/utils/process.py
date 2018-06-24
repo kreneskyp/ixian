@@ -4,12 +4,12 @@ import subprocess
 logger = logging.getLogger(__name__)
 
 
-def execute(command, fail_silent=True):
+def execute(command):
     """Execute a shell command"""
     print(command)
     args = [arg for arg in command.split(' ') if arg]
     code = subprocess.call(args)
-    if not fail_silent and code:
+    if code:
         raise Exception('command returned non-zero code: %s' % code)
 
 
