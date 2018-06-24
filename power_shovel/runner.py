@@ -6,7 +6,7 @@ import sys
 
 from collections import defaultdict
 
-
+from power_shovel import logger
 from power_shovel.modules.filesystem import utils as file_utils
 from power_shovel.task import AlreadyComplete
 from power_shovel.utils.color_codes import RED, ENDC
@@ -96,7 +96,7 @@ def get_parser(tasks):
     # TODO: try to fix formatting for choices
     parser.add_argument('--log',
                         type=str,
-                        help='Log level (DEBUG|INFO|WARN|ERROR)',
+                        help='Log level (DEBUG|INFO|WARN|ERROR|NONE)',
                         default='DEBUG')
     parser.add_argument('--force',
                         help='force task execution',
@@ -120,10 +120,6 @@ def get_parser(tasks):
     return parser
 
 
-def setup_logging(level):
-    pass
-
-
 def general_help(tasks):
     """General shovel help"""
     parser = get_parser(tasks)
@@ -143,7 +139,7 @@ def run(modules, tasks, config):
 
     # parse args
     args = get_parser(tasks).parse_args()
-    setup_logging(args.log)
+    logger.set_level(logger.LogLevels[args.log])
     formatted_args = [config.format(arg) for arg in args.arg]
 
     # run help if help command given
