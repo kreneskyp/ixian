@@ -123,11 +123,13 @@ class Task(object):
         else:
             raise Exception('Either func or name must be given.')
 
-        # Add task to global registry. Inherit virtual targets if they exist.
+        # Add task to global registry. Merge virtual target's dependencies if
+        # they exist.
         if self.name in TASKS:
             task_instance = TASKS[self.name]
             if isinstance(task_instance, VirtualTarget):
                 self.add_dependency(*task_instance.depends)
+                task_instance = self
             else:
                 # warning
                 print('Duplicate task definition: {}'.format(name))
