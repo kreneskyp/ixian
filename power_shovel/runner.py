@@ -34,6 +34,7 @@ def init():
 
     :return:
     """
+    init_logging()
 
     if not os.path.exists(shovel_path()):
         print ('shovel.py was not found in the current directory.')
@@ -48,6 +49,7 @@ def init():
         sys.exit(-1)
 
     # init module and return all globals.
+    logger.debug('Powershovel v0.0.1')
     load_module('power_shovel.modules.core')
     module_init()
     from power_shovel.config import CONFIG
@@ -58,30 +60,39 @@ def init():
 
 
 def build_epilog(tasks):
-    categories = defaultdict(list)
-    for task in tasks.values():
-        categories[task.category].append(task)
-    padding = max(len(task.name) for task in tasks.values())
     output = io.StringIO()
-    output.write("""Type 's2 help <subcommand>' for help on a specific """
-                 """subcommand.\n\n""")
-    output.write("""Available subcommands:\n\n""")
+    if tasks:
+        categories = defaultdict(list)
+        for task in tasks.values():
+            categories[task.category].append(task)
+        padding = max(len(task.name) for task in tasks.values())
+        output.write("""Type 's2 help <subcommand>' for help on a specific """
+                     """subcommand.\n\n""")
+        output.write("""Available subcommands:\n\n""")
 
-    for name, tasks in categories.items():
-        output.write('{RED}[ {category} ]{ENDC}\n'.format(
-            category=name.capitalize() if name else 'Misc',
-            RED=RED,
-            ENDC=ENDC,
-        ))
-        for task in sorted(tasks, key=lambda t: t.name.upper()):
-            line ='  {task}    {help}\n'
-            output.write(line.format(
-                task=task.name.ljust(padding, ' '),
-                help=task.short_description
+        for name, tasks in categories.items():
+            output.write('{RED}[ {category} ]{ENDC}\n'.format(
+                category=name.capitalize() if name else 'Misc',
+                RED=RED,
+                ENDC=ENDC,
             ))
-        output.write('\n')
+            for task in sorted(tasks, key=lambda t: t.name.upper()):
+                line ='  {task}    {help}\n'
+                output.write(line.format(
+                    task=task.name.ljust(padding, ' '),
+                    help=task.short_description
+                ))
+            output.write('\n')
 
     return output.getvalue()
+
+
+def init_logging():
+    """Initialize logging system."""
+    parser = get_parser({})
+    args = parser.parse_args()
+    log_level =  logger.LogLevels[args.log]
+    logger.set_level(log_level)
 
 
 def get_parser(tasks):
@@ -141,7 +152,6 @@ def run(modules, tasks, config):
 
     # parse args
     args = get_parser(tasks).parse_args()
-    logger.set_level(logger.LogLevels[args.log])
     formatted_args = [config.format(arg) for arg in args.arg]
 
     # run help if help command given

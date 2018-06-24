@@ -1,5 +1,7 @@
 import re
 from importlib import import_module
+
+from power_shovel import logger
 from power_shovel.config import CONFIG
 
 CLASS_PATH_PATTERN = re.compile(r'(?P<module_path>.*)\.(?P<classname>.+)')
@@ -41,6 +43,8 @@ def load_module(module_path):
 
     # add config to global so downstream utils/modules may use it
     MODULES.append(MODULE_CONFIG)
+
+    logger.debug('Loaded Module: {}'.format(MODULE_CONFIG['name']))
 
 
 def load_modules(*module_paths):

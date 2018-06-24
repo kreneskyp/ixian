@@ -13,6 +13,7 @@ __LEVEL = LogLevels.ERROR
 
 
 def set_level(level):
+    """Set the log level"""
     global __LEVEL
     __LEVEL = level
 
