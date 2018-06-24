@@ -326,17 +326,45 @@ class Task(object):
             else:
                 spacer = ''
 
-            buffer.write('{spacer}[{check}] {name}\n'.format(
-                check=rendered_check,
-                name=node['name'],
-                spacer=spacer
-            ))
+            # render task status
+            task_line = (
+                '{spacer}[{check}] {name}\n'.format(
+                    check=rendered_check,
+                    name=node['name'],
+                    spacer=spacer
+                )
+            )
+
+            # render dependencies into list. Only increase indent for
+            # multi-node-wide dependency chains. Single-node-wide chains are
+            # collapsed into the parent.
+            dependency_lines = []
+            single_dep = len(node['dependencies']) == 1
+            next_indent = indent if single_dep else indent + 1
             for dependency in node['dependencies']:
                 if dependency['name'] not in seen:
-                    render_task(dependency, indent=indent+1)
-            return passes
+                    dependency_lines.extend(
+                        render_task(
+                          dependency, indent=next_indent
+                        )
+                    )
 
-        render_task(self.tree_status(), 2)
+            # Add task and dependency lines. Reverse order for single-node
+            # dependency chains. Dependencies run before the parent so when
+            # rendered at the same indent they dependencies come first.
+            lines = []
+            if single_dep:
+                lines.extend(reversed(dependency_lines))
+                lines.append(task_line)
+            else:
+                lines.append(task_line)
+                lines.extend(dependency_lines)
+            return lines
+
+        # Lines are sorted/indented as needed, render to buffer.
+        lines = render_task(self.tree_status(), indent=2)
+        for line in lines:
+            buffer.write(line)
 
     def tree_status(self):
         """Return a tree structure of dependencies and check status"""
