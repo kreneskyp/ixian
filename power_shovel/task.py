@@ -16,6 +16,7 @@ def decorate_task(
     func,
     category=None,
     check=None,
+    config=None,
     clean=None,
     depends=None,
     parent=None,
@@ -49,6 +50,7 @@ def decorate_task(
     :param depends: list of tasks that must run before this task.
     :param check: list of Checkers that indicate the task is already complete.
     :param clean: Cleanup function to run if task is run with --clean
+    :param config: Configuration variables (as strings) used by this task.
     :param short_description: help text shown in main --help screen
     :return: decorated task.
     """
@@ -58,6 +60,7 @@ def decorate_task(
         category=category,
         check=check,
         clean=clean,
+        config=config,
         depends=depends,
         parent=parent,
         short_description=short_description,
@@ -100,6 +103,7 @@ class Task(object):
         category=None,
         check=None,
         clean=None,
+        config=None,
         depends=None,
         name=None,
         parent=None,
@@ -110,6 +114,7 @@ class Task(object):
         self.category = category.upper() if category else None
         self.clean = clean
         self.short_description = short_description or ''
+        self.config = config
 
         # determine task name
         if func is not None:
@@ -295,10 +300,21 @@ class Task(object):
         buffer.write('\nDESCRIPTION\n')
         buffer.write(ENDC)
         buffer.write(CONFIG.format(self.func.__doc__))
+
+        if self.config:
+            buffer.write(BOLD_WHITE)
+            buffer.write('\nCONFIGURATION\n')
+            buffer.write(ENDC)
+            padding = max(len(config) for config in self.config) - 1
+            for config in self.config:
+                buffer.write('    - {key}  {value}\n'.format(
+                    key='{key}:'.format(key=config[1:-1]).ljust(padding),
+                    value=CONFIG.format(config)
+                ))
+
         buffer.write(BOLD_WHITE)
         buffer.write('\n\nSTATUS\n')
         buffer.write(ENDC)
-
         self.render_status(buffer)
         print(buffer.getvalue())
         buffer.close()
