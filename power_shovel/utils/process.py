@@ -1,13 +1,17 @@
 import logging
 import subprocess
 
-logger = logging.getLogger(__name__)
+from power_shovel import logger
+from power_shovel.config import CONFIG
 
 
-def execute(command):
+def execute(command, silent=False):
     """Execute a shell command"""
-    print(command)
-    args = [arg for arg in command.split(' ') if arg]
+    formatted_command = CONFIG.format(command)
+    if not silent:
+        logger.info(formatted_command)
+
+    args = [arg for arg in formatted_command.split(' ') if arg]
     code = subprocess.call(args)
     if code:
         raise Exception('command returned non-zero code: %s' % code)
