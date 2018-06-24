@@ -1,12 +1,18 @@
 from power_shovel import task
 
 
-@task()
+@task(
+    category='testing',
+    short_description='Run all linting tasks.'
+)
 def lint():
     """Virtual target for linting project."""
 
 
-@task()
+@task(
+    category='testing',
+    short_description='Run all testing tasks.'
+)
 def test():
     """Virtual target for running all tests."""
 
@@ -15,13 +21,9 @@ def test():
 #  Teardown
 # =============================================================================
 
-@task()
+@task(
+    category='build',
+    short_description='Run all clean tasks.'
+)
 def clean():
     """Virtual target for cleaning the project."""
-
-
-
-@task()
-def teardown():
-    """Shutdown running processes"""
-

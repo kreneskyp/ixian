@@ -8,7 +8,6 @@ from power_shovel.utils.color_codes import BOLD_WHITE, ENDC
 
 shovel_task = shovel.task
 
-logger = logging.getLogger(__name__)
 TASKS = {}
 
 

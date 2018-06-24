@@ -7,6 +7,7 @@ import sys
 from collections import defaultdict
 
 from power_shovel import logger
+from power_shovel.module import load_module
 from power_shovel.modules.filesystem import utils as file_utils
 from power_shovel.task import AlreadyComplete
 from power_shovel.utils.color_codes import RED, ENDC
@@ -47,6 +48,7 @@ def init():
         sys.exit(-1)
 
     # init module and return all globals.
+    load_module('power_shovel.modules.core')
     module_init()
     from power_shovel.config import CONFIG
     from power_shovel.task import TASKS
