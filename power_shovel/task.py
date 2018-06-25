@@ -222,7 +222,14 @@ class Task(object):
         if force_all:
             force = True
 
+        logger.debug('Executing [{}] force={} clean={}'.format(
+            self.name, force, clean
+        ))
+
         if self.clean and clean:
+            logger.debug('Cleaning Task: {}'.format(
+                self.clean
+            ))
             self.clean()
 
         # execute dependencies. Ignore completed.
@@ -242,6 +249,8 @@ class Task(object):
         if self.func:
             passes, checkers = self.check(force)
             if depends_complete and passes:
+                logger.debug('Skipping [{}], already complete.'.format(
+                    self.name))
                 raise AlreadyComplete()
 
             else:
