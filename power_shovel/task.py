@@ -111,7 +111,7 @@ class Task(object):
         short_description=None,
     ):
         self.func = func
-        self.depends = depends or []
+        self._depends = depends or []
         self.category = category.upper() if category else None
         self.clean = clean
         self.short_description = short_description or ''
@@ -130,7 +130,7 @@ class Task(object):
         if self.name in TASKS:
             task_instance = TASKS[self.name]
             if isinstance(task_instance, VirtualTarget):
-                self.add_dependency(*task_instance.depends)
+                self.add_dependency(*task_instance._depends)
                 task_instance = self
             else:
                 logger.warn('Duplicate task definition: {}'.format(self.name))
@@ -272,7 +272,14 @@ class Task(object):
         return passes, checkers
 
     def add_dependency(self, *tasks):
-        self.depends.extend(tasks)
+        self._depends.extend(tasks)
+
+    @property
+    def depends(self):
+        return [
+            dependency if isinstance(dependency, Task) else TASKS[dependency]
+            for dependency in self._depends
+        ]
 
     def render_help(self):
         """render the "help" command
