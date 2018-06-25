@@ -4,6 +4,7 @@ import logging
 import io
 
 import shovel
+from power_shovel import logger
 from power_shovel.utils.color_codes import BOLD_WHITE, ENDC
 
 shovel_task = shovel.task
@@ -97,7 +98,8 @@ class Task(object):
     such as dependencies and check functions.
     """
 
-    def __init__(self,
+    def __init__(
+        self,
         func=None,
         category=None,
         check=None,
@@ -131,8 +133,7 @@ class Task(object):
                 self.add_dependency(*task_instance.depends)
                 task_instance = self
             else:
-                # warning
-                print('Duplicate task definition: {}'.format(name))
+                logger.warn('Duplicate task definition: {}'.format(self.name))
         else:
             task_instance = self
         TASKS[self.name] = task_instance

@@ -37,7 +37,7 @@ def init():
     init_logging()
 
     if not os.path.exists(shovel_path()):
-        print ('shovel.py was not found in the current directory.')
+        logger.error('shovel.py was not found in the current directory.')
         sys.exit(1)
 
     shovel_module = import_shovel()
@@ -45,7 +45,7 @@ def init():
     try:
         module_init = shovel_module.init
     except AttributeError:
-        print('init() was not found within shovel.py')
+        logger.error('init() was not found within shovel.py')
         sys.exit(-1)
 
     # init module and return all globals.
@@ -147,7 +147,7 @@ def run(modules, tasks, config):
         try:
             return tasks[key]
         except KeyError:
-            print('Unknown task, run with --help for list of commands')
+            logger.error('Unknown task, run with --help for list of commands')
             sys.exit(-1)
 
     # parse args
@@ -174,4 +174,4 @@ def run(modules, tasks, config):
             force_all=args.force_all,
         )
     except AlreadyComplete:
-        print('Already complete. Override with --force or --force-all')
+        logger.warn('Already complete. Override with --force or --force-all')
