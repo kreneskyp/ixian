@@ -1,5 +1,7 @@
 from enum import Enum
 
+from power_shovel.utils import color_codes as COLOR
+
 
 class LogLevels(Enum):
     NONE = -1
@@ -20,12 +22,12 @@ def set_level(level):
 
 def error(txt):
     if __LEVEL.value >= LogLevels.ERROR.value:
-        print(txt)
+        print(COLOR.red(txt))
 
 
 def warn(txt):
     if __LEVEL.value >= LogLevels.WARN.value:
-        print(txt)
+        print(COLOR.yellow(txt))
 
 
 def info(txt):
@@ -35,7 +37,7 @@ def info(txt):
 
 def debug(txt):
     if __LEVEL.value >= LogLevels.DEBUG.value:
-        print(txt)
+        print(COLOR.gray(txt))
 
 
 __all__ = [
