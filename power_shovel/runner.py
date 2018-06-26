@@ -90,8 +90,8 @@ def build_epilog(tasks):
 def init_logging():
     """Initialize logging system."""
     parser = get_parser({})
-    args = parser.parse_args()
-    log_level =  logger.LogLevels[args.log]
+    args, _ = parser.parse_known_args()
+    log_level = logger.LogLevels[args.log]
     logger.set_level(log_level)
 
 
@@ -123,13 +123,27 @@ def get_parser(tasks):
     parser.add_argument('--clean-all',
                         help='clean all dependencies before running task',
                         action='store_true')
-    parser.add_argument('task',
-                        type=str,
-                        default='help',
-                        help='task to run')
-    parser.add_argument('arg',
-                        nargs=argparse.REMAINDER,
-                        help='arguments for task.')
+
+    subparsers = parser.add_subparsers()
+    help = subparsers.add_parser(
+        name='help',
+        help='this command or help <command> for help')
+    help.add_argument(
+        'subtask',
+        choices=tasks.keys(),
+        nargs="?",
+        default=None,
+    )
+    help.set_defaults(task='help')
+
+    # add a subparser for every task.
+    for task in tasks.values():
+        task_parser = subparsers.add_parser(
+            name=task.name,
+            add_help=False
+        )
+        task_parser.set_defaults(task=task.name)
+
     return parser
 
 
@@ -147,17 +161,21 @@ def run(modules, tasks, config):
         try:
             return tasks[key]
         except KeyError:
-            logger.error('Unknown task, run with --help for list of commands')
+            logger.error(
+                'Unknown task "%s", run with --help for list of commands'
+                % key
+            )
             sys.exit(-1)
 
     # parse args
-    args = get_parser(tasks).parse_args()
-    formatted_args = [config.format(arg) for arg in args.arg]
+    parser = get_parser(tasks)
+    args, extra_args = parser.parse_known_args()
+    formatted_extra_args = [config.format(arg) for arg in extra_args]
 
     # run help if help command given
     if args.task == 'help':
-        if formatted_args and formatted_args[0]:
-            task = resolve_task(formatted_args[0])
+        if args.subtask:
+            task = resolve_task(args.subtask)
             task.render_help()
         else:
             general_help(tasks)
@@ -167,7 +185,7 @@ def run(modules, tasks, config):
     task = resolve_task(args.task)
     try:
         task.execute(
-            formatted_args,
+            formatted_extra_args,
             clean=args.clean,
             clean_all=args.clean_all,
             force=args.force,

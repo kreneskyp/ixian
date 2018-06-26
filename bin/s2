@@ -9,7 +9,6 @@ MODULES, TASKS, CONFIG = init()
 # setup autocomplete
 parser = get_parser(TASKS)
 argcomplete.autocomplete(parser)
-args = parser.parse_args()
 
 # run power_shovel
 run(MODULES, TASKS, CONFIG)
