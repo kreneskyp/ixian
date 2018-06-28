@@ -27,3 +27,17 @@ def test():
 )
 def clean():
     """Virtual target for cleaning the project."""
+
+
+@task(
+    short_description='This help message or help <task> for task help'
+)
+def help(task_name=None):
+    from power_shovel import runner
+    if task_name:
+        subtask = runner.resolve_task(task_name)
+        subtask.render_help()
+    else:
+        parser = runner.get_parser()
+        parser.print_help()
+    return 0

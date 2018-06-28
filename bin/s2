@@ -2,13 +2,18 @@
 # PYTHON_ARGCOMPLETE_OK
 
 import argcomplete
+import sys
 from power_shovel.runner import init, run, get_parser
 
-MODULES, TASKS, CONFIG = init()
+init_code = init()
+if init_code < 0:
+    sys.exit(init_code)
 
 # setup autocomplete
-parser = get_parser(TASKS)
+parser = get_parser()
 argcomplete.autocomplete(parser)
 
 # run power_shovel
-run(MODULES, TASKS, CONFIG)
+run_code = run()
+if run_code < 0:
+    sys.exit(run_code)

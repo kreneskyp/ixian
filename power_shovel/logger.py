@@ -11,7 +11,8 @@ class LogLevels(Enum):
     DEBUG = 3
 
 
-__LEVEL = LogLevels.ERROR
+DEFAULT_LOG_LEVEL = LogLevels.DEBUG
+__LEVEL = DEFAULT_LOG_LEVEL
 
 
 def set_level(level):
@@ -20,24 +21,28 @@ def set_level(level):
     __LEVEL = level
 
 
+def _print(txt):
+    print(txt)
+
+
 def error(txt):
     if __LEVEL.value >= LogLevels.ERROR.value:
-        print(COLOR.red(txt))
+        _print(COLOR.red(txt))
 
 
 def warn(txt):
     if __LEVEL.value >= LogLevels.WARN.value:
-        print(COLOR.yellow(txt))
+        _print(COLOR.yellow(txt))
 
 
 def info(txt):
     if __LEVEL.value >= LogLevels.INFO.value:
-        print(txt)
+        _print(txt)
 
 
 def debug(txt):
     if __LEVEL.value >= LogLevels.DEBUG.value:
-        print(COLOR.gray(txt))
+        _print(COLOR.gray(txt))
 
 
 __all__ = [

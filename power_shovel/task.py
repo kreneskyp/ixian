@@ -222,8 +222,8 @@ class Task(object):
         if force_all:
             force = True
 
-        logger.debug('Executing [{}] force={} clean={}'.format(
-            self.name, force, clean
+        logger.debug('Executing [{}] ({}) force={} clean={}'.format(
+            self.name, args, force, clean
         ))
 
         if self.clean and clean:
