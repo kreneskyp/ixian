@@ -2,7 +2,6 @@ import argparse
 import importlib
 import io
 import os
-import sys
 
 from collections import defaultdict
 
