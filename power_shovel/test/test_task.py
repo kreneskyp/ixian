@@ -10,8 +10,8 @@ def create_task(**task_kwargs):
     task_mock = mock.Mock()
 
     @task(**task_kwargs)
-    def mocked_task(*args, **kwargs):
-        task_mock(*args, **kwargs)
+    def mocked_task(*args):
+        task_mock(*args)
 
     mocked_task.mock = task_mock
     return mocked_task
@@ -63,8 +63,8 @@ class TaskTestCases(TestCase):
     def test_task(self):
         """Test running a single task"""
         mocked_task = create_task()
-        mocked_task(1, 2, three=3)
-        call = mock.call(1, 2, three=3)
+        mocked_task(1, 2)
+        call = mock.call(1, 2)
         mocked_task.mock.assert_has_calls([call])
 
     def test_dependency(self):
@@ -143,7 +143,7 @@ class TaskTestCases(TestCase):
         """Test forcing clean of entire dependency tree before run"""
         grandparent, parent, child = self.setup_tasks_with_clean_tasks()
 
-        grandparent(**{'clean-all': True})
+        grandparent(clean_all=True)
         grandparent.mock_clean.assert_has_calls([CALL])
         parent.mock_clean.assert_has_calls([CALL])
         child.mock_clean.assert_has_calls([CALL])
@@ -153,7 +153,7 @@ class TaskTestCases(TestCase):
         self.reset_task_mocks()
         self.reset_task_clean_mocks()
 
-        parent(**{'clean-all': True})
+        parent(clean_all=True)
         grandparent.mock_clean.assert_has_calls([])
         parent.mock_clean.assert_has_calls([CALL])
         child.mock_clean.assert_has_calls([CALL])
@@ -163,7 +163,7 @@ class TaskTestCases(TestCase):
         self.reset_task_mocks()
         self.reset_task_clean_mocks()
 
-        child(**{'clean-all': True})
+        child(clean_all=True)
         grandparent.mock_clean.assert_has_calls([])
         parent.mock_clean.assert_has_calls([])
         child.mock_clean.assert_has_calls([CALL])
@@ -266,7 +266,7 @@ class TaskTestCases(TestCase):
         parent_checker = self.parent.checkers[0]
         child_checker = self.child.checkers[0]
 
-        self.grandparent(**{'force-all': True})
+        self.grandparent(force_all=True)
         grandparent_checker.check.assert_has_calls([])
         parent_checker.check.assert_has_calls([])
         child_checker.check.assert_has_calls([])
@@ -275,7 +275,7 @@ class TaskTestCases(TestCase):
         self.child.mock.assert_has_calls([CALL])
         self.reset_task_checkers_check()
 
-        self.parent(**{'force-all': True})
+        self.parent(force_all=True)
         grandparent_checker.check.assert_has_calls([])
         parent_checker.check.assert_has_calls([])
         child_checker.check.assert_has_calls([])
@@ -284,7 +284,7 @@ class TaskTestCases(TestCase):
         self.child.mock.assert_has_calls([CALL])
         self.reset_task_checkers_check()
 
-        self.child(**{'force-all': True})
+        self.child(force_all=True)
         grandparent_checker.check.assert_has_calls([])
         parent_checker.check.assert_has_calls([])
         child_checker.check.assert_has_calls([])
