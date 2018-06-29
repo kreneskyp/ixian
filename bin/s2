@@ -15,5 +15,5 @@ argcomplete.autocomplete(parser)
 
 # run power_shovel
 run_code = run()
-if run_code < 0:
+if run_code is not None and run_code < 0:
     sys.exit(run_code)

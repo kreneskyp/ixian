@@ -12,9 +12,7 @@ def execute(command, silent=False):
         logger.info(formatted_command)
 
     args = [arg for arg in formatted_command.split(' ') if arg]
-    code = subprocess.call(args)
-    if code:
-        raise Exception('command returned non-zero code: %s' % code)
+    return subprocess.call(args)
 
 
 def get_dev_uid():
