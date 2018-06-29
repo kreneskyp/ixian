@@ -261,6 +261,7 @@ class Task(object):
                 if checkers:
                     for checker in checkers:
                         checker.save()
+                logger.debug('[fini] {}'.format(self.name))
                 return return_value
 
     def check(self, force=False):
