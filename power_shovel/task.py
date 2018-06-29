@@ -3,12 +3,10 @@ import logging
 
 import io
 
-import shovel
 from power_shovel.config import CONFIG
 from power_shovel import logger
 from power_shovel.utils.color_codes import BOLD_WHITE, ENDC
 
-shovel_task = shovel.task
 
 TASKS = {}
 
@@ -56,7 +54,7 @@ def decorate_task(
     :return: decorated task.
     """
 
-    power_shovel_task = Task(
+    return Task(
         func=func,
         category=category,
         check=check,
@@ -66,16 +64,6 @@ def decorate_task(
         parent=parent,
         short_description=short_description,
     )
-
-    # Register with shovel. Shovel expects a function so create another wrapper
-    # function around the power_shovel_task.
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        return power_shovel_task(*args, **kwargs)
-    shovel_task(wrapper)
-
-    # return the Task object so the module receives the task.
-    return power_shovel_task
 
 
 def task(func=None, **kwargs):
