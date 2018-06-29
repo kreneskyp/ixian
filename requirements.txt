@@ -1,2 +1,2 @@
-shovel
-docker-py
+argparse==1.4.0
+argcomplete==1.9.4
