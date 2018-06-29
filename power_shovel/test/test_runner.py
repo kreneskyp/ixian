@@ -115,12 +115,7 @@ class ParserTests(InitedTest, TestCase):
         self.assertArgs(['foo'], task='foo')
 
     def test_unknown_task(self):
-        try:
-            self.assertArgs(['unknown_task'])
-        except SystemExit as e:
-            self.assertEquals(e.code, 2)
-        else:
-            self.fail('Expected SystemExit(2)')
+        self.assertArgs(['unknown_task'], task='unknown_task')
 
     def test_general_help(self):
         try:

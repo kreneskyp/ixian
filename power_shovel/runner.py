@@ -129,29 +129,9 @@ def get_parser():
     parser.add_argument('--clean-all',
                         help='clean all dependencies before running task',
                         action='store_true')
-
-    subparsers = parser.add_subparsers(title='task',
-                                       description = 'valid subcommands',
-                                       help=argparse.SUPPRESS)
-    help = subparsers.add_parser(
-        name='help',
-        help='this command or help <command> for help')
-    help.add_argument(
-        'subtask',
-        choices=TASKS.keys(),
-        nargs="?",
-        default=None,
-    )
-    help.set_defaults(task='help')
-
-    # add a subparser for every task.
-    for task in TASKS.values():
-        task_parser = subparsers.add_parser(
-            name=task.name,
-            add_help=False
-        )
-        task_parser.set_defaults(task=task.name)
-
+    parser.add_argument('remainder',
+                        nargs=argparse.REMAINDER,
+                        help='arguments for task.')
     return parser
 
 
@@ -171,16 +151,23 @@ def parse_args(args=None):
     """Parse args from command line input"""
     parser = get_parser()
     compiled_args = DEFAULT_ARGS.copy()
-    parsed_args, extra_args = parser.parse_known_args(args)
+    parsed_args, _ = parser.parse_known_args(args)
     compiled_args.update(parsed_args.__dict__)
-    if 'task_args' not in parsed_args:
-        compiled_args['task_args'] = extra_args
+    remainder = compiled_args.pop('remainder')
+
+    if remainder:
+        compiled_args['task'] = remainder[0]
+        compiled_args['task_args'] = remainder[1:]
+    else:
+        compiled_args['task'] = 'help'
+        compiled_args['task_args'] = []
+
     compiled_args['log'] = logger.LogLevels[compiled_args['log']]
 
     # if --help flag is given then run that task.
     if parsed_args.help:
         if compiled_args['task'] and compiled_args['task'] != 'help':
-            compiled_args['task_args'] = compiled_args['task']
+            compiled_args['task_args'] = [compiled_args['task']]
         compiled_args['task'] = 'help'
 
     return compiled_args
