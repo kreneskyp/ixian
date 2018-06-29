@@ -4,6 +4,7 @@ import logging
 import io
 
 import shovel
+from power_shovel.config import CONFIG
 from power_shovel import logger
 from power_shovel.utils.color_codes import BOLD_WHITE, ENDC
 
@@ -222,8 +223,9 @@ class Task(object):
         if force_all:
             force = True
 
-        logger.debug('Executing [{}] ({}) force={} clean={}'.format(
-            self.name, args, force, clean
+        args_as_str = CONFIG.format(' '.join([str(arg) for arg in args]))
+        logger.debug('[exec] {}({}) force={} clean={}'.format(
+            self.name, args_as_str, force, clean
         ))
 
         if self.clean and clean:
@@ -249,7 +251,7 @@ class Task(object):
         if self.func:
             passes, checkers = self.check(force)
             if depends_complete and passes:
-                logger.debug('Skipping [{}], already complete.'.format(
+                logger.debug('[skip] {}, already complete.'.format(
                     self.name))
                 raise AlreadyComplete()
 
