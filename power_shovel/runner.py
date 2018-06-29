@@ -1,7 +1,9 @@
+import argcomplete
 import argparse
 import importlib
 import io
 import os
+import sys
 
 from collections import defaultdict
 
@@ -217,3 +219,18 @@ def run():
         return ERROR_COMPLETE
 
     return 0
+
+
+def cli():
+    init_code = init()
+    if init_code < 0:
+        sys.exit(init_code)
+
+    # setup autocomplete
+    parser = get_parser()
+    argcomplete.autocomplete(parser)
+
+    # run power_shovel
+    run_code = run()
+    if run_code is not None and run_code < 0:
+        sys.exit(run_code)
