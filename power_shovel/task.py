@@ -53,7 +53,7 @@ def decorate_task(
     :return: decorated task.
     """
 
-    return Task(
+    return TaskRunner(
         func=func,
         category=category,
         check=check,
@@ -80,7 +80,7 @@ class AlreadyComplete(Exception):
     """
 
 
-class Task(object):
+class TaskRunner(object):
     """
     A task is a wrapper around functions that adds in various functionality
     such as dependencies and check functions.
@@ -276,7 +276,7 @@ class Task(object):
     @property
     def depends(self):
         return [
-            dependency if isinstance(dependency, Task) else TASKS[dependency]
+            dependency if isinstance(dependency, TaskRunner) else TASKS[dependency]
             for dependency in self._depends
         ]
 
@@ -405,7 +405,40 @@ class Task(object):
         }
 
 
-class VirtualTarget(Task):
+class Task(object):
+    __task__ = None
+
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, 'execute'):
+            raise NotImplementedError(
+                'Task classes must implemement execute method')
+
+        instance = super(Task, cls).__new__(cls, *args, **kwargs)
+
+        if cls.__task__ is None:
+
+            def execute(*args, **kwargs):
+                return instance.execute(*args, **kwargs)
+
+            cls.__task__ = TaskRunner(
+                func=execute,
+                name=instance.name,
+                category=getattr(instance, 'category', None),
+                depends=getattr(instance, 'depends', None),
+                check=getattr(instance, 'check', None),
+                clean=getattr(instance, 'clean', None),
+                config=getattr(instance, 'config', None),
+                parent=getattr(instance, 'parent', None),
+                short_description=getattr(instance, 'short_description', None),
+            )
+
+        return instance
+
+    def __call__(self, *args, **kwargs):
+        type(self).__task__(*args, **kwargs)
+
+
+class VirtualTarget(TaskRunner):
     """
     A virtual target is a placeholder task that is used for targets that
     don't have a real task registered.

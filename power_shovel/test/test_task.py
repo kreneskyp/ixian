@@ -67,7 +67,7 @@ class TaskTestCases(TestCase):
         call = mock.call(1, 2)
         mocked_task.mock.assert_has_calls([call])
 
-    def test_dependency(self):
+    def test_run_dependency(self):
         """Test running dependant tasks"""
         self.setup_tasks()
 
@@ -107,7 +107,7 @@ class TaskTestCases(TestCase):
         self.parent.mock_clean.reset_mock()
         self.child.mock_clean.reset_mock()
 
-    def test_clean(self):
+    def test_run_clean(self):
         """Test forcing clean of task"""
         grandparent, parent, child = self.setup_tasks_with_clean_tasks()
 
@@ -139,7 +139,7 @@ class TaskTestCases(TestCase):
         self.parent.mock.assert_has_calls([])
         self.child.mock.assert_has_calls([CALL])
 
-    def test_clean_all(self):
+    def test_run_clean_all(self):
         """Test forcing clean of entire dependency tree before run"""
         grandparent, parent, child = self.setup_tasks_with_clean_tasks()
 
@@ -194,7 +194,7 @@ class TaskTestCases(TestCase):
         self.parent.checkers[0].check.reset_mock()
         self.child.checkers[0].check.reset_mock()
 
-    def test_checker(self):
+    def test_run_checker(self):
         """Test calling checkers"""
         self.setup_tasks_with_passing_checkers()
         grandparent_checker = self.grandparent.checkers[0]
@@ -225,7 +225,7 @@ class TaskTestCases(TestCase):
         self.assert_no_checker_save_calls()
         self.reset_task_checkers_check()
 
-    def test_force(self):
+    def test_run_force(self):
         """Test forcing run of task"""
         self.setup_tasks_with_passing_checkers()
         grandparent_checker = self.grandparent.checkers[0]
@@ -259,7 +259,7 @@ class TaskTestCases(TestCase):
         self.child.mock.assert_has_calls([CALL])
         self.reset_task_checkers_check()
 
-    def test_force_all(self):
+    def test_run_force_all(self):
         """Test forcing run of entire dependency tree"""
         self.setup_tasks_with_passing_checkers()
         grandparent_checker = self.grandparent.checkers[0]
@@ -296,3 +296,4 @@ class TaskTestCases(TestCase):
     def test_tree(self):
         """Test generating dependency tree data"""
         raise NotImplementedError
+
