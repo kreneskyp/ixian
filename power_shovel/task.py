@@ -5,8 +5,7 @@ import io
 
 from power_shovel.config import CONFIG
 from power_shovel import logger
-from power_shovel.utils.color_codes import BOLD_WHITE, ENDC
-
+from power_shovel.utils.color_codes import BOLD_WHITE, ENDC, GRAY, OK_GREEN
 
 TASKS = {}
 
@@ -337,15 +336,16 @@ class Task(object):
          - Tree trimming: Redundant nodes are trimmed from the status tree.
             If A and B both depend on C then C will only be shown once.
         """
-        OK_GREEN = '\033[92m'
-        ENDC = '\033[0m'
 
         seen = set()
 
         def render_task(node, indent=0):
             seen.add(node['name'])
             passes = node['passes']
-            rendered_check = OK_GREEN + 'x' + ENDC if passes else ' '
+            if passes:
+                icon = OK_GREEN + '✔' + ENDC
+            else:
+                icon = GRAY + '•' + ENDC
             if indent:
                 spacer = ''.join([' ' for _ in range(indent * 2)])
             else:
@@ -353,8 +353,8 @@ class Task(object):
 
             # render task status
             task_line = (
-                '{spacer}[{check}] {name}\n'.format(
-                    check=rendered_check,
+                '{spacer}{icon} {name}\n'.format(
+                    icon=icon,
                     name=node['name'],
                     spacer=spacer
                 )
