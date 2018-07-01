@@ -6,6 +6,7 @@ import io
 from power_shovel.config import CONFIG
 from power_shovel import logger
 from power_shovel.utils.color_codes import BOLD_WHITE, ENDC, GRAY, OK_GREEN
+from power_shovel.utils.decorators import classproperty
 
 TASKS = {}
 
@@ -97,6 +98,7 @@ class TaskRunner(object):
         name=None,
         parent=None,
         short_description=None,
+        description=None,
     ):
         self.func = func
         self._depends = depends or []
@@ -112,6 +114,14 @@ class TaskRunner(object):
             self.name = func.__name__
         else:
             raise Exception('Either func or name must be given.')
+
+        # determine description
+        if name is not None:
+            self.description = description
+        elif func is not None and hasattr(func, '__doc__'):
+            self.description = func.__doc__
+        else:
+            self.description = ''
 
         # Add task to global registry. Merge virtual target's dependencies if
         # they exist.
@@ -307,7 +317,7 @@ class TaskRunner(object):
         buffer.write(BOLD_WHITE)
         buffer.write('\nDESCRIPTION\n')
         buffer.write(ENDC)
-        buffer.write(CONFIG.format(self.func.__doc__))
+        buffer.write(CONFIG.format(self.description))
 
         if self.config:
             buffer.write(BOLD_WHITE)
@@ -430,6 +440,7 @@ class Task(object):
                 config=getattr(instance, 'config', None),
                 parent=getattr(instance, 'parent', None),
                 short_description=getattr(instance, 'short_description', None),
+                description=cls.__doc__
             )
 
         return instance
