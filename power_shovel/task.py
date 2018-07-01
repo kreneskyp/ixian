@@ -106,10 +106,10 @@ class Task(object):
         self.config = config
 
         # determine task name
-        if func is not None:
-            self.name = func.__name__
-        elif name is not None:
+        if name is not None:
             self.name = name
+        elif func is not None:
+            self.name = func.__name__
         else:
             raise Exception('Either func or name must be given.')
 
