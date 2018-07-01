@@ -127,7 +127,8 @@ class TaskRunner(object):
         # they exist.
         if self.name in TASKS:
             task_instance = TASKS[self.name]
-            if isinstance(task_instance, VirtualTarget):
+            # The task is virtual if there is no func, replace it.
+            if task_instance.func is None:
                 self.add_dependency(*task_instance._depends)
                 task_instance = self
             else:
