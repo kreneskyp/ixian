@@ -416,22 +416,33 @@ class TaskRunner(object):
 
 
 class Task(object):
+    """
+    Super class for defining power_shovel tasks.
+
+    Task subclasses should define an execute method.
+    """
     __task__ = None
 
-    def __new__(cls, *args, **kwargs):
-        if not hasattr(cls, 'execute'):
+    @property
+    def __func__(self):
+        if not hasattr(self, 'execute'):
             raise NotImplementedError(
-                'Task classes must implemement execute method')
+                'Task classes must implement execute method')
+
+        # wrap execute method to curry `self`
+        def execute(*args, **kwargs):
+            return self.execute(*args, **kwargs)
+
+        return execute
+
+    def __new__(cls, *args, **kwargs):
+
 
         instance = super(Task, cls).__new__(cls, *args, **kwargs)
 
         if cls.__task__ is None:
-
-            def execute(*args, **kwargs):
-                return instance.execute(*args, **kwargs)
-
             cls.__task__ = TaskRunner(
-                func=execute,
+                func=instance.__func__,
                 name=instance.name,
                 category=getattr(instance, 'category', None),
                 depends=getattr(instance, 'depends', None),
