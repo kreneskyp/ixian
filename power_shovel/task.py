@@ -355,7 +355,7 @@ class TaskRunner(object):
             if passes:
                 icon = OK_GREEN + '✔' + ENDC
             else:
-                icon = GRAY + '•' + ENDC
+                icon = GRAY + '○' + ENDC
             if indent:
                 spacer = ''.join([' ' for _ in range(indent * 2)])
             else:
