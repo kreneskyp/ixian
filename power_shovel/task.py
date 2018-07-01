@@ -460,9 +460,33 @@ class Task(object):
         type(self).__task__(*args, **kwargs)
 
 
-class VirtualTarget(TaskRunner):
+class VirtualTarget(Task):
     """
     A virtual target is a placeholder task that is used for targets that
-    don't have a real task registered.
+    don't have a concrete task registered. VirtualTargets may be executed the
+    same as tasks. When run, they execute dependencies that were registered
+    with them.
+
+    VirtualTargets allow the target to be given a description, dependencies,
+    and other options. VirtualTargets allow tasks grouping without tight
+    coupling to a specific target.
+
+    Tasks and other VirtualTargets register with another VirtualTarget by
+    specifying the targets as it's parent.  I.e. `parent='my_target'`.
+
+    If multiple modules implement VirtualTargets with the same name, then they
+    will be merged. This allows modules to define the same groupings.
+
+    For example, javascript and python modules might both define a `test`
+    target to encapsulate all tests. Build pipeline tools can be built to
+    expect the generic `test` target regardless of whether a project use
+    python, javascript, or any other combination of languages.
+
+    If a concrete Task with the same name as VirtualTarget is registered, the
+    Task will replace the VirtualTarget. Tasks that contribute to the virtual
+    target act as dependencies, they'll run before any concrete task.
     """
-    pass
+
+    @property
+    def __func__(self):
+        return None

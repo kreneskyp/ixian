@@ -3,7 +3,7 @@ from importlib import import_module
 
 from power_shovel import logger
 from power_shovel.config import CONFIG
-from power_shovel.task import Task
+from power_shovel.task import Task, VirtualTarget
 
 CLASS_PATH_PATTERN = re.compile(r'(?P<module_path>.*)\.(?P<classname>.+)')
 MODULES = []
@@ -59,7 +59,7 @@ def load_tasks(tasks_module_path):
         if (
             isinstance(module_attribute, type) and
             issubclass(module_attribute, Task) and
-            module_attribute is not Task
+            module_attribute not in (Task, VirtualTarget)
         ):
             try:
                 module_attribute()
