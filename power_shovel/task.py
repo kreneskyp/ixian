@@ -1,12 +1,8 @@
-import functools
-import logging
-
 import io
 
 from power_shovel.config import CONFIG
 from power_shovel import logger
 from power_shovel.utils.color_codes import BOLD_WHITE, ENDC, GRAY, OK_GREEN
-from power_shovel.utils.decorators import classproperty
 
 TASKS = {}
 
@@ -187,12 +183,7 @@ class TaskRunner(object):
         return parent
 
     def __call__(self, *args, **kwargs):
-        try:
-            self.execute(args, **kwargs)
-        except AlreadyComplete:
-            logger.info(
-                'Already complete. Override with --force or --force-all')
-            print('Already complete. Override with --force or --force-all')
+        self.execute(args, **kwargs)
 
     def execute(self, args, **kwargs):
         """Execute this task.
@@ -440,8 +431,6 @@ class Task(object):
         return execute
 
     def __new__(cls, *args, **kwargs):
-
-
         instance = super(Task, cls).__new__(cls, *args, **kwargs)
 
         if cls.__task__ is None:
