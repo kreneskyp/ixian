@@ -4,7 +4,6 @@ from unittest import mock
 
 from power_shovel import logger
 from power_shovel import runner
-from power_shovel.task import TaskRunner
 from power_shovel.task import TASKS
 from power_shovel.config import CONFIG
 from power_shovel.module import load_modules
