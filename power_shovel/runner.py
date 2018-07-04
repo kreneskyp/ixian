@@ -9,6 +9,7 @@ from collections import defaultdict
 
 from power_shovel import logger
 from power_shovel.config import CONFIG
+from power_shovel.logger import DEFAULT_LOG_LEVEL
 from power_shovel.module import load_module
 from power_shovel.modules.filesystem import utils as file_utils
 from power_shovel.task import AlreadyComplete
@@ -119,7 +120,7 @@ def get_parser():
     parser.add_argument('--log',
                         type=str,
                         help='Log level (DEBUG|INFO|WARN|ERROR|NONE)',
-                        default='DEBUG')
+                        default=DEFAULT_LOG_LEVEL.name)
     parser.add_argument('--force',
                         help='force task execution',
                         action='store_true')
