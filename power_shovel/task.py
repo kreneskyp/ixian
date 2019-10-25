@@ -215,6 +215,8 @@ class TaskRunner(object):
         if force_all:
             force = True
 
+        self.force = True
+
         args_as_str = CONFIG.format(' '.join([str(arg) for arg in args]))
         logger.debug('[exec] {}({}) force={} clean={}'.format(
             self.name, args_as_str, force, clean
