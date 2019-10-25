@@ -314,7 +314,8 @@ class TaskRunner(object):
         buffer.write(BOLD_WHITE)
         buffer.write('\nDESCRIPTION\n')
         buffer.write(ENDC)
-        buffer.write(CONFIG.format(self.description))
+        if self.description:
+            buffer.write(CONFIG.format(self.description))
 
         if self.config:
             buffer.write(BOLD_WHITE)
