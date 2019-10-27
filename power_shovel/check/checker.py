@@ -108,7 +108,7 @@ class MultiValueChecker(Checker):
     @property
     def keys(self):
         """list of keys saved in this instance"""
-        return self._keys
+        return [CONFIG.format(key) for key in self._keys]
 
     def filename(self):
         """"Generate file path using keys of the data dict."""

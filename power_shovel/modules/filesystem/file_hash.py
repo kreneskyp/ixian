@@ -98,8 +98,7 @@ class FileHash(MultiValueChecker):
         # keys and a different filename. The filename should just be raw keys
         # and expand them below.
         _keys = super(FileHash, self).keys
-        formatted = [CONFIG.format(pattern) for pattern in _keys]
-        expanded = (glob(pattern) for pattern in formatted)
+        expanded = (glob(pattern) for pattern in _keys)
         return list(chain(*expanded))
 
     def state(self):
