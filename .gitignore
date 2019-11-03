@@ -4,6 +4,7 @@
 
 # virtualenv
 .venv
+venv
 
 # Compiled Python Files
 *.pyc
@@ -14,6 +15,9 @@
 /dist/
 /power_shovel.egg-info/
 .builder
+.image_created
+.tox
+.python-version
 
 # Emacs
 .\#*

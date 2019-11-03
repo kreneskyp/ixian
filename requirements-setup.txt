@@ -1,0 +1,4 @@
+coverage
+tox==3.14.0
+tox-pyenv==1.1.0
+wheel==0.33.6
