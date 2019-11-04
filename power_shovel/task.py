@@ -347,72 +347,176 @@ class TaskRunner(object):
             If A and B both depend on C then C will only be shown once.
         """
 
-        seen = set()
-
         def render_task(node, indent=0):
-            seen.add(node['name'])
-            passes = node['passes']
-            if passes:
-                icon = OK_GREEN + '✔' + ENDC
-            else:
-                icon = GRAY + '○' + ENDC
-            if indent:
-                spacer = ''.join([' ' for _ in range(indent * 2)])
-            else:
-                spacer = ''
-
             # render task status
-            task_line = (
-                '{spacer}{icon} {name}\n'.format(
-                    icon=icon,
-                    name=node['name'],
-                    spacer=spacer
-                )
-            )
+            if node["name"] is not None:
+                passes = node['passes']
+                if passes:
+                    icon = OK_GREEN + '✔' + ENDC
+                else:
+                    icon = GRAY + '○' + ENDC
+                if indent:
+                    spacer = '  ' * indent
+                else:
+                    spacer = ''
 
-            # render dependencies into list. Only increase indent for
-            # multi-node-wide dependency chains. Single-node-wide chains are
-            # collapsed into the parent.
-            dependency_lines = []
-            single_dep = len(node['dependencies']) == 1
-            next_indent = indent if single_dep else indent + 1
-            for dependency in node['dependencies']:
-                if dependency['name'] not in seen:
-                    dependency_lines.extend(
-                        render_task(
-                          dependency, indent=next_indent
-                        )
-                    )
+                task_line = f'{spacer}{icon} {node["name"]}\n'
+                buffer.write(task_line)
+                indent += 1
 
-            # Add task and dependency lines. Reverse order for single-node
-            # dependency chains. Dependencies run before the parent so when
-            # rendered at the same indent they dependencies come first.
-            lines = []
-            if single_dep:
-                lines.extend(reversed(dependency_lines))
-                lines.append(task_line)
-            else:
-                lines.append(task_line)
-                lines.extend(dependency_lines)
-            return lines
+            for dependency in node["dependencies"]:
+                render_task(dependency, indent=indent)
 
-        # Lines are sorted/indented as needed, render to buffer.
-        lines = render_task(self.tree_status(), indent=2)
-        for line in lines:
-            buffer.write(line)
+        render_task(self.status(), indent=2)
 
-    def tree_status(self):
-        """Return a tree structure of dependencies and check status"""
-        dependencies = [dependency.tree_status()
-                        for dependency in self.depends]
+    def tree(self, dedupe: bool = True, flatten: bool = True) -> dict:
+        """
+        Return tree of tasks, with this task as the root.
 
-        passes, checkers = self.check()
+        :param dedupe: remove duplicates from tree
+        :param flatten: flatten single item dependcy lists into the parent
+        :return:
+        """
+        tree = self._build_tree(
+            set([]) if dedupe else None
+        )
+        if flatten:
+            tree = flatten_tree(tree)
+        return tree
+
+    def _build_tree(self, seen=None):
+        """
+        Internal method for recursively building task tree
+        :param seen: should be a Set if deduping.
+        :return: node in tree
+        """
+        dependencies = []
+        for dependency in self.depends:
+            if seen is not None:
+                if dependency in seen:
+                    continue
+                seen.add(dependency)
+            dependencies.append(dependency._build_tree(seen))
+
         return {
-            'passes': passes and all((d['passes'] for d in dependencies)),
-            'checkers': checkers,
             'name': self.name,
             'dependencies': dependencies
         }
+
+    def status(self, dedupe: bool = True, flatten: bool = True) -> dict:
+        """
+        Return the task tree augmented with status information
+        """
+        def update(node):
+            for dependency in node["dependencies"]:
+                update(dependency)
+
+            if node["name"] is not None:
+                # Run self.check even if children fail their checks. That way the
+                # checkers (and state) are available.
+                children_passes = all((dependency['passes'] for dependency in node["dependencies"]))
+                runner = TASKS[node["name"]]
+                passes, checkers = runner.check()
+                node["checkers"] = checkers
+
+                # node fails if any children have failed
+                node["passes"] = passes and children_passes
+
+            return node
+
+        return update(self.tree(dedupe, flatten))
+
+
+def flatten_tree(tree: dict, full: bool = False) -> dict:
+    """
+    Flatten an execution tree to make it easier to read.
+
+    Task trees are often a single node nested several levels deep. These trees may be collapsed
+    into a list. The execution order is the same, but it's easier for a human to read.
+
+    Before:
+        - foo
+          - bar
+            - xoo
+
+    After:
+        - xoo
+        - bar
+        - foo
+
+
+    Before:
+        - foo
+          - xar
+          - bar
+            - xoo
+
+    After:
+        - foo
+          - xar
+          - xoo
+          - bar
+
+    :param tree: Tree to flatten
+    :param full: Flatten tree into single list
+    :return: flattened task list
+    """
+
+    def flatten_node(node: dict) -> list:
+        """
+        Flatten a single node. Always return a list for consistency, even when returning a single
+        node.
+
+        :param node:
+        :param parent: parent task list to collapse into
+        :return: flattened node
+        """
+        node = node.copy()
+        num_dependencies = len(node["dependencies"])
+        if num_dependencies == 0:
+            # no dependencies: nothing to flatten, return as-is
+            return [node]
+
+        elif full or num_dependencies == 1:
+            # flatten dependencies: flatten into single list that includes parent & child
+            flattened = []
+            for dependency in node["dependencies"]:
+                flattened_child = flatten_node(dependency)
+                flattened.extend(flattened_child)
+
+                # clear dependencies, since they are now siblings
+                # this node is added last since it runs after dependencies
+                node["dependencies"] = []
+                flattened.append(node)
+
+            return flattened
+
+        else:
+            # multiple dependencies: do not flatten into parent.
+            #
+            # Any dependencies that are flattened need to be merged with other dependencies.
+            # Dependency nodes should either be a single node, or a list of nodes
+            dependencies = []
+            for dependency in node["dependencies"]:
+                flattened = flatten_node(dependency)
+                dependencies.extend(flattened)
+
+            node["dependencies"] = dependencies
+            return [node]
+
+    root = flatten_node(tree)
+    if len(root) > 1:
+        # if root's dependencies were flattened into it, then the returned list will have all of
+        # those dependencies. Create a new root node to contain them all. This keeps the structure
+        # consistent-ish for downstream consumers. They still have to special case this node, but
+        # it should be a little simpler since all nodes are of a similar shape
+        return {
+            "name": None,
+            "dependencies": root
+        }
+    else:
+        # a single node, unpack it and return as root.
+        return root[0]
 
 
 class Task(object):

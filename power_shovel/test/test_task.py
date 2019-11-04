@@ -1,7 +1,9 @@
+from io import StringIO
 from unittest import TestCase
 from unittest import mock
 
 from power_shovel import task
+from power_shovel.task import clear_task_registry, Task
 from power_shovel.test.test_checker import PassingCheck
 
 
@@ -293,7 +295,121 @@ class TaskTestCases(TestCase):
         self.child.mock.assert_has_calls([CALL])
         self.reset_task_checkers_check()
 
-    def test_tree(self):
-        """Test generating dependency tree data"""
-        raise NotImplementedError
 
+class TestTaskTree:
+    """
+    Test task tree methods of TaskRunner
+    """
+
+    def test_tree(self, snapshot, task_scenarios):
+        runner = task_scenarios.__task__
+        tree = runner.tree(dedupe=False, flatten=False)
+        snapshot.assert_match(tree)
+
+    def test_tree_deduped(self, snapshot, task_scenarios):
+        runner = task_scenarios.__task__
+        tree = runner.tree(dedupe=True, flatten=False)
+        snapshot.assert_match(tree)
+
+    def test_tree_flattened(self, snapshot, task_scenarios):
+        runner = task_scenarios.__task__
+        tree = runner.tree(dedupe=True, flatten=True)
+        snapshot.assert_match(tree)
+
+    def test_status(self, snapshot, task_scenarios):
+        runner = task_scenarios.__task__
+        tree = runner.status(dedupe=False, flatten=False)
+        snapshot.assert_match(tree)
+
+    def test_status_deduped(self, snapshot, task_scenarios):
+        runner = task_scenarios.__task__
+        tree = runner.status(dedupe=True, flatten=False)
+        snapshot.assert_match(tree)
+
+    def test_status_flattened(self, snapshot, task_scenarios):
+        runner = task_scenarios.__task__
+        tree = runner.status(dedupe=True, flatten=True)
+        snapshot.assert_match(tree)
+
+
+class TestTaskHelp:
+
+    def teardown_method(self):
+        clear_task_registry()
+
+    def test_render_help(self, snapshot):
+        class MockTask(Task):
+            """This is a mock test"""
+            name = "mock_test"
+            config = ["{POWER_SHOVEL}", "{PROJECT_NAME}"]
+
+            def execute(self, *args, **kwargs):
+                pass
+
+        MockTask()
+        output = StringIO()
+        # Add an extra CR so snapshot is easier to read.
+        output.write("\n")
+        MockTask.__task__.render_help(output)
+        snapshot.assert_match(output.getvalue())
+
+    def test_render_help_no_docstring(self, snapshot):
+        """
+        Help should still render if task has no docstring. The docstring is the long description
+        for the task.
+        """
+        class MockTask(Task):
+            name = "mock_test"
+            config = ["{POWER_SHOVEL}", "{PROJECT_NAME}"]
+
+            def execute(self, *args, **kwargs):
+                pass
+
+        MockTask()
+        output = StringIO()
+        # Add an extra CR so snapshot is easier to read.
+        output.write("\n")
+        MockTask.__task__.render_help(output)
+        snapshot.assert_match(output.getvalue())
+
+    def test_render_help_no_config(self, snapshot):
+        """
+        Help should still render if config is missing. Config is a list of settings that are
+        relevent to the Task. The settings key and value are rendered in the help to give users
+        context
+        """
+        class MockTask(Task):
+            """This is a mock test"""
+
+            name = "mock_test"
+
+            def execute(self, *args, **kwargs):
+                pass
+
+        MockTask()
+        output = StringIO()
+        # Add an extra CR so snapshot is easier to read.
+        output.write("\n")
+        MockTask.__task__.render_help(output)
+        snapshot.assert_match(output.getvalue())
+
+    def test_render_status(self, snapshot, task_scenarios):
+        """
+        Test rendering status for various task trees.
+        """
+
+        def go():
+            output = StringIO()
+            # Add an extra CR so snapshot is easier to read.
+            output.write("\n")
+            runner = task_scenarios.__task__
+            runner.render_status(output)
+            snapshot.assert_match(output.getvalue())
+
+        # tasks start non-passing
+        go()
+
+        # mock checkers for the tree and test when tree is passing
+        for task in task_scenarios.mock_tests:
+            task.__task__.check = mock.Mock(return_value=(True, []))
+        go()
