@@ -22,9 +22,9 @@ def hash_file(path):
     :return: sha256 hash of path contents
     """
     hash = hashlib.sha256()
-    hash.update(get_flags(path).encode('utf-8'))
-    with open(path, 'rb', buffering=0) as f:
-        for b in iter(lambda: f.read(128 * 1024), b''):
+    hash.update(get_flags(path).encode("utf-8"))
+    with open(path, "rb", buffering=0) as f:
+        for b in iter(lambda: f.read(128 * 1024), b""):
             hash.update(b)
     return hash.hexdigest()
 
@@ -42,7 +42,7 @@ def hash_dir(path):
     :param path: path of directory
     :return: sha256 hash of directory contents
     """
-    content_hashes = {'___FLAGS___': get_flags(path)}
+    content_hashes = {"___FLAGS___": get_flags(path)}
     contents = sorted(os.listdir(path))
     for child in contents:
         child_path = os.path.join(path, child)

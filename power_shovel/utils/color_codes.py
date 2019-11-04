@@ -1,13 +1,13 @@
-BOLD_WHITE = '\033[1m'
-RED = '\033[91m'
-OK_GREEN = '\033[92m'
-ENDC = '\033[0m'
-YELLOW = '\033[93m'
-GRAY = '\033[90m'
+BOLD_WHITE = "\033[1m"
+RED = "\033[91m"
+OK_GREEN = "\033[92m"
+ENDC = "\033[0m"
+YELLOW = "\033[93m"
+GRAY = "\033[90m"
 
 
 def format(txt, color):
-    return '{color}{txt}{end}'.format(color=color, txt=txt, end=ENDC)
+    return "{color}{txt}{end}".format(color=color, txt=txt, end=ENDC)
 
 
 def red(txt):

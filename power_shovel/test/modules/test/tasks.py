@@ -8,4 +8,4 @@ def foo(args):
 
 @task()
 def error(args):
-    raise Exception('Intentional error.')
+    raise Exception("Intentional error.")

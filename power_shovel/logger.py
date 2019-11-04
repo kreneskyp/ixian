@@ -45,11 +45,4 @@ def debug(txt):
         _print(COLOR.gray(txt))
 
 
-__all__ = [
-    LogLevels,
-    set_level,
-    error,
-    warn,
-    info,
-    debug
-]
+__all__ = [LogLevels, set_level, error, warn, info, debug]

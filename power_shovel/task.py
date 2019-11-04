@@ -69,8 +69,10 @@ def decorate_task(
 
 def task(func=None, **kwargs):
     if func is None:
+
         def decorator(func):
             return decorate_task(func, **kwargs)
+
         return decorator
     else:
         return decorate_task(func)
@@ -105,7 +107,7 @@ class TaskRunner(object):
         self._depends = depends or []
         self.category = category.upper() if category else None
         self.clean = clean
-        self.short_description = short_description or ''
+        self.short_description = short_description or ""
         self.config = config
 
         # determine task name
@@ -114,15 +116,15 @@ class TaskRunner(object):
         elif func is not None:
             self.name = func.__name__
         else:
-            raise Exception('Either func or name must be given.')
+            raise Exception("Either func or name must be given.")
 
         # determine description
         if name is not None:
             self.description = description
-        elif func is not None and hasattr(func, '__doc__'):
+        elif func is not None and hasattr(func, "__doc__"):
             self.description = func.__doc__
         else:
-            self.description = ''
+            self.description = ""
 
         # Add task to global registry. Merge virtual target's dependencies if
         # they exist.
@@ -133,7 +135,7 @@ class TaskRunner(object):
                 self.add_dependency(*task_instance._depends)
                 task_instance = self
             else:
-                logger.warn('Duplicate task definition: {}'.format(self.name))
+                logger.warn("Duplicate task definition: {}".format(self.name))
         else:
             task_instance = self
         TASKS[self.name] = task_instance
@@ -153,16 +155,13 @@ class TaskRunner(object):
             self.checkers = None
 
     def __str__(self):
-        return '<{}@{} func={}>'.format(
-            type(self).__name__, id(self), self.name)
+        return "<{}@{} func={}>".format(type(self).__name__, id(self), self.name)
 
     def __unicode__(self):
-        return '<{}@{} name={}>'.format(
-            type(self).__name__, id(self), self.name)
+        return "<{}@{} name={}>".format(type(self).__name__, id(self), self.name)
 
     def __repr__(self):
-        return '<{}@{} name={}>'.format(
-            type(self).__name__, id(self), self.name)
+        return "<{}@{} name={}>".format(type(self).__name__, id(self), self.name)
 
     def add_to_parent(self, name):
         """Add a task to as a dependency of a another task.
@@ -207,10 +206,10 @@ class TaskRunner(object):
         :param kwargs: options for task execution
         :return: return value from task function
         """
-        clean = kwargs.get('clean', False)
-        clean_all = kwargs.pop('clean_all', False)
-        force = kwargs.pop('force', False)
-        force_all = kwargs.pop('force_all', False)
+        clean = kwargs.get("clean", False)
+        clean_all = kwargs.pop("clean_all", False)
+        force = kwargs.pop("force", False)
+        force_all = kwargs.pop("force_all", False)
 
         if clean:
             force = True
@@ -222,22 +221,19 @@ class TaskRunner(object):
 
         self.force = True
 
-        args_as_str = CONFIG.format(' '.join([str(arg) for arg in args]))
-        logger.debug('[exec] {}({}) force={} clean={}'.format(
-            self.name, args_as_str, force, clean
-        ))
+        args_as_str = CONFIG.format(" ".join([str(arg) for arg in args]))
+        logger.debug(
+            "[exec] {}({}) force={} clean={}".format(
+                self.name, args_as_str, force, clean
+            )
+        )
 
         if self.clean and clean:
-            logger.debug('Cleaning Task: {}'.format(
-                self.clean
-            ))
+            logger.debug("Cleaning Task: {}".format(self.clean))
             self.clean()
 
         # execute dependencies. Ignore completed.
-        dependency_kwargs = {
-            'clean_all': clean_all,
-            'force_all': force_all
-        }
+        dependency_kwargs = {"clean_all": clean_all, "force_all": force_all}
         depends_complete = True
         for dependency in self.depends:
             try:
@@ -250,8 +246,7 @@ class TaskRunner(object):
         if self.func:
             passes, checkers = self.check(force)
             if depends_complete and passes:
-                logger.debug('[skip] {}, already complete.'.format(
-                    self.name))
+                logger.debug("[skip] {}, already complete.".format(self.name))
                 raise AlreadyComplete()
 
             else:
@@ -260,7 +255,7 @@ class TaskRunner(object):
                 if checkers:
                     for checker in checkers:
                         checker.save()
-                logger.debug('[fini] {}'.format(self.name))
+                logger.debug("[fini] {}".format(self.name))
                 return return_value
 
     def check(self, force=False):
@@ -308,32 +303,36 @@ class TaskRunner(object):
           - task status tree
         """
         from power_shovel.config import CONFIG
+
         buffer.write(BOLD_WHITE)
-        buffer.write('NAME\n')
+        buffer.write("NAME\n")
         buffer.write(ENDC)
-        buffer.write('    {task} -- {short_description}\n'.format(
-            task=self.name,
-            short_description=self.short_description
-        ))
+        buffer.write(
+            "    {task} -- {short_description}\n".format(
+                task=self.name, short_description=self.short_description
+            )
+        )
         buffer.write(BOLD_WHITE)
-        buffer.write('\nDESCRIPTION\n')
+        buffer.write("\nDESCRIPTION\n")
         buffer.write(ENDC)
         if self.description:
             buffer.write(CONFIG.format(self.description))
 
         if self.config:
             buffer.write(BOLD_WHITE)
-            buffer.write('\nCONFIGURATION\n')
+            buffer.write("\nCONFIGURATION\n")
             buffer.write(ENDC)
             padding = max(len(config) for config in self.config) - 1
             for config in self.config:
-                buffer.write('    - {key}  {value}\n'.format(
-                    key='{key}:'.format(key=config[1:-1]).ljust(padding),
-                    value=CONFIG.format(config)
-                ))
+                buffer.write(
+                    "    - {key}  {value}\n".format(
+                        key="{key}:".format(key=config[1:-1]).ljust(padding),
+                        value=CONFIG.format(config),
+                    )
+                )
 
         buffer.write(BOLD_WHITE)
-        buffer.write('\n\nSTATUS\n')
+        buffer.write("\n\nSTATUS\n")
         buffer.write(ENDC)
         self.render_status(buffer)
 
@@ -350,15 +349,15 @@ class TaskRunner(object):
         def render_task(node, indent=0):
             # render task status
             if node["name"] is not None:
-                passes = node['passes']
+                passes = node["passes"]
                 if passes:
-                    icon = OK_GREEN + '✔' + ENDC
+                    icon = OK_GREEN + "✔" + ENDC
                 else:
-                    icon = GRAY + '○' + ENDC
+                    icon = GRAY + "○" + ENDC
                 if indent:
-                    spacer = '  ' * indent
+                    spacer = "  " * indent
                 else:
-                    spacer = ''
+                    spacer = ""
 
                 task_line = f'{spacer}{icon} {node["name"]}\n'
                 buffer.write(task_line)
@@ -377,9 +376,7 @@ class TaskRunner(object):
         :param flatten: flatten single item dependcy lists into the parent
         :return:
         """
-        tree = self._build_tree(
-            set([]) if dedupe else None
-        )
+        tree = self._build_tree(set([]) if dedupe else None)
         if flatten:
             tree = flatten_tree(tree)
         return tree
@@ -398,15 +395,13 @@ class TaskRunner(object):
                 seen.add(dependency)
             dependencies.append(dependency._build_tree(seen))
 
-        return {
-            'name': self.name,
-            'dependencies': dependencies
-        }
+        return {"name": self.name, "dependencies": dependencies}
 
     def status(self, dedupe: bool = True, flatten: bool = True) -> dict:
         """
         Return the task tree augmented with status information
         """
+
         def update(node):
             for dependency in node["dependencies"]:
                 update(dependency)
@@ -414,7 +409,9 @@ class TaskRunner(object):
             if node["name"] is not None:
                 # Run self.check even if children fail their checks. That way the
                 # checkers (and state) are available.
-                children_passes = all((dependency['passes'] for dependency in node["dependencies"]))
+                children_passes = all(
+                    (dependency["passes"] for dependency in node["dependencies"])
+                )
                 runner = TASKS[node["name"]]
                 passes, checkers = runner.check()
                 node["checkers"] = checkers
@@ -510,10 +507,7 @@ def flatten_tree(tree: dict, full: bool = False) -> dict:
         # those dependencies. Create a new root node to contain them all. This keeps the structure
         # consistent-ish for downstream consumers. They still have to special case this node, but
         # it should be a little simpler since all nodes are of a similar shape
-        return {
-            "name": None,
-            "dependencies": root
-        }
+        return {"name": None, "dependencies": root}
     else:
         # a single node, unpack it and return as root.
         return root[0]
@@ -525,13 +519,13 @@ class Task(object):
 
     Task subclasses should define an execute method.
     """
+
     __task__ = None
 
     @property
     def __func__(self):
-        if not hasattr(self, 'execute'):
-            raise NotImplementedError(
-                'Task classes must implement execute method')
+        if not hasattr(self, "execute"):
+            raise NotImplementedError("Task classes must implement execute method")
 
         # wrap execute method to curry `self`
         def execute(*args, **kwargs):
@@ -546,14 +540,14 @@ class Task(object):
             cls.__task__ = TaskRunner(
                 func=instance.__func__,
                 name=instance.name,
-                category=getattr(instance, 'category', None),
-                depends=getattr(instance, 'depends', None),
-                check=getattr(instance, 'check', None),
-                clean=getattr(instance, 'clean', None),
-                config=getattr(instance, 'config', None),
-                parent=getattr(instance, 'parent', None),
-                short_description=getattr(instance, 'short_description', None),
-                description=cls.__doc__
+                category=getattr(instance, "category", None),
+                depends=getattr(instance, "depends", None),
+                check=getattr(instance, "check", None),
+                clean=getattr(instance, "clean", None),
+                config=getattr(instance, "config", None),
+                parent=getattr(instance, "parent", None),
+                short_description=getattr(instance, "short_description", None),
+                description=cls.__doc__,
             )
 
         return instance

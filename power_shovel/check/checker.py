@@ -10,7 +10,7 @@ from power_shovel.modules.filesystem.utils import mkdir
 def hash_object(obj):
     """deterministically hash a dict."""
     hash = hashlib.sha256()
-    hash.update(json.dumps(obj, sort_keys=True).encode('utf-8'))
+    hash.update(json.dumps(obj, sort_keys=True).encode("utf-8"))
     return hash.hexdigest()
 
 
@@ -64,9 +64,7 @@ class Checker(object):
 
         :return: path
         """
-        return CONFIG.format(
-            '{BUILDER}/checks/{file_name}',
-            file_name=self.filename())
+        return CONFIG.format("{BUILDER}/checks/{file_name}", file_name=self.filename())
 
     def filename(self):
         """
@@ -76,9 +74,9 @@ class Checker(object):
         raise NotImplementedError
 
     def save(self):
-        mkdir(CONFIG.format('{BUILDER}/checks/'))
+        mkdir(CONFIG.format("{BUILDER}/checks/"))
         state = self.state()
-        with open(self.file_path(), 'w') as file:
+        with open(self.file_path(), "w") as file:
             file.write(json.dumps(state))
 
     def clone(self):
@@ -116,5 +114,3 @@ class MultiValueChecker(Checker):
 
     def clone(self):
         return type(self)(*self._keys)
-
-

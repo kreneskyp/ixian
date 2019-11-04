@@ -1,5 +1,4 @@
 class MockChecker(Checker):
-
     def __init__(self, mock_save=True, mock_check=True, *args, **kwargs):
         self.mock_save = mock_save
         if mock_save:
@@ -11,10 +10,10 @@ class MockChecker(Checker):
         self.id = uuid.uuid4()
 
     def state(self):
-        return {'mock': self.mocked_state}
+        return {"mock": self.mocked_state}
 
     def filename(self):
-        return 'mock-%s' % str(self.id)
+        return "mock-%s" % str(self.id)
 
     def clone(self):
         instance = type(self)(self.mock_save)
@@ -35,4 +34,5 @@ class FailingCheck(MockChecker):
 
 class PassingCheck(MockChecker):
     """A checker that always passes the check"""
+
     pass

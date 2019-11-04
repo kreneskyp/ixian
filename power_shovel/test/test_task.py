@@ -29,9 +29,8 @@ def create_dependent_tasks(child_kwargs=None, parent_kwargs=None):
 
 
 def create_nested_dependency(
-        child_kwargs=None,
-        parent_kwargs=None,
-        grandparent_kwargs=None):
+    child_kwargs=None, parent_kwargs=None, grandparent_kwargs=None
+):
     """Create two levels of dependencies"""
     parent, child = create_dependent_tasks(child_kwargs, parent_kwargs)
     grandparent = create_task(depends=[parent], **(grandparent_kwargs or {}))
@@ -39,19 +38,17 @@ def create_nested_dependency(
 
 
 CALL = mock.call()
-DEPENDENT_CALL = mock.call(**{'clean-all': False, 'force-all': False})
+DEPENDENT_CALL = mock.call(**{"clean-all": False, "force-all": False})
 
 
 class TaskTestCases(TestCase):
-
     def setup_tasks(
-            self,
-            child_kwargs=None,
-            parent_kwargs=None,
-            grandparent_kwargs=None):
+        self, child_kwargs=None, parent_kwargs=None, grandparent_kwargs=None
+    ):
         """setup tasks"""
         self.grandparent, self.parent, self.child = create_nested_dependency(
-            child_kwargs, parent_kwargs, grandparent_kwargs)
+            child_kwargs, parent_kwargs, grandparent_kwargs
+        )
         return self.grandparent, self.parent, self.child
 
     def reset_task_mocks(self):
@@ -98,9 +95,10 @@ class TaskTestCases(TestCase):
         parent_clean = mock.Mock()
         child_clean = mock.Mock()
         grandparent, parent, child = self.setup_tasks(
-            {'clean': child_clean},
-            {'clean': parent_clean},
-            {'clean': grandparent_clean})
+            {"clean": child_clean},
+            {"clean": parent_clean},
+            {"clean": grandparent_clean},
+        )
         grandparent.mock_clean = grandparent_clean
         parent.mock_clean = parent_clean
         child.mock_clean = child_clean
@@ -178,9 +176,10 @@ class TaskTestCases(TestCase):
     def setup_tasks_with_passing_checkers(self):
         """Create task tree with clean tasks attached"""
         grandparent, parent, child = self.setup_tasks(
-            {'check': [PassingCheck()]},
-            {'check': [PassingCheck()]},
-            {'check': [PassingCheck()]})
+            {"check": [PassingCheck()]},
+            {"check": [PassingCheck()]},
+            {"check": [PassingCheck()]},
+        )
         return grandparent, parent, child
 
     def assert_no_checker_save_calls(self):
@@ -341,13 +340,13 @@ class TestTaskTree:
 
 
 class TestTaskHelp:
-
     def teardown_method(self):
         clear_task_registry()
 
     def test_render_help(self, snapshot):
         class MockTask(Task):
             """This is a mock test"""
+
             name = "mock_test"
             config = ["{POWER_SHOVEL}", "{PROJECT_NAME}"]
 
@@ -366,6 +365,7 @@ class TestTaskHelp:
         Help should still render if task has no docstring. The docstring is the long description
         for the task.
         """
+
         class MockTask(Task):
             name = "mock_test"
             config = ["{POWER_SHOVEL}", "{PROJECT_NAME}"]
@@ -386,6 +386,7 @@ class TestTaskHelp:
         relevent to the Task. The settings key and value are rendered in the help to give users
         context
         """
+
         class MockTask(Task):
             """This is a mock test"""
 

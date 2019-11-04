@@ -25,15 +25,14 @@ ERROR_TASK = -5
 
 
 def shovel_path():
-    return file_utils.pwd() + '/shovel.py'
+    return file_utils.pwd() + "/shovel.py"
 
 
 def import_shovel():
     """Imports a shovel module and returns it."""
     path = shovel_path()
 
-
-    loader = importlib.machinery.SourceFileLoader('shovel', f"{path}/shovel.py")
+    loader = importlib.machinery.SourceFileLoader("shovel", f"{path}/shovel.py")
     shovel_module = types.ModuleType(loader.name)
     loader.exec_module(shovel_module)
     return shovel_module
@@ -58,12 +57,12 @@ def init():
     try:
         module_init = shovel_module.init
     except AttributeError:
-        logger.error('init() was not found within shovel.py')
+        logger.error("init() was not found within shovel.py")
         return ERROR_NO_INIT
 
     # init module and return all globals.
-    logger.debug('Powershovel v0.0.1')
-    load_module('power_shovel.modules.core')
+    logger.debug("Powershovel v0.0.1")
+    load_module("power_shovel.modules.core")
     module_init()
 
     return 0
@@ -76,23 +75,26 @@ def build_epilog():
         for task in TASKS.values():
             categories[task.category].append(task)
         padding = max(len(task.name) for task in TASKS.values())
-        output.write("""Type 's2 help <subcommand>' for help on a specific """
-                     """subcommand.\n\n""")
+        output.write(
+            """Type 's2 help <subcommand>' for help on a specific """
+            """subcommand.\n\n"""
+        )
         output.write("""Available subcommands:\n\n""")
 
         for name, tasks in categories.items():
-            output.write('{RED}[ {category} ]{ENDC}\n'.format(
-                category=name.capitalize() if name else 'Misc',
-                RED=RED,
-                ENDC=ENDC,
-            ))
+            output.write(
+                "{RED}[ {category} ]{ENDC}\n".format(
+                    category=name.capitalize() if name else "Misc", RED=RED, ENDC=ENDC,
+                )
+            )
             for task in sorted(tasks, key=lambda t: t.name.upper()):
-                line ='  {task}    {help}\n'
-                output.write(line.format(
-                    task=task.name.ljust(padding, ' '),
-                    help=task.short_description
-                ))
-            output.write('\n')
+                line = "  {task}    {help}\n"
+                output.write(
+                    line.format(
+                        task=task.name.ljust(padding, " "), help=task.short_description
+                    )
+                )
+            output.write("\n")
 
     return output.getvalue()
 
@@ -100,7 +102,7 @@ def build_epilog():
 def init_logging():
     """Initialize logging system."""
     args = parse_args()
-    logger.set_level(args['log'])
+    logger.set_level(args["log"])
 
 
 def get_parser():
@@ -112,44 +114,49 @@ def get_parser():
     parser = argparse.ArgumentParser(
         prog="power_shovel",
         add_help=False,
-        description='Run a power_shovel task.',
+        description="Run a power_shovel task.",
         formatter_class=argparse.RawTextHelpFormatter,
-        epilog=build_epilog())
+        epilog=build_epilog(),
+    )
     # TODO: try to fix formatting for choices
-    parser.add_argument('--help',
-                        help='show this help message and exit',
-                        action='store_true')
-    parser.add_argument('--log',
-                        type=str,
-                        help='Log level (DEBUG|INFO|WARN|ERROR|NONE)',
-                        default=DEFAULT_LOG_LEVEL.name)
-    parser.add_argument('--force',
-                        help='force task execution',
-                        action='store_true')
-    parser.add_argument('--force-all',
-                        help='force execution including task dependencies',
-                        action='store_true')
-    parser.add_argument('--clean',
-                        help='clean before running task',
-                        action='store_true')
-    parser.add_argument('--clean-all',
-                        help='clean all dependencies before running task',
-                        action='store_true')
-    parser.add_argument('remainder',
-                        nargs=argparse.REMAINDER,
-                        help='arguments for task.')
+    parser.add_argument(
+        "--help", help="show this help message and exit", action="store_true"
+    )
+    parser.add_argument(
+        "--log",
+        type=str,
+        help="Log level (DEBUG|INFO|WARN|ERROR|NONE)",
+        default=DEFAULT_LOG_LEVEL.name,
+    )
+    parser.add_argument("--force", help="force task execution", action="store_true")
+    parser.add_argument(
+        "--force-all",
+        help="force execution including task dependencies",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--clean", help="clean before running task", action="store_true"
+    )
+    parser.add_argument(
+        "--clean-all",
+        help="clean all dependencies before running task",
+        action="store_true",
+    )
+    parser.add_argument(
+        "remainder", nargs=argparse.REMAINDER, help="arguments for task."
+    )
     return parser
 
 
 DEFAULT_ARGS = {
-    'clean': False,
-    'clean_all': False,
-    'force': False,
-    'force_all': False,
-    'log': logger.LogLevels.DEBUG,
-    'task': 'help',
-    'task_args': None,
-    'help': False
+    "clean": False,
+    "clean_all": False,
+    "force": False,
+    "force_all": False,
+    "log": logger.LogLevels.DEBUG,
+    "task": "help",
+    "task_args": None,
+    "help": False,
 }
 
 
@@ -159,22 +166,22 @@ def parse_args(args=None):
     compiled_args = DEFAULT_ARGS.copy()
     parsed_args, _ = parser.parse_known_args(args)
     compiled_args.update(parsed_args.__dict__)
-    remainder = compiled_args.pop('remainder')
+    remainder = compiled_args.pop("remainder")
 
     if remainder:
-        compiled_args['task'] = remainder[0]
-        compiled_args['task_args'] = remainder[1:]
+        compiled_args["task"] = remainder[0]
+        compiled_args["task_args"] = remainder[1:]
     else:
-        compiled_args['task'] = 'help'
-        compiled_args['task_args'] = []
+        compiled_args["task"] = "help"
+        compiled_args["task_args"] = []
 
-    compiled_args['log'] = logger.LogLevels[compiled_args['log']]
+    compiled_args["log"] = logger.LogLevels[compiled_args["log"]]
 
     # if --help flag is given then run that task.
     if parsed_args.help:
-        if compiled_args['task'] and compiled_args['task'] != 'help':
-            compiled_args['task_args'] = [compiled_args['task']]
-        compiled_args['task'] = 'help'
+        if compiled_args["task"] and compiled_args["task"] != "help":
+            compiled_args["task_args"] = [compiled_args["task"]]
+        compiled_args["task"] = "help"
 
     return compiled_args
 
@@ -198,17 +205,14 @@ def resolve_task(key):
     try:
         return TASKS[key]
     except KeyError:
-        logger.error(
-            'Unknown task "%s", run with --help for list of commands'
-            % key
-        )
+        logger.error('Unknown task "%s", run with --help for list of commands' % key)
 
 
 def run():
     # parse args
     args = parse_args()
-    task_name = args.pop('task')
-    task_args = args.pop('task_args')
+    task_name = args.pop("task")
+    task_args = args.pop("task_args")
     formatted_task_args = [CONFIG.format(arg) for arg in task_args]
 
     task = resolve_task(task_name)
@@ -218,7 +222,7 @@ def run():
     try:
         task.execute(formatted_task_args, **args)
     except AlreadyComplete:
-        logger.warn('Already complete. Override with --force or --force-all')
+        logger.warn("Already complete. Override with --force or --force-all")
         return ERROR_COMPLETE
 
     return 0

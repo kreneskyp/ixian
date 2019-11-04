@@ -1,5 +1,4 @@
 class ClassPropertyDescriptor(object):
-
     def __init__(self, fget, fset=None):
         self.fget = fget
         self.fset = fset
@@ -37,9 +36,10 @@ class cached_property:
     Optional ``name`` argument allows you to make cached properties of other
     methods. (e.g.  url = cached_property(get_absolute_url, name='url') )
     """
+
     def __init__(self, func, name=None):
         self.func = func
-        self.__doc__ = getattr(func, '__doc__')
+        self.__doc__ = getattr(func, "__doc__")
         self.name = name or func.__name__
 
     def __get__(self, instance, cls=None):

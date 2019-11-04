@@ -1,4 +1,4 @@
-VERSION = '0.1'
+VERSION = "0.1"
 
 
 from power_shovel.task import Task, VirtualTarget, task

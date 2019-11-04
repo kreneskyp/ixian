@@ -6,18 +6,23 @@ from power_shovel import Task
 
 def create_task_class(name=None, parent=None, depends=None):
     """Create a task that runs a unittest.Mock"""
+
     class MockTaskBase:
         mock = mock.Mock()
 
         def execute(self, *args, **kwargs):
             self.mock(*args, **kwargs)
 
-    MockTask = type(name, (MockTaskBase, Task), {
-        "name": name or str(uuid.uuid4()),
-        "parent": parent,
-        "depends": depends,
-        "category": "testing"
-    })
+    MockTask = type(
+        name,
+        (MockTaskBase, Task),
+        {
+            "name": name or str(uuid.uuid4()),
+            "parent": parent,
+            "depends": depends,
+            "category": "testing",
+        },
+    )
 
     return MockTask()
 
@@ -151,9 +156,15 @@ def mock_common_dependency():
     """
     root = create_task_class(name="root")
     root.common_setup = create_task_class(name="common_setup", parent="root")
-    root.child_A = create_task_class(name="child_A", parent="root", depends=["common_setup"])
-    root.child_B = create_task_class(name="child_B", parent="root", depends=["common_setup"])
-    root.grandchild_B1 = create_task_class(name="grandchild_B1", parent="child_A", depends=["common_setup"])
+    root.child_A = create_task_class(
+        name="child_A", parent="root", depends=["common_setup"]
+    )
+    root.child_B = create_task_class(
+        name="child_B", parent="root", depends=["common_setup"]
+    )
+    root.grandchild_B1 = create_task_class(
+        name="grandchild_B1", parent="child_A", depends=["common_setup"]
+    )
     root.mock_tests = [
         root,
         root.common_setup,

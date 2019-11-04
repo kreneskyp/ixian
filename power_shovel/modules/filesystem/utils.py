@@ -15,4 +15,4 @@ def pwd():
 
 def touch(path):
     """Unix touch command"""
-    subprocess.Popen(['touch', path])
+    subprocess.Popen(["touch", path])

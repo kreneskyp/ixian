@@ -7,10 +7,10 @@ from power_shovel.utils.decorators import classproperty
 
 
 class MissingConfiguration(AssertionError):
-
     def __init__(self, value, key):
         super(MissingConfiguration, self).__init__(
-            'Missing config while rendering %s: %s' % (value, key))
+            "Missing config while rendering %s: %s" % (value, key)
+        )
 
 
 def requires_config(*properties):
@@ -25,7 +25,9 @@ def requires_config(*properties):
                 if value is None:
                     raise MissingConfiguration(func.__name__, property)
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
@@ -34,19 +36,12 @@ def set_config(options):
     CONFIG.__dict__.update(options)
 
 
-CONFIG_VARIABLE_PATTERN = re.compile(r'{(?P<var>[a-zA-Z0-9_.]+)}')
+CONFIG_VARIABLE_PATTERN = re.compile(r"{(?P<var>[a-zA-Z0-9_.]+)}")
 
 
 class Config(object):
     root = None
-    reserved = {
-        'add',
-        'format',
-        'reserved',
-        'children',
-        'root',
-        '__dict__'
-    }
+    reserved = {"add", "format", "reserved", "children", "root", "__dict__"}
 
     def __getattribute__(self, key):
         """
@@ -60,7 +55,7 @@ class Config(object):
             if self.root:
                 return getattr(self.root, key)
 
-        if key == 'reserved' or key in self.reserved:
+        if key == "reserved" or key in self.reserved:
             return value
         else:
             return self.format(value, key)
@@ -97,17 +92,17 @@ class Config(object):
         for variable in variables:
             if variable not in kwargs:
                 try:
-                    root_key = variable.split('.')[0]
+                    root_key = variable.split(".")[0]
                     root = self.root if self.root else self
 
                     expanded[root_key] = self.format(
-                        getattr(root, root_key), variable, **kwargs)
+                        getattr(root, root_key), variable, **kwargs
+                    )
                 except AttributeError:
                     raise MissingConfiguration(key, variable)
 
         expanded.update(**kwargs)
         return value.format(**expanded)
-
 
     # =========================================================================
     #  Base config
@@ -116,6 +111,7 @@ class Config(object):
     def POWER_SHOVEL(cls):
         """Directory where power_shovel is installed"""
         import power_shovel
+
         return os.path.dirname(os.path.realpath(power_shovel.__file__))
 
     @classproperty
@@ -126,11 +122,11 @@ class Config(object):
     PROJECT_NAME = None
 
     # ENV - build environment PRODUCTION or DEV
-    ENV = 'DEV'
+    ENV = "DEV"
 
     # Local store for task runtime data.
-    BUILDER_DIR = '.builder'
-    BUILDER = '{PWD}/{BUILDER_DIR}'
+    BUILDER_DIR = ".builder"
+    BUILDER = "{PWD}/{BUILDER_DIR}"
 
 
 CONFIG = Config()
