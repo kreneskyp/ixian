@@ -1,3 +1,5 @@
+import io
+
 from power_shovel import Task, VirtualTarget
 
 
@@ -39,7 +41,10 @@ class Help(Task):
         from power_shovel import runner
         if task_name:
             subtask = runner.resolve_task(task_name)
-            subtask.render_help()
+            buffer = io.StringIO()
+            subtask.render_help(buffer)
+            print(buffer.getvalue())
+            buffer.close()
         else:
             parser = runner.get_parser()
             parser.print_help()

@@ -287,7 +287,7 @@ class TaskRunner(object):
             for dependency in self._depends
         ]
 
-    def render_help(self):
+    def render_help(self, buffer):
         """render the "help" command
 
         Renders shovel internal help for the task. This help should explain
@@ -303,7 +303,6 @@ class TaskRunner(object):
           - task status tree
         """
         from power_shovel.config import CONFIG
-        buffer = io.StringIO()
         buffer.write(BOLD_WHITE)
         buffer.write('NAME\n')
         buffer.write(ENDC)
@@ -332,8 +331,6 @@ class TaskRunner(object):
         buffer.write('\n\nSTATUS\n')
         buffer.write(ENDC)
         self.render_status(buffer)
-        print(buffer.getvalue())
-        buffer.close()
 
     def render_status(self, buffer):
         """render task status.
