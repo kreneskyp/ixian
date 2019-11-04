@@ -2,8 +2,10 @@ from io import StringIO
 from unittest import TestCase
 from unittest import mock
 
+import pytest
+
 from power_shovel import task
-from power_shovel.task import clear_task_registry, Task
+from power_shovel.task import clear_task_registry, Task, AlreadyComplete
 from power_shovel.test.test_checker import PassingCheck
 
 
@@ -197,13 +199,17 @@ class TaskTestCases(TestCase):
         self.child.checkers[0].check.reset_mock()
 
     def test_run_checker(self):
-        """Test calling checkers"""
+        """
+        Test passing checkers
+        """
         self.setup_tasks_with_passing_checkers()
         grandparent_checker = self.grandparent.checkers[0]
         parent_checker = self.parent.checkers[0]
         child_checker = self.child.checkers[0]
 
-        self.grandparent()
+        with pytest.raises(AlreadyComplete):
+            self.grandparent()
+
         grandparent_checker.check.assert_has_calls([])
         parent_checker.check.assert_has_calls([])
         child_checker.check.assert_has_calls([])
@@ -211,7 +217,8 @@ class TaskTestCases(TestCase):
         self.assert_no_checker_save_calls()
         self.reset_task_checkers_check()
 
-        self.parent()
+        with pytest.raises(AlreadyComplete):
+            self.parent()
         grandparent_checker.check.assert_has_calls([])
         parent_checker.check.assert_has_calls([])
         child_checker.check.assert_has_calls([])
@@ -219,7 +226,8 @@ class TaskTestCases(TestCase):
         self.assert_no_checker_save_calls()
         self.reset_task_checkers_check()
 
-        self.child()
+        with pytest.raises(AlreadyComplete):
+            self.child()
         grandparent_checker.check.assert_has_calls([])
         parent_checker.check.assert_has_calls([])
         child_checker.check.assert_has_calls([])

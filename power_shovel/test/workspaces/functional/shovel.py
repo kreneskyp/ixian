@@ -1,5 +1,5 @@
-from config import CONFIG
-from module import load_modules
+from power_shovel.config import CONFIG
+from power_shovel.module import load_modules
 
 
 def init():
