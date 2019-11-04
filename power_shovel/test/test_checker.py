@@ -189,7 +189,7 @@ class FileHashTests(TestCase):
         path = file_hash_mock_path(self.MOCK_DIR)
         checker_1 = FileHash(path)
         self.assertEqual(checker_1.state(), {
-            path: '6516a91e281f54c87929d0fa2c355209f260ab2b2c58af713e5e5e9e855c629d'
+            path: 'f443aa643743df88ff39648d3cc04973813be298bee1c29372a9e103ad20fb47'
         })
 
     def test_dir_rename(self):
