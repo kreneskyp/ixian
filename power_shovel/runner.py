@@ -1,10 +1,10 @@
 import argcomplete
 import argparse
 import importlib
+import importlib.machinery
 import io
-import os
+import types
 import sys
-
 from collections import defaultdict
 
 from power_shovel import logger
@@ -31,9 +31,11 @@ def shovel_path():
 def import_shovel():
     """Imports a shovel module and returns it."""
     path = shovel_path()
-    spec = importlib.util.spec_from_file_location('shovel', path)
-    shovel_module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(shovel_module)
+
+
+    loader = importlib.machinery.SourceFileLoader('shovel', f"{path}/shovel.py")
+    shovel_module = types.ModuleType(loader.name)
+    loader.exec_module(shovel_module)
     return shovel_module
 
 
@@ -47,11 +49,11 @@ def init():
     """
     init_logging()
 
-    if not os.path.exists(shovel_path()):
-        logger.error('shovel.py was not found in the current directory.')
+    try:
+        shovel_module = import_shovel()
+    except FileNotFoundError as e:
+        logger.error(str(e))
         return ERROR_NO_SHOVEL_PY
-
-    shovel_module = import_shovel()
 
     try:
         module_init = shovel_module.init
