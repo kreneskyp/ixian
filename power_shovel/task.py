@@ -7,6 +7,11 @@ from power_shovel.utils.color_codes import BOLD_WHITE, ENDC, GRAY, OK_GREEN
 TASKS = {}
 
 
+def clear_task_registry():
+    global TASKS
+    TASKS = {}
+
+
 def decorate_task(
     func,
     category=None,
