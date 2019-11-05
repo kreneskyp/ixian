@@ -1,4 +1,3 @@
-import json
 import hashlib
 import os
 from glob import glob
@@ -6,7 +5,6 @@ from itertools import chain
 from stat import ST_MODE
 
 from power_shovel.check.checker import MultiValueChecker, hash_object
-from power_shovel.config import CONFIG
 
 
 def get_flags(path):
