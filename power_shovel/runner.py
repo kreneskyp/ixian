@@ -82,18 +82,11 @@ def build_epilog():
         output.write("""Available subcommands:\n\n""")
 
         for name, tasks in categories.items():
-            output.write(
-                "{RED}[ {category} ]{ENDC}\n".format(
-                    category=name.capitalize() if name else "Misc", RED=RED, ENDC=ENDC,
-                )
-            )
+            category = name.capitalize() if name else "Misc"
+            output.write(f"{RED}[ {category} ]{ENDC}\n")
             for task in sorted(tasks, key=lambda t: t.name.upper()):
-                line = "  {task}    {help}\n"
-                output.write(
-                    line.format(
-                        task=task.name.ljust(padding, " "), help=task.short_description
-                    )
-                )
+                task_name = task.name.ljust(padding, " ")
+                output.write(f"  {task_name}    {task.short_description}\n")
             output.write("\n")
 
     return output.getvalue()
