@@ -178,9 +178,9 @@ class TaskRunner(object):
         try:
             parent = TASKS[name]
         except KeyError:
-            # VirtualTarget was defined explicitly, or hasn't been loaded yet.
-            # create a TaskRunner for the target. If the task is loaded after
-            # it will replace this.
+            # VirtualTarget wasn't defined explicitly, or task hasn't been loaded yet.
+            # create a TaskRunner for the target. If an explicit task is loaded after
+            # it will replace this and assume the children that were already added.
             parent = TaskRunner(name=name)
             TASKS[name] = parent
         parent.add_dependency(self)
