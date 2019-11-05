@@ -87,7 +87,7 @@ def file_hash_mock_path(path):
     import power_shovel.test as test_module
 
     module_dir = os.path.dirname(os.path.realpath(test_module.__file__))
-    return "{module}/file_hash_mocks/{path}".format(module=module_dir, path=path)
+    return f"{module_dir}/file_hash_mocks/{path}"
 
 
 class FileHashTests(TestCase):

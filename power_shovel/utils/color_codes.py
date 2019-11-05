@@ -7,7 +7,7 @@ GRAY = "\033[90m"
 
 
 def format(txt, color):
-    return "{color}{txt}{end}".format(color=color, txt=txt, end=ENDC)
+    return f"{color}{txt}{ENDC}"
 
 
 def red(txt):

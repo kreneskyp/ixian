@@ -25,7 +25,8 @@ ERROR_TASK = -5
 
 
 def shovel_path():
-    return file_utils.pwd() + "/shovel.py"
+    """Return path to shovel.py"""
+    return f"{file_utils.pwd()}/shovel.py"
 
 
 def import_shovel():

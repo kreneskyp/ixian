@@ -155,13 +155,13 @@ class TaskRunner(object):
             self.checkers = None
 
     def __str__(self):
-        return "<{}@{} func={}>".format(type(self).__name__, id(self), self.name)
+        return f"<{type(self).__name__}@{id(self)} func={self.name}>"
 
     def __unicode__(self):
-        return "<{}@{} name={}>".format(type(self).__name__, id(self), self.name)
+        return f"<{type(self).__name__}@{id(self)} func={self.name}>"
 
     def __repr__(self):
-        return "<{}@{} name={}>".format(type(self).__name__, id(self), self.name)
+        return f"<{type(self).__name__}@{id(self)} func={self.name}>"
 
     def add_to_parent(self, name):
         """Add a task to as a dependency of a another task.
@@ -222,14 +222,10 @@ class TaskRunner(object):
         self.force = True
 
         args_as_str = CONFIG.format(" ".join([str(arg) for arg in args]))
-        logger.debug(
-            "[exec] {}({}) force={} clean={}".format(
-                self.name, args_as_str, force, clean
-            )
-        )
+        logger.debug(f"[exec] {self.name}({args_as_str}) force={force} clean={clean}")
 
         if self.clean and clean:
-            logger.debug("Cleaning Task: {}".format(self.clean))
+            logger.debug(f"Cleaning Task: {self.clean}")
             self.clean()
 
         # execute dependencies. Ignore completed.
@@ -246,7 +242,7 @@ class TaskRunner(object):
         if self.func:
             passes, checkers = self.check(force)
             if depends_complete and passes:
-                logger.debug("[skip] {}, already complete.".format(self.name))
+                logger.debug(f"[skip] {self.name}, already complete.")
                 raise AlreadyComplete()
 
             else:
@@ -255,7 +251,7 @@ class TaskRunner(object):
                 if checkers:
                     for checker in checkers:
                         checker.save()
-                logger.debug("[fini] {}".format(self.name))
+                logger.debug(f"[fini] {self.name}")
                 return return_value
 
     def check(self, force=False):
@@ -307,11 +303,7 @@ class TaskRunner(object):
         buffer.write(BOLD_WHITE)
         buffer.write("NAME\n")
         buffer.write(ENDC)
-        buffer.write(
-            "    {task} -- {short_description}\n".format(
-                task=self.name, short_description=self.short_description
-            )
-        )
+        buffer.write(f"    {self.name} -- {self.short_description}\n")
         buffer.write(BOLD_WHITE)
         buffer.write("\nDESCRIPTION\n")
         buffer.write(ENDC)

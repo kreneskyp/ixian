@@ -31,7 +31,7 @@ def workspace(path):
     import power_shovel.test as power_shovel_test
 
     base = os.path.dirname(os.path.realpath(power_shovel_test.__file__))
-    return "{}/workspaces/{}".format(base, path)
+    return f"{base}/workspaces/{path}/shovel.py"
 
 
 def build_test_args(**extra):
