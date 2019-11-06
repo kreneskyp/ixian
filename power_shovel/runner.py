@@ -16,15 +16,15 @@ from power_shovel.task import AlreadyComplete
 from power_shovel.task import TASKS
 from power_shovel.utils.color_codes import RED, ENDC
 
+# Runner process error exit codes
+ERROR_COMPLETE = -1  # task is already complete
+ERROR_UNKNOWN_TASK = -2  # task isn't registered
+ERROR_NO_INIT = -3  # shovel.py does not contain an init flag
+ERROR_NO_SHOVEL_PY = -4  # shovel.py does not exist
+ERROR_TASK = -5  # task did not complete
 
-ERROR_COMPLETE = -1
-ERROR_UNKNOWN_TASK = -2
-ERROR_NO_INIT = -3
-ERROR_NO_SHOVEL_PY = -4
-ERROR_TASK = -5
 
-
-def shovel_path():
+def shovel_path() -> str:
     """Return path to shovel.py"""
     return f"{file_utils.pwd()}/shovel.py"
 
@@ -39,7 +39,7 @@ def import_shovel():
     return shovel_module
 
 
-def init():
+def init() -> int:
     """init powershovel
 
     Finds the shovel config module for the projects and initializes itself
@@ -69,7 +69,8 @@ def init():
     return 0
 
 
-def build_epilog():
+def build_epilog() -> str:
+    """Build help epilog text"""
     output = io.StringIO()
     if TASKS:
         categories = defaultdict(list)
@@ -93,14 +94,14 @@ def build_epilog():
     return output.getvalue()
 
 
-def init_logging():
+def init_logging() -> None:
     """Initialize logging system."""
     args = parse_args()
     logger.set_level(args["log"])
 
 
-def get_parser():
-    """Return an instance of the base parser.
+def get_parser() -> argparse.ArgumentParser:
+    """Return an instance of the base argument parser.
 
     The base parser has the internal flags but not tasks.
     :return:
@@ -154,7 +155,7 @@ DEFAULT_ARGS = {
 }
 
 
-def parse_args(args=None):
+def parse_args(args: str = None) -> dict:
     """Parse args from command line input"""
     parser = get_parser()
     compiled_args = DEFAULT_ARGS.copy()
@@ -193,16 +194,26 @@ Type 's2 help <subcommand>' for help on a specific subcommand.
 """
 
 
-def resolve_task(key):
-    # get command to run:
-    #  - default to `help` task if no command specified.
+def resolve_task(key: str) -> TaskRunner:
+    """
+    Resolve a task from the register by it's name
+
+    :param key: name of task to resolve
+    :return: TaskRunner instance
+    """
     try:
         return TASKS[key]
     except KeyError:
         logger.error('Unknown task "%s", run with --help for list of commands' % key)
 
 
-def run():
+def run() -> int:
+    """
+    Run power_shovel task
+
+    :return: 0 if successful or an error code
+    """
+
     # parse args
     args = parse_args()
     task_name = args.pop("task")
@@ -218,11 +229,17 @@ def run():
     except AlreadyComplete:
         logger.warn("Already complete. Override with --force or --force-all")
         return ERROR_COMPLETE
+    except ExecuteFailed as e:
+        logger.error(str(e))
+        return ERROR_TASK
 
     return 0
 
 
-def cli():
+def cli() -> None:
+    """
+    Main entry point into the command line interface.
+    """
     init_code = init()
     if init_code < 0:
         sys.exit(init_code)

@@ -163,7 +163,7 @@ class TaskRunner(object):
     def __repr__(self):
         return f"<{type(self).__name__}@{id(self)} func={self.name}>"
 
-    def add_to_parent(self, name):
+    def add_to_parent(self, name: str):
         """Add a task to as a dependency of a another task.
 
         This is a grouping method that allows modules to inject
@@ -254,7 +254,7 @@ class TaskRunner(object):
                 logger.debug(f"[fini] {self.name}")
                 return return_value
 
-    def check(self, force=False):
+    def check(self, force: bool = False) -> (bool, list):
         """Return True if the task is complete based on configured checks.
 
         If the task does not have a checker this method always returns `False`.
@@ -277,13 +277,13 @@ class TaskRunner(object):
         self._depends.extend(tasks)
 
     @property
-    def depends(self):
+    def depends(self) -> list:
         return [
             dependency if isinstance(dependency, TaskRunner) else TASKS[dependency]
             for dependency in self._depends
         ]
 
-    def render_help(self, buffer):
+    def render_help(self, buffer) -> None:
         """render the "help" command
 
         Renders shovel internal help for the task. This help should explain
@@ -328,7 +328,7 @@ class TaskRunner(object):
         buffer.write(ENDC)
         self.render_status(buffer)
 
-    def render_status(self, buffer):
+    def render_status(self, buffer) -> None:
         """render task status.
 
         Display the dependency tree for the task.
