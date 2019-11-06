@@ -33,7 +33,7 @@ def import_shovel():
     """Imports a shovel module and returns it."""
     path = shovel_path()
 
-    loader = importlib.machinery.SourceFileLoader("shovel", f"{path}/shovel.py")
+    loader = importlib.machinery.SourceFileLoader("shovel", f"{path}")
     shovel_module = types.ModuleType(loader.name)
     loader.exec_module(shovel_module)
     return shovel_module
