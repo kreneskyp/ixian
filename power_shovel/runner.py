@@ -252,3 +252,5 @@ def cli() -> None:
     run_code = run()
     if run_code is not None and run_code < 0:
         sys.exit(run_code)
+    else:
+        sys.exit(0)
