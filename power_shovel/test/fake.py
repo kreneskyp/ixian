@@ -2,16 +2,53 @@ import uuid
 from unittest import mock
 
 from power_shovel import Task
+from power_shovel.test.mock_checker import PassingCheck
 
 
-def create_task_class(name=None, parent=None, depends=None):
-    """Create a task that runs a unittest.Mock"""
+def mock_task(
+    name: str = None, parent: str = None, depends: list = None, **kwargs: dict
+) -> Task:
+    """
+    Create a mock task. It calls a mock function when executed. It also provides a number of helper
+    functions for testing and resetting a hierarchy of mocked tasks
+
+    :param name: name of task
+    :param parent: parents of task
+    :param depends: depends of task
+    :param kwargs: additional kwargs to pass to class, these become class members.
+    :return:
+    """
 
     class MockTaskBase:
         mock = mock.Mock()
+        mock_tasks = []
 
         def execute(self, *args, **kwargs):
             self.mock(*args, **kwargs)
+
+        def reset_task_mocks(self):
+            for mock_task in self.mock_tasks:
+                mock_task.mock.reset_mock()
+
+        def reset_task_clean_mocks(self):
+            for mock_task in self.mock_tasks:
+                mock_task.mock_clean.reset_mock()
+
+        def reset_task_checkers_save(self):
+            for mock_task in self.mock_tasks:
+                mock_task.checkers[0].save.reset_mock()
+
+        def reset_task_checkers_check(self):
+            for mock_task in self.mock_tasks:
+                mock_task.checkers[0].check.reset_mock()
+
+        def assert_no_calls(self):
+            for mock_task in self.mock_tasks:
+                mock_task.mock.assert_has_calls([])
+
+        def assert_no_checker_save_calls(self):
+            for mock_task in self.mock_tasks:
+                mock_task.checkers[0].save.assert_has_calls([])
 
     MockTask = type(
         name,
@@ -21,28 +58,55 @@ def create_task_class(name=None, parent=None, depends=None):
             "parent": parent,
             "depends": depends,
             "category": "testing",
+            **kwargs,
         },
     )
 
     return MockTask()
 
 
-def mock_nested_single_dependency_nodes():
+def mock_nested_single_dependency_nodes(
+    root_kwargs=None, child_kwargs=None, grandchild_kwargs=None
+):
     """
     Task tree with structure:
         - root
           - child
             - grandchild
     """
-    root = create_task_class(name="root")
-    root.child = create_task_class(name="child", parent="root")
-    root.grandchild = create_task_class(name="grandchild", parent="child")
-    root.mock_tests = [
+
+    root = mock_task(name="root", **root_kwargs or {})
+    root.child = mock_task(name="child", parent="root", **child_kwargs or {})
+    root.grandchild = mock_task(
+        name="grandchild", parent="child", **grandchild_kwargs or {}
+    )
+    root.mock_tasks = [
         root,
         root.child,
         root.grandchild,
     ]
+
     return root
+
+
+def mock_tasks_with_clean_functions():
+    """
+    Setup nested single dependency nodes with mock clean functions
+    """
+
+    return mock_nested_single_dependency_nodes(
+        {"mock_clean": mock.Mock()},
+        {"mock_clean": mock.Mock()},
+        {"mock_clean": mock.Mock()},
+    )
+
+
+def mock_tasks_with_passing_checkers():
+    return mock_nested_single_dependency_nodes(
+        {"check": [PassingCheck()]},
+        {"check": [PassingCheck()]},
+        {"check": [PassingCheck()]},
+    )
 
 
 def mock_single_dependency_node_at_end_of_branch_1():
@@ -53,10 +117,10 @@ def mock_single_dependency_node_at_end_of_branch_1():
           - child_B
               - grandchild_B1
     """
-    root = create_task_class(name="root")
-    root.child_A = create_task_class(name="child_A", parent="root")
-    root.child_B = create_task_class(name="child_B", parent="root")
-    root.grandchild_B1 = create_task_class(name="grandchild_B1", parent="child_B")
+    root = mock_task(name="root")
+    root.child_A = mock_task(name="child_A", parent="root")
+    root.child_B = mock_task(name="child_B", parent="root")
+    root.grandchild_B1 = mock_task(name="grandchild_B1", parent="child_B")
     root.mock_tests = [
         root,
         root.child_A,
@@ -74,10 +138,10 @@ def mock_single_dependency_node_at_end_of_branch_2():
             - grandchild_A1
           - child_B
     """
-    root = create_task_class(name="root")
-    root.child_A = create_task_class(name="child_A", parent="root")
-    root.child_B = create_task_class(name="child_B", parent="root")
-    root.grandchild_A1 = create_task_class(name="grandchild_A1", parent="child_A")
+    root = mock_task(name="root")
+    root.child_A = mock_task(name="child_A", parent="root")
+    root.child_B = mock_task(name="child_B", parent="root")
+    root.grandchild_A1 = mock_task(name="grandchild_A1", parent="child_A")
     root.mock_tests = [
         root,
         root.child_A,
@@ -95,10 +159,10 @@ def mock_single_dependency_in_middle_of_branch():
             - grandchild_A1
             - grandchild_A2
     """
-    root = create_task_class(name="root")
-    root.child_A = create_task_class(name="child_A", parent="root")
-    root.grandchild_A1 = create_task_class(name="grandchild_A1", parent="child_A")
-    root.grandchild_A2 = create_task_class(name="grandchild_A2", parent="child_A")
+    root = mock_task(name="root")
+    root.child_A = mock_task(name="child_A", parent="root")
+    root.grandchild_A1 = mock_task(name="grandchild_A1", parent="child_A")
+    root.grandchild_A2 = mock_task(name="grandchild_A2", parent="child_A")
     root.mock_tests = [
         root,
         root.child_A,
@@ -119,13 +183,13 @@ def mock_nested_multiple_dependency_nodes():
             - grandchild_B1
             - grandchild_B2
     """
-    root = create_task_class(name="root")
-    root.child_A = create_task_class(name="child_A", parent="root")
-    root.child_B = create_task_class(name="child_B", parent="root")
-    root.grandchild_A1 = create_task_class(name="grandchild_A1", parent="child_A")
-    root.grandchild_A2 = create_task_class(name="grandchild_A2", parent="child_A")
-    root.grandchild_B1 = create_task_class(name="grandchild_B1", parent="child_B")
-    root.grandchild_B2 = create_task_class(name="grandchild_B2", parent="child_B")
+    root = mock_task(name="root")
+    root.child_A = mock_task(name="child_A", parent="root")
+    root.child_B = mock_task(name="child_B", parent="root")
+    root.grandchild_A1 = mock_task(name="grandchild_A1", parent="child_A")
+    root.grandchild_A2 = mock_task(name="grandchild_A2", parent="child_A")
+    root.grandchild_B1 = mock_task(name="grandchild_B1", parent="child_B")
+    root.grandchild_B2 = mock_task(name="grandchild_B2", parent="child_B")
     root.mock_tests = [
         root,
         root.child_A,
@@ -154,15 +218,11 @@ def mock_common_dependency():
             - grandchild_B1
                 - common_setup
     """
-    root = create_task_class(name="root")
-    root.common_setup = create_task_class(name="common_setup", parent="root")
-    root.child_A = create_task_class(
-        name="child_A", parent="root", depends=["common_setup"]
-    )
-    root.child_B = create_task_class(
-        name="child_B", parent="root", depends=["common_setup"]
-    )
-    root.grandchild_B1 = create_task_class(
+    root = mock_task(name="root")
+    root.common_setup = mock_task(name="common_setup", parent="root")
+    root.child_A = mock_task(name="child_A", parent="root", depends=["common_setup"])
+    root.child_B = mock_task(name="child_B", parent="root", depends=["common_setup"])
+    root.grandchild_B1 = mock_task(
         name="grandchild_B1", parent="child_A", depends=["common_setup"]
     )
     root.mock_tests = [

@@ -1,3 +1,9 @@
+import uuid
+from unittest import mock
+
+from power_shovel.check.checker import Checker
+
+
 class MockChecker(Checker):
     def __init__(self, mock_save=True, mock_check=True, *args, **kwargs):
         self.mock_save = mock_save
@@ -29,7 +35,7 @@ class FailingCheck(MockChecker):
 
     def __init__(self, *args, **kwargs):
         super(FailingCheck, self).__init__(*args, **kwargs)
-        self.check = Mock(return_value=False)
+        self.check = mock.Mock(return_value=False)
 
 
 class PassingCheck(MockChecker):

@@ -790,29 +790,12 @@ snapshots[
 """
 
 snapshots[
-    "TestTaskHelp.test_render_status[nested_single_dependency_nodes] 2"
-] = """
-    \x1b[92m✔\x1b[0m grandchild
-    \x1b[92m✔\x1b[0m child
-    \x1b[92m✔\x1b[0m root
-"""
-
-snapshots[
     "TestTaskHelp.test_render_status[single_dependency_node_at_end_of_branch_1] 1"
 ] = """
     \x1b[90m○\x1b[0m root
       \x1b[90m○\x1b[0m child_A
       \x1b[90m○\x1b[0m grandchild_B1
       \x1b[90m○\x1b[0m child_B
-"""
-
-snapshots[
-    "TestTaskHelp.test_render_status[single_dependency_node_at_end_of_branch_1] 2"
-] = """
-    \x1b[92m✔\x1b[0m root
-      \x1b[92m✔\x1b[0m child_A
-      \x1b[92m✔\x1b[0m grandchild_B1
-      \x1b[92m✔\x1b[0m child_B
 """
 
 snapshots[
@@ -825,30 +808,12 @@ snapshots[
 """
 
 snapshots[
-    "TestTaskHelp.test_render_status[single_dependency_node_at_end_of_branch_2] 2"
-] = """
-    \x1b[92m✔\x1b[0m root
-      \x1b[92m✔\x1b[0m grandchild_A1
-      \x1b[92m✔\x1b[0m child_A
-      \x1b[92m✔\x1b[0m child_B
-"""
-
-snapshots[
     "TestTaskHelp.test_render_status[single_dependency_in_middle_of_branch] 1"
 ] = """
     \x1b[90m○\x1b[0m child_A
       \x1b[90m○\x1b[0m grandchild_A1
       \x1b[90m○\x1b[0m grandchild_A2
     \x1b[90m○\x1b[0m root
-"""
-
-snapshots[
-    "TestTaskHelp.test_render_status[single_dependency_in_middle_of_branch] 2"
-] = """
-    \x1b[92m✔\x1b[0m child_A
-      \x1b[92m✔\x1b[0m grandchild_A1
-      \x1b[92m✔\x1b[0m grandchild_A2
-    \x1b[92m✔\x1b[0m root
 """
 
 snapshots[
@@ -864,18 +829,6 @@ snapshots[
 """
 
 snapshots[
-    "TestTaskHelp.test_render_status[nested_multiple_dependency_nodes] 2"
-] = """
-    \x1b[92m✔\x1b[0m root
-      \x1b[92m✔\x1b[0m child_A
-        \x1b[92m✔\x1b[0m grandchild_A1
-        \x1b[92m✔\x1b[0m grandchild_A2
-      \x1b[92m✔\x1b[0m child_B
-        \x1b[92m✔\x1b[0m grandchild_B1
-        \x1b[92m✔\x1b[0m grandchild_B2
-"""
-
-snapshots[
     "TestTaskHelp.test_render_status[common_dependency] 1"
 ] = """
     \x1b[90m○\x1b[0m root
@@ -886,11 +839,9 @@ snapshots[
 """
 
 snapshots[
-    "TestTaskHelp.test_render_status[common_dependency] 2"
+    "TestTaskHelp.test_render_status_passing_checks 1"
 ] = """
+    \x1b[92m✔\x1b[0m grandchild
+    \x1b[92m✔\x1b[0m child
     \x1b[92m✔\x1b[0m root
-      \x1b[92m✔\x1b[0m common_setup
-      \x1b[92m✔\x1b[0m grandchild_B1
-      \x1b[92m✔\x1b[0m child_A
-      \x1b[92m✔\x1b[0m child_B
 """
