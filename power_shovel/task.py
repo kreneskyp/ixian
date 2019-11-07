@@ -2,7 +2,10 @@ import io
 
 from power_shovel.config import CONFIG
 from power_shovel import logger
+from power_shovel.config import CONFIG
+from power_shovel.exceptions import AlreadyComplete
 from power_shovel.utils.color_codes import BOLD_WHITE, ENDC, GRAY, OK_GREEN
+
 
 TASKS = {}
 
@@ -219,40 +222,45 @@ class TaskRunner(object):
         if force_all:
             force = True
 
+        # save force to task instance so it may be referenced downstream
         self.force = True
 
         args_as_str = CONFIG.format(" ".join([str(arg) for arg in args]))
         logger.debug(f"[exec] {self.name}({args_as_str}) force={force} clean={clean}")
 
-        if self.clean and clean:
-            logger.debug(f"Cleaning Task: {self.clean}")
-            self.clean()
+        def execute_node(node, clean, force, args=None):
+            runner = TASKS[node["name"]]
 
-        # execute dependencies. Ignore completed.
-        dependency_kwargs = {"clean_all": clean_all, "force_all": force_all}
-        depends_complete = True
-        for dependency in self.depends:
-            try:
-                dependency.execute([], **dependency_kwargs)
-                depends_complete = False
-            except AlreadyComplete:
-                pass
+            if runner.clean and clean:
+                logger.debug(f"Cleaning Task: {runner.clean}")
+                runner.clean()
 
-        # Execute function if there is one. Targets may not have a function.
-        if self.func:
-            passes, checkers = self.check(force)
-            if depends_complete and passes:
-                logger.debug(f"[skip] {self.name}, already complete.")
-                raise AlreadyComplete()
+            complete_dependencies = 0
+            for dependency in node["dependencies"]:
+                try:
+                    execute_node(dependency, clean_all, force_all)
+                except AlreadyComplete:
+                    complete_dependencies += 1
+            dependencies_complete = complete_dependencies == len(node["dependencies"])
 
-            else:
-                return_value = self.func(*args)
-                # save checker only after function has completed successfully
-                if checkers:
-                    for checker in checkers:
-                        checker.save()
-                logger.debug(f"[fini] {self.name}")
-                return return_value
+            # Execute function if there is one. Targets may not have a function. If any dependency
+            # was run, then this task must run too.
+            if runner.func:
+                passes, checkers = runner.check(force)
+                if dependencies_complete and passes:
+                    logger.debug(f"[skip] {self.name}, already complete.")
+                    raise AlreadyComplete()
+
+                else:
+                    return_value = runner.func(*args or [])
+                    # save checker only after function has completed successfully
+                    if checkers:
+                        for checker in checkers:
+                            checker.save()
+                    logger.debug(f"[fini] {runner.name}")
+                    return return_value
+
+        return execute_node(self.tree(), clean, force, args)
 
     def check(self, force: bool = False) -> (bool, list):
         """Return True if the task is complete based on configured checks.
