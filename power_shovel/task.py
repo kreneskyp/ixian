@@ -118,7 +118,7 @@ class TaskRunner(object):
         return parent
 
     def __call__(self, *args, **kwargs):
-        self.execute(args, **kwargs)
+        return self.execute(args, **kwargs)
 
     def execute(self, args, **kwargs):
         """Execute this task.
