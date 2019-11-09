@@ -2,12 +2,50 @@ import uuid
 from unittest import mock
 
 from power_shovel import Task
+from power_shovel.exceptions import ExecuteFailed
 from power_shovel.test.mock_checker import PassingCheck
 
 
+class MockTaskBase:
+    def __init__(self):
+        self.mock = mock.Mock()
+        self.mock_tasks = []
+
+    def execute(self, *args, **kwargs):
+        self.mock(*args, **kwargs)
+
+    def reset_task_mocks(self):
+        for mock_task in self.mock_tasks:
+            mock_task.mock.reset_mock()
+
+    def reset_task_clean_mocks(self):
+        for mock_task in self.mock_tasks:
+            mock_task.__task__.clean.reset_mock()
+
+    def reset_task_checkers_save(self):
+        for mock_task in self.mock_tasks:
+            mock_task.__task__.checkers[0].save.reset_mock()
+
+    def reset_task_checkers_check(self):
+        for mock_task in self.mock_tasks:
+            mock_task.__task__.checkers[0].check.reset_mock()
+
+    def assert_no_calls(self):
+        for mock_task in self.mock_tasks:
+            mock_task.mock.assert_has_calls([])
+
+    def assert_no_checker_save_calls(self):
+        for mock_task in self.mock_tasks:
+            mock_task.__task__.checkers[0].save.assert_has_calls([])
+
+    def assert_no_checker_calls(self):
+        for mock_task in self.mock_tasks:
+            mock_task.__task__.checkers[0].save.assert_has_calls([])
+
+
 def mock_task(
-    name: str = None, parent: str = None, depends: list = None, **kwargs: dict
-) -> Task:
+    name: str = "mock_task", parent: str = None, depends: list = None, **kwargs: dict
+) -> MockTaskBase:
     """
     Create a mock task. It calls a mock function when executed. It also provides a number of helper
     functions for testing and resetting a hierarchy of mocked tasks
@@ -18,38 +56,6 @@ def mock_task(
     :param kwargs: additional kwargs to pass to class, these become class members.
     :return:
     """
-
-    class MockTaskBase:
-        mock = mock.Mock()
-        mock_tasks = []
-
-        def execute(self, *args, **kwargs):
-            self.mock(*args, **kwargs)
-
-        def reset_task_mocks(self):
-            for mock_task in self.mock_tasks:
-                mock_task.mock.reset_mock()
-
-        def reset_task_clean_mocks(self):
-            for mock_task in self.mock_tasks:
-                mock_task.mock_clean.reset_mock()
-
-        def reset_task_checkers_save(self):
-            for mock_task in self.mock_tasks:
-                mock_task.checkers[0].save.reset_mock()
-
-        def reset_task_checkers_check(self):
-            for mock_task in self.mock_tasks:
-                mock_task.checkers[0].check.reset_mock()
-
-        def assert_no_calls(self):
-            for mock_task in self.mock_tasks:
-                mock_task.mock.assert_has_calls([])
-
-        def assert_no_checker_save_calls(self):
-            for mock_task in self.mock_tasks:
-                mock_task.checkers[0].save.assert_has_calls([])
-
     MockTask = type(
         name,
         (MockTaskBase, Task),
@@ -95,9 +101,7 @@ def mock_tasks_with_clean_functions():
     """
 
     return mock_nested_single_dependency_nodes(
-        {"mock_clean": mock.Mock()},
-        {"mock_clean": mock.Mock()},
-        {"mock_clean": mock.Mock()},
+        {"clean": mock.Mock()}, {"clean": mock.Mock()}, {"clean": mock.Mock()},
     )
 
 
