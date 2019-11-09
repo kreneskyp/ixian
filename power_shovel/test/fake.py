@@ -113,6 +113,18 @@ def mock_tasks_with_passing_checkers():
     )
 
 
+def mock_failing_tasks():
+    """
+    Mock tests that always raise ExecuteFailed when executed.
+    :return:
+    """
+    root = mock_nested_single_dependency_nodes()
+    root.mock.side_effect = ExecuteFailed
+    root.child.mock.side_effect = ExecuteFailed
+    root.grandchild.mock.side_effect = ExecuteFailed
+    return root
+
+
 def mock_single_dependency_node_at_end_of_branch_1():
     """
     Task tree with structure:

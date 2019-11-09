@@ -1,19 +1,17 @@
 from io import StringIO
-from unittest import TestCase
 from unittest import mock
 
 import pytest
 
-from power_shovel.exceptions import AlreadyComplete
+from power_shovel.exceptions import AlreadyComplete, ExecuteFailed
 from power_shovel.task import clear_task_registry, Task, TaskRunner
-from power_shovel.test.test_checker import PassingCheck
 
 
 CALL = mock.call()
 DEPENDENT_CALL = mock.call(**{"clean-all": False, "force-all": False})
 
 
-class TaskTestCases:
+class TestTask:
     def test_task(self, task):
         """Test running a single task"""
         task(1, 2)
@@ -46,9 +44,9 @@ class TaskTestCases:
         root, child, grandchild = tasks_with_cleaners.mock_tasks
 
         root(clean=True)
-        root.mock_clean.assert_has_calls([CALL])
-        child.mock_clean.assert_has_calls([])
-        grandchild.mock_clean.assert_has_calls([])
+        root.__task__.clean.assert_has_calls([CALL])
+        child.__task__.clean.assert_has_calls([])
+        grandchild.__task__.clean.assert_has_calls([])
         root.mock.assert_has_calls([CALL])
         child.mock.assert_has_calls([])
         grandchild.mock.assert_has_calls([])
@@ -56,9 +54,9 @@ class TaskTestCases:
         root.reset_task_clean_mocks()
 
         child(clean=True)
-        root.mock_clean.assert_has_calls([])
-        child.mock_clean.assert_has_calls([CALL])
-        grandchild.mock_clean.assert_has_calls([])
+        root.__task__.clean.assert_has_calls([])
+        child.__task__.clean.assert_has_calls([CALL])
+        grandchild.__task__.clean.assert_has_calls([])
         root.mock.assert_has_calls([])
         child.mock.assert_has_calls([CALL])
         grandchild.mock.assert_has_calls([])
@@ -66,9 +64,9 @@ class TaskTestCases:
         root.reset_task_clean_mocks()
 
         grandchild(clean=True)
-        root.mock_clean.assert_has_calls([])
-        child.mock_clean.assert_has_calls([])
-        grandchild.mock_clean.assert_has_calls([CALL])
+        root.__task__.clean.assert_has_calls([])
+        child.__task__.clean.assert_has_calls([])
+        grandchild.__task__.clean.assert_has_calls([CALL])
         root.mock.assert_has_calls([])
         child.mock.assert_has_calls([])
         grandchild.mock.assert_has_calls([CALL])
@@ -78,9 +76,9 @@ class TaskTestCases:
         root, child, grandchild = tasks_with_cleaners.mock_tasks
 
         root(clean_all=True)
-        root.mock_clean.assert_has_calls([CALL])
-        child.mock_clean.assert_has_calls([CALL])
-        grandchild.mock_clean.assert_has_calls([CALL])
+        root.__task__.clean.assert_has_calls([CALL])
+        child.__task__.clean.assert_has_calls([CALL])
+        grandchild.__task__.clean.assert_has_calls([CALL])
         root.mock.assert_has_calls([CALL])
         child.mock.assert_has_calls([CALL])
         grandchild.mock.assert_has_calls([CALL])
@@ -88,9 +86,9 @@ class TaskTestCases:
         root.reset_task_clean_mocks()
 
         child(clean_all=True)
-        root.mock_clean.assert_has_calls([])
-        child.mock_clean.assert_has_calls([CALL])
-        grandchild.mock_clean.assert_has_calls([CALL])
+        root.__task__.clean.assert_has_calls([])
+        child.__task__.clean.assert_has_calls([CALL])
+        grandchild.__task__.clean.assert_has_calls([CALL])
         root.mock.assert_has_calls([])
         child.mock.assert_has_calls([CALL])
         grandchild.mock.assert_has_calls([CALL])
@@ -98,22 +96,22 @@ class TaskTestCases:
         root.reset_task_clean_mocks()
 
         grandchild(clean_all=True)
-        root.mock_clean.assert_has_calls([])
-        child.mock_clean.assert_has_calls([])
-        grandchild.mock_clean.assert_has_calls([CALL])
+        root.__task__.clean.assert_has_calls([])
+        child.__task__.clean.assert_has_calls([])
+        grandchild.__task__.clean.assert_has_calls([CALL])
         root.mock.assert_has_calls([])
         child.mock.assert_has_calls([])
         grandchild.mock.assert_has_calls([CALL])
 
     def test_run_checker(self, tasks_with_passing_checkers):
         """
-        Test passing checkers
+        Test passing checkers - the checkers should raise AlreadyComplete and skip running
         """
         root, child, grandchild = tasks_with_passing_checkers.mock_tasks
 
-        root_checker = root.checkers[0]
-        child_checker = child.checkers[0]
-        grandchild_checker = grandchild.checkers[0]
+        root_checker = root.__task__.checkers[0]
+        child_checker = child.__task__.checkers[0]
+        grandchild_checker = grandchild.__task__.checkers[0]
 
         with pytest.raises(AlreadyComplete):
             root()
@@ -147,9 +145,9 @@ class TaskTestCases:
         """Test forcing run of task"""
         root, child, grandchild = tasks_with_passing_checkers.mock_tasks
 
-        root_checker = root.checkers[0]
-        child_checker = child.checkers[0]
-        grandchild_checker = grandchild.checkers[0]
+        root_checker = root.__task__.checkers[0]
+        child_checker = child.__task__.checkers[0]
+        grandchild_checker = grandchild.__task__.checkers[0]
 
         root(force=True)
         root_checker.check.assert_has_calls([])
@@ -178,39 +176,47 @@ class TaskTestCases:
         grandchild.mock.assert_has_calls([CALL])
         root.reset_task_checkers_check()
 
-    def test_run_force_all(self):
-        """Test forcing run of entire dependency tree"""
-        self.setup_tasks_with_passing_checkers()
-        grandparent_checker = self.grandparent.checkers[0]
-        parent_checker = self.parent.checkers[0]
-        child_checker = self.child.checkers[0]
+    def test_run_force_all(self, tasks_with_passing_checkers):
+        """
+        Test forcing run of entire dependency tree
 
-        self.grandparent(force_all=True)
-        grandparent_checker.check.assert_has_calls([])
-        parent_checker.check.assert_has_calls([])
-        child_checker.check.assert_has_calls([])
-        self.grandparent.mock.assert_has_calls([CALL])
-        self.parent.mock.assert_has_calls([CALL])
-        self.child.mock.assert_has_calls([CALL])
-        self.reset_task_checkers_check()
+        Checkers should be skipped since they are forced. all methods should run.
+        """
+        root, child, grandchild = tasks_with_passing_checkers.mock_tasks
 
-        self.parent(force_all=True)
-        grandparent_checker.check.assert_has_calls([])
-        parent_checker.check.assert_has_calls([])
-        child_checker.check.assert_has_calls([])
-        self.grandparent.mock.assert_has_calls([])
-        self.parent.mock.assert_has_calls([CALL])
-        self.child.mock.assert_has_calls([CALL])
-        self.reset_task_checkers_check()
+        root(force_all=True)
+        root.assert_no_checker_calls()
+        root.mock.assert_has_calls([CALL])
+        child.mock.assert_has_calls([CALL])
+        grandchild.mock.assert_has_calls([CALL])
+        root.reset_task_checkers_check()
 
-        self.child(force_all=True)
-        grandparent_checker.check.assert_has_calls([])
-        parent_checker.check.assert_has_calls([])
-        child_checker.check.assert_has_calls([])
-        self.grandparent.mock.assert_has_calls([])
-        self.parent.mock.assert_has_calls([])
-        self.child.mock.assert_has_calls([CALL])
-        self.reset_task_checkers_check()
+        child(force_all=True)
+        root.assert_no_checker_calls()
+        root.mock.assert_has_calls([])
+        child.mock.assert_has_calls([CALL])
+        grandchild.mock.assert_has_calls([CALL])
+        root.reset_task_checkers_check()
+
+        grandchild(force_all=True)
+        root.assert_no_checker_calls()
+        root.mock.assert_has_calls([])
+        child.mock.assert_has_calls([])
+        grandchild.mock.assert_has_calls([CALL])
+        root.reset_task_checkers_check()
+
+    def test_execute_failure(self, tasks_that_fail):
+        """
+        If a task fails the execution chain should stop.
+        :return:
+        """
+        root, child, grandchild = tasks_that_fail.mock_tasks
+
+        with pytest.raises(ExecuteFailed):
+            grandchild()
+
+        root.mock.assert_has_calls([])
+        child.mock.assert_has_calls([])
 
 
 class TestTaskTree:

@@ -7,6 +7,7 @@ from power_shovel.test.fake import (
     MOCK_TASKS,
     mock_tasks_with_clean_functions,
     mock_tasks_with_passing_checkers,
+    mock_failing_tasks,
 )
 
 
@@ -35,6 +36,13 @@ def tasks_with_cleaners(request):
 def tasks_with_passing_checkers(request):
     """nested tasks all with mocked cleaner functions"""
     yield mock_tasks_with_passing_checkers()
+    clear_task_registry()
+
+
+@pytest.fixture()
+def tasks_that_fail(request):
+    """nested tasks all with mocked cleaner functions"""
+    yield mock_failing_tasks()
     clear_task_registry()
 
 
