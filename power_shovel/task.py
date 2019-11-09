@@ -137,29 +137,32 @@ class TaskRunner(object):
         :param kwargs: options for task execution
         :return: return value from task function
         """
-        clean = kwargs.get("clean", False)
+        clean_root = kwargs.get("clean", False)
         clean_all = kwargs.pop("clean_all", False)
-        force = kwargs.pop("force", False)
+        force_root = kwargs.pop("force", False)
         force_all = kwargs.pop("force_all", False)
 
-        if clean:
-            force = True
+        if clean_root:
+            force_root = True
         if clean_all:
-            clean = True
+            clean_root = True
             force_all = True
         if force_all:
-            force = True
+            force_root = True
 
         # save force to task instance so it may be referenced downstream
+        # TODO: this should be passing in `force`
         self.force = True
 
         args_as_str = CONFIG.format(" ".join([str(arg) for arg in args]))
-        logger.debug(f"[exec] {self.name}({args_as_str}) force={force} clean={clean}")
+        logger.debug(
+            f"[exec] {self.name}({args_as_str}) force={force_root} clean={clean_root}"
+        )
 
         def execute_node(node, clean, force, args=None):
             runner = TASKS[node["name"]]
 
-            if runner.clean and clean:
+            if runner and runner.clean and clean:
                 logger.debug(f"Cleaning Task: {runner.clean}")
                 runner.clean()
 
@@ -173,7 +176,7 @@ class TaskRunner(object):
 
             # Execute function if there is one. Targets may not have a function. If any dependency
             # was run, then this task must run too.
-            if runner.func:
+            if runner and runner.func:
                 passes, checkers = runner.check(force)
                 if dependencies_complete and passes:
                     logger.debug(f"[skip] {self.name}, already complete.")
@@ -188,7 +191,7 @@ class TaskRunner(object):
                     logger.debug(f"[fini] {runner.name}")
                     return return_value
 
-        return execute_node(self.tree(), clean, force, args)
+        return execute_node(self.tree(flatten=False), clean_root, force_root, args)
 
     def check(self, force: bool = False) -> (bool, list):
         """Return True if the task is complete based on configured checks.
