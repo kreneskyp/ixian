@@ -1,3 +1,5 @@
+from enum import Enum
+
 import argcomplete
 import argparse
 import importlib
@@ -12,16 +14,50 @@ from power_shovel.config import CONFIG
 from power_shovel.logger import DEFAULT_LOG_LEVEL
 from power_shovel.module import load_module
 from power_shovel.modules.filesystem import utils as file_utils
-from power_shovel.task import AlreadyComplete
-from power_shovel.task import TASKS
+from power_shovel.exceptions import AlreadyComplete, ExecuteFailed
+from power_shovel.task import TASKS, TaskRunner
 from power_shovel.utils.color_codes import RED, ENDC
+from power_shovel.utils.decorators import classproperty
 
-# Runner process error exit codes
-ERROR_COMPLETE = -1  # task is already complete
-ERROR_UNKNOWN_TASK = -2  # task isn't registered
-ERROR_NO_INIT = -3  # shovel.py does not contain an init flag
-ERROR_NO_SHOVEL_PY = -4  # shovel.py does not exist
-ERROR_TASK = -5  # task did not complete
+
+class ExitCodes(Enum):
+    """Codes that may be returned by cli"""
+
+    SUCCESS = 0  # Success
+    ERROR_COMPLETE = -1  # task is already complete
+    ERROR_UNKNOWN_TASK = -2  # task isn't registered
+    ERROR_NO_INIT = -3  # shovel.py does not contain an init flag
+    ERROR_NO_SHOVEL_PY = -4  # shovel.py does not exist
+    ERROR_TASK = -5  # task did not complete
+
+    @classproperty
+    def errors(cls):
+        return [e for e in list(cls) if e.is_error]
+
+    @classproperty
+    def init_errors(cls):
+        """Errors that init can raise"""
+        return [
+            cls.ERROR_NO_SHOVEL_PY,
+            cls.ERROR_NO_INIT,
+        ]
+
+    @classproperty
+    def run_errors(cls):
+        """Errors that run can raise"""
+        return [
+            cls.ERROR_UNKNOWN_TASK,
+            cls.ERROR_COMPLETE,
+            cls.ERROR_TASK,
+        ]
+
+    @property
+    def is_success(self):
+        return self == self.SUCCESS
+
+    @property
+    def is_error(self):
+        return self != self.SUCCESS
 
 
 def shovel_path() -> str:
@@ -39,7 +75,7 @@ def import_shovel():
     return shovel_module
 
 
-def init() -> int:
+def init() -> ExitCodes:
     """init powershovel
 
     Finds the shovel config module for the projects and initializes itself
@@ -53,20 +89,20 @@ def init() -> int:
         shovel_module = import_shovel()
     except FileNotFoundError as e:
         logger.error(str(e))
-        return ERROR_NO_SHOVEL_PY
+        return ExitCodes.ERROR_NO_SHOVEL_PY
 
     try:
         module_init = shovel_module.init
     except AttributeError:
         logger.error("init() was not found within shovel.py")
-        return ERROR_NO_INIT
+        return ExitCodes.ERROR_NO_INIT
 
     # init module and return all globals.
     logger.debug("Powershovel v0.0.1")
     load_module("power_shovel.modules.core")
     module_init()
 
-    return 0
+    return ExitCodes.SUCCESS
 
 
 def build_epilog() -> str:
@@ -207,7 +243,7 @@ def resolve_task(key: str) -> TaskRunner:
         logger.error('Unknown task "%s", run with --help for list of commands' % key)
 
 
-def run() -> int:
+def run() -> ExitCodes:
     """
     Run power_shovel task
 
@@ -222,18 +258,24 @@ def run() -> int:
 
     task = resolve_task(task_name)
     if not task:
-        return ERROR_UNKNOWN_TASK
+        return ExitCodes.ERROR_UNKNOWN_TASK
 
     try:
         task.execute(formatted_task_args, **args)
     except AlreadyComplete:
         logger.warn("Already complete. Override with --force or --force-all")
-        return ERROR_COMPLETE
+        return ExitCodes.ERROR_COMPLETE
     except ExecuteFailed as e:
         logger.error(str(e))
-        return ERROR_TASK
+        return ExitCodes.ERROR_TASK
 
-    return 0
+    return ExitCodes.SUCCESS
+
+
+def exit_with_code(code):
+    if isinstance(code, ExitCodes):
+        code = code.value
+    sys.exit(code)
 
 
 def cli() -> None:
@@ -241,8 +283,8 @@ def cli() -> None:
     Main entry point into the command line interface.
     """
     init_code = init()
-    if init_code < 0:
-        sys.exit(init_code)
+    if init_code.is_error:
+        exit_with_code(init_code)
 
     # setup autocomplete
     parser = get_parser()
@@ -250,7 +292,7 @@ def cli() -> None:
 
     # run power_shovel
     run_code = run()
-    if run_code is not None and run_code < 0:
-        sys.exit(run_code)
+    if run_code is not None and run_code.is_error:
+        exit_with_code(run_code)
     else:
-        sys.exit(0)
+        exit_with_code(ExitCodes.SUCCESS)

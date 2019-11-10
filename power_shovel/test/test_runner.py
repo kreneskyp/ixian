@@ -1,9 +1,13 @@
 import os
 from unittest import mock
 
+import pytest
+
 from power_shovel import logger
 from power_shovel import runner
+from power_shovel.exceptions import MockExit
 from power_shovel.module import load_modules
+from power_shovel.runner import ExitCodes
 from power_shovel.test.fake import build_test_args
 
 
@@ -29,20 +33,20 @@ class TestInit:
     def test_no_shovel_py(self, shovel_path):
         """Test workspace without shovel.py"""
         shovel_path.return_value = workspace("missing_shovel_py")
-        assert runner.init() == runner.ERROR_NO_SHOVEL_PY
+        assert runner.init() == ExitCodes.ERROR_NO_SHOVEL_PY
 
     @mock.patch("power_shovel.runner.shovel_path")
     def test_no_init_method(self, shovel_path):
         """Test workspace with shovel.py, but module is missing init method"""
         shovel_path.return_value = workspace("shovel_py_no_init")
-        assert runner.init() == runner.ERROR_NO_INIT
+        assert runner.init() == ExitCodes.ERROR_NO_INIT
 
     @mock.patch("power_shovel.runner.shovel_path")
     def test_success(self, shovel_path):
         """Test a workspace that can be successfully loaded"""
         # TODO: this workspace should load tasks, need to clear registry after though
         shovel_path.return_value = workspace("functional")
-        assert runner.init() == 0
+        assert runner.init() == ExitCodes.SUCCESS
 
 
 class TestLogging:
@@ -158,4 +162,30 @@ class TestRun:
 
     def test_unknown_task(self, mock_environment, mock_parse_args):
         mock_parse_args.return_value = build_test_args(task="unknown_task")
-        assert runner.run() == runner.ERROR_UNKNOWN_TASK
+        assert runner.run() == ExitCodes.ERROR_UNKNOWN_TASK
+
+
+class TestCLI:
+    def test_init_errors(self, mock_init_exit_errors, mock_exit):
+        """
+        If `init` returns an error code the process should exit with the same code.
+        """
+        with pytest.raises(MockExit) as exit_call:
+            runner.cli()
+        assert exit_call.value.code == mock_init_exit_errors.return_value
+
+    def test_run_errors(self, mock_init, mock_run_exit_errors, mock_exit):
+        """
+        if `run` returns an error code the process should exit with the same code.
+        """
+        with pytest.raises(MockExit) as exit_call:
+            runner.cli()
+        assert exit_call.value.code == mock_run_exit_errors.return_value
+
+    def test_success(self, task, mock_init, mock_parse_args, mock_exit):
+        mock_parse_args.return_value = build_test_args(task="mock_task")
+
+        with pytest.raises(MockExit) as exit_call:
+            runner.cli()
+        assert exit_call.value.code == ExitCodes.SUCCESS
+        task.mock.assert_called_with()

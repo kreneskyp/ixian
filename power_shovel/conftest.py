@@ -2,7 +2,9 @@ import pytest
 from unittest import mock
 
 from power_shovel.config import CONFIG
+from power_shovel.exceptions import MockExit
 from power_shovel.module import load_modules, clear_modules
+from power_shovel.runner import ExitCodes
 from power_shovel.task import clear_task_registry
 from power_shovel.test.fake import (
     mock_task,
@@ -16,9 +18,7 @@ from power_shovel.test.fake import (
 
 
 # =================================================================================================
-#
 # Environment and system components
-#
 # =================================================================================================
 
 
@@ -35,22 +35,55 @@ def mock_environment():
 
 
 @pytest.fixture
+def mock_init():
+    """
+    Mock `runner.init`
+    """
+    patcher = mock.patch("power_shovel.runner.init")
+    mock_init = patcher.start()
+    mock_init.return_value = ExitCodes.SUCCESS
+    yield mock_init
+    patcher.stop()
+
+
+@pytest.fixture(params=ExitCodes.init_errors)
+def mock_init_exit_errors(request, mock_init):
+    mock_init.return_value = request.param
+    yield mock_init
+
+
+@pytest.fixture
+def mock_run():
+    """
+    Mock `runner.run`
+    """
+    patcher = mock.patch("power_shovel.runner.run")
+    mock_run = patcher.start()
+    mock_run.return_value = ExitCodes.SUCCESS
+    yield mock_run
+    patcher.stop()
+
+
+@pytest.fixture(params=ExitCodes.run_errors)
+def mock_run_exit_errors(request, mock_run):
+    mock_run.return_value = request.param
+    yield mock_run
+
+
+@pytest.fixture
 def mock_parse_args():
     """
     Mock runner.parse_args()
     """
     patcher = mock.patch("power_shovel.runner.parse_args")
     mock_parse_args = patcher.start()
-    print("WUT?", mock_parse_args)
     mock_parse_args.return_value = build_test_args()
     yield mock_parse_args
     patcher.stop()
 
 
 # =================================================================================================
-#
 # Tasks and trees of tasks
-#
 # =================================================================================================
 
 
@@ -96,3 +129,20 @@ def task_scenarios(request):
     """
     yield MOCK_TASKS[request.param]()
     clear_task_registry()
+
+
+# =================================================================================================
+# Utils
+# =================================================================================================
+
+
+@pytest.fixture
+def mock_exit():
+    def raise_exit_code(code):
+        raise MockExit(ExitCodes(code))
+
+    patcher = mock.patch("power_shovel.runner.sys.exit")
+    mock_exit = patcher.start()
+    mock_exit.side_effect = raise_exit_code
+    yield mock_exit
+    patcher.stop()
