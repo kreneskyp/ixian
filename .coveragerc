@@ -1,0 +1,5 @@
+[run]
+omit = power_shovel/test/*,.tox/*
+
+[report]
+show_missing = True
