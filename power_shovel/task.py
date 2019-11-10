@@ -11,8 +11,7 @@ TASKS = {}
 
 
 def clear_task_registry():
-    global TASKS
-    TASKS = {}
+    TASKS.clear()
 
 
 class TaskRunner(object):
