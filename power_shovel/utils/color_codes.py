@@ -6,6 +6,15 @@ YELLOW = "\033[93m"
 GRAY = "\033[90m"
 
 
+COLOR_REFERENCE = {
+    "BOLD_WHITE": BOLD_WHITE,
+    "RED": RED,
+    "OK_GREEN": OK_GREEN,
+    "YELLOW": YELLOW,
+    "GRAY": GRAY,
+}
+
+
 def format(txt, color):
     return f"{color}{txt}{ENDC}"
 
