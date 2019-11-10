@@ -12,15 +12,15 @@ DEPENDENT_CALL = mock.call(**{"clean-all": False, "force-all": False})
 
 
 class TestTask:
-    def test_task(self, task):
+    def test_task(self, mock_task):
         """Test running a single task"""
-        task(1, 2)
+        mock_task(1, 2)
         call = mock.call(1, 2)
-        task.mock.assert_has_calls([call])
+        mock_task.mock.assert_has_calls([call])
 
-    def test_run_dependency(self, nested_tasks):
+    def test_run_dependency(self, mock_nested_tasks):
         """Test running dependant tasks"""
-        root, child, grandchild = nested_tasks.mock_tasks
+        root, child, grandchild = mock_nested_tasks.mock_tasks
 
         root()
         root.mock.assert_has_calls([CALL])
@@ -39,9 +39,9 @@ class TestTask:
         child.mock.assert_has_calls([])
         grandchild.mock.assert_has_calls([CALL])
 
-    def test_run_clean(self, tasks_with_cleaners):
+    def test_run_clean(self, mock_tasks_with_cleaners):
         """Test forcing clean of task"""
-        root, child, grandchild = tasks_with_cleaners.mock_tasks
+        root, child, grandchild = mock_tasks_with_cleaners.mock_tasks
 
         root(clean=True)
         root.__task__.clean.assert_has_calls([CALL])
@@ -71,9 +71,9 @@ class TestTask:
         child.mock.assert_has_calls([])
         grandchild.mock.assert_has_calls([CALL])
 
-    def test_run_clean_all(self, tasks_with_cleaners):
+    def test_run_clean_all(self, mock_tasks_with_cleaners):
         """Test forcing clean of entire dependency tree before run"""
-        root, child, grandchild = tasks_with_cleaners.mock_tasks
+        root, child, grandchild = mock_tasks_with_cleaners.mock_tasks
 
         root(clean_all=True)
         root.__task__.clean.assert_has_calls([CALL])
@@ -103,11 +103,11 @@ class TestTask:
         child.mock.assert_has_calls([])
         grandchild.mock.assert_has_calls([CALL])
 
-    def test_run_checker(self, tasks_with_passing_checkers):
+    def test_run_checker(self, mock_tasks_with_passing_checkers):
         """
         Test passing checkers - the checkers should raise AlreadyComplete and skip running
         """
-        root, child, grandchild = tasks_with_passing_checkers.mock_tasks
+        root, child, grandchild = mock_tasks_with_passing_checkers.mock_tasks
 
         root_checker = root.__task__.checkers[0]
         child_checker = child.__task__.checkers[0]
@@ -141,9 +141,9 @@ class TestTask:
         root.assert_no_checker_save_calls()
         root.reset_task_checkers_check()
 
-    def test_run_force(self, tasks_with_passing_checkers):
+    def test_run_force(self, mock_tasks_with_passing_checkers):
         """Test forcing run of task"""
-        root, child, grandchild = tasks_with_passing_checkers.mock_tasks
+        root, child, grandchild = mock_tasks_with_passing_checkers.mock_tasks
 
         root_checker = root.__task__.checkers[0]
         child_checker = child.__task__.checkers[0]
@@ -176,13 +176,13 @@ class TestTask:
         grandchild.mock.assert_has_calls([CALL])
         root.reset_task_checkers_check()
 
-    def test_run_force_all(self, tasks_with_passing_checkers):
+    def test_run_force_all(self, mock_tasks_with_passing_checkers):
         """
         Test forcing run of entire dependency tree
 
         Checkers should be skipped since they are forced. all methods should run.
         """
-        root, child, grandchild = tasks_with_passing_checkers.mock_tasks
+        root, child, grandchild = mock_tasks_with_passing_checkers.mock_tasks
 
         root(force_all=True)
         root.assert_no_checker_calls()
@@ -205,12 +205,12 @@ class TestTask:
         grandchild.mock.assert_has_calls([CALL])
         root.reset_task_checkers_check()
 
-    def test_execute_failure(self, tasks_that_fail):
+    def test_execute_failure(self, mock_tasks_that_fail):
         """
         If a task fails the execution chain should stop.
         :return:
         """
-        root, child, grandchild = tasks_that_fail.mock_tasks
+        root, child, grandchild = mock_tasks_that_fail.mock_tasks
 
         with pytest.raises(ExecuteFailed):
             grandchild()
@@ -224,33 +224,33 @@ class TestTaskTree:
     Test task tree methods of TaskRunner
     """
 
-    def test_tree(self, snapshot, task_scenarios):
-        runner = task_scenarios.__task__
+    def test_tree(self, snapshot, mock_task_scenarios):
+        runner = mock_task_scenarios.__task__
         tree = runner.tree(dedupe=False, flatten=False)
         snapshot.assert_match(tree)
 
-    def test_tree_deduped(self, snapshot, task_scenarios):
-        runner = task_scenarios.__task__
+    def test_tree_deduped(self, snapshot, mock_task_scenarios):
+        runner = mock_task_scenarios.__task__
         tree = runner.tree(dedupe=True, flatten=False)
         snapshot.assert_match(tree)
 
-    def test_tree_flattened(self, snapshot, task_scenarios):
-        runner = task_scenarios.__task__
+    def test_tree_flattened(self, snapshot, mock_task_scenarios):
+        runner = mock_task_scenarios.__task__
         tree = runner.tree(dedupe=True, flatten=True)
         snapshot.assert_match(tree)
 
-    def test_status(self, snapshot, task_scenarios):
-        runner = task_scenarios.__task__
+    def test_status(self, snapshot, mock_task_scenarios):
+        runner = mock_task_scenarios.__task__
         tree = runner.status(dedupe=False, flatten=False)
         snapshot.assert_match(tree)
 
-    def test_status_deduped(self, snapshot, task_scenarios):
-        runner = task_scenarios.__task__
+    def test_status_deduped(self, snapshot, mock_task_scenarios):
+        runner = mock_task_scenarios.__task__
         tree = runner.status(dedupe=True, flatten=False)
         snapshot.assert_match(tree)
 
-    def test_status_flattened(self, snapshot, task_scenarios):
-        runner = task_scenarios.__task__
+    def test_status_flattened(self, snapshot, mock_task_scenarios):
+        runner = mock_task_scenarios.__task__
         tree = runner.status(dedupe=True, flatten=True)
         snapshot.assert_match(tree)
 
@@ -326,12 +326,14 @@ class TestTaskHelp:
         runner.render_status(output)
         snapshot.assert_match(output.getvalue())
 
-    def test_render_status(self, snapshot, task_scenarios):
+    def test_render_status(self, snapshot, mock_task_scenarios):
         """
         Test rendering status for various task trees.
         """
-        self.assert_render_status(snapshot, task_scenarios.__task__)
+        self.assert_render_status(snapshot, mock_task_scenarios.__task__)
 
-    def test_render_status_passing_checks(self, snapshot, tasks_with_passing_checkers):
+    def test_render_status_passing_checks(
+        self, snapshot, mock_tasks_with_passing_checkers
+    ):
         # mock checkers for the tree and test when tree is passing
-        self.assert_render_status(snapshot, tasks_with_passing_checkers.__task__)
+        self.assert_render_status(snapshot, mock_tasks_with_passing_checkers.__task__)

@@ -130,9 +130,9 @@ class TestRun:
     Tests for runner.run()
     """
 
-    def assertRan(self, mock_task, mock_parse_args, **extra_args):
+    def assertRan(self, mock_task_, mock_parse_args, **extra_args):
         # Mock task.execute since these tests are testing args passed to execute.
-        mock_task.__task__.execute = mock.Mock()
+        mock_task_.__task__.execute = mock.Mock()
 
         # update args with test specific args
         args = build_test_args(**extra_args)
@@ -140,25 +140,29 @@ class TestRun:
         mock_parse_args.return_value = args
 
         runner.run()
-        mock_task.__task__.execute.assert_called_with(task_args, **args)
+        mock_task_.__task__.execute.assert_called_with(task_args, **args)
 
-    def test_clean(self, task, mock_parse_args):
-        self.assertRan(task, mock_parse_args, task="mock_task", clean=True)
+    def test_clean(self, mock_task, mock_parse_args):
+        self.assertRan(mock_task, mock_parse_args, task="mock_task", clean=True)
 
-    def test_clean_all(self, task, mock_parse_args):
-        self.assertRan(task, mock_parse_args, task="mock_task", **{"clean_all": True})
+    def test_clean_all(self, mock_task, mock_parse_args):
+        self.assertRan(
+            mock_task, mock_parse_args, task="mock_task", **{"clean_all": True}
+        )
 
-    def test_force(self, task, mock_parse_args):
-        self.assertRan(task, mock_parse_args, task="mock_task", force=True)
+    def test_force(self, mock_task, mock_parse_args):
+        self.assertRan(mock_task, mock_parse_args, task="mock_task", force=True)
 
-    def test_force_all(self, task, mock_parse_args):
-        self.assertRan(task, mock_parse_args, task="mock_task", **{"force_all": True})
+    def test_force_all(self, mock_task, mock_parse_args):
+        self.assertRan(
+            mock_task, mock_parse_args, task="mock_task", **{"force_all": True}
+        )
 
-    def test_run(self, task, mock_parse_args):
-        self.assertRan(task, mock_parse_args, task="mock_task")
+    def test_run(self, mock_task, mock_parse_args):
+        self.assertRan(mock_task, mock_parse_args, task="mock_task")
 
-    def test_task_args(self, task, mock_parse_args):
-        self.assertRan(task, mock_parse_args, task="mock_task", task_args=["-h"])
+    def test_task_args(self, mock_task, mock_parse_args):
+        self.assertRan(mock_task, mock_parse_args, task="mock_task", task_args=["-h"])
 
     def test_unknown_task(self, mock_environment, mock_parse_args):
         mock_parse_args.return_value = build_test_args(task="unknown_task")
@@ -182,10 +186,11 @@ class TestCLI:
             runner.cli()
         assert exit_call.value.code == mock_run_exit_errors.return_value
 
-    def test_success(self, task, mock_init, mock_parse_args, mock_exit):
+    # TODO: mock_task should mock an environment
+    def test_success(self, mock_task, mock_init, mock_parse_args, mock_exit):
         mock_parse_args.return_value = build_test_args(task="mock_task")
 
         with pytest.raises(MockExit) as exit_call:
             runner.cli()
         assert exit_call.value.code == ExitCodes.SUCCESS
-        task.mock.assert_called_with()
+        mock_task.mock.assert_called_with()

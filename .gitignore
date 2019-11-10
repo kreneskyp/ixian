@@ -40,6 +40,7 @@ Session.vim
 .sentinel
 nosetests.xml
 coverage/
+.coverage
 
 # test output
 shared

@@ -1,5 +1,5 @@
 [run]
-omit = power_shovel/test/*,.tox/*
+omit = power_shovel/test/*,.tox/*,conftest.py
 
 [report]
 show_missing = True

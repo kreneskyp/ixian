@@ -6,16 +6,7 @@ from power_shovel.exceptions import MockExit
 from power_shovel.module import load_modules, clear_modules
 from power_shovel.runner import ExitCodes
 from power_shovel.task import clear_task_registry
-from power_shovel.test.fake import (
-    mock_task,
-    mock_nested_single_dependency_nodes,
-    MOCK_TASKS,
-    mock_tasks_with_clean_functions,
-    mock_tasks_with_passing_checkers,
-    mock_failing_tasks,
-    build_test_args,
-)
-
+from power_shovel.test import fake
 
 # =================================================================================================
 # Environment and system components
@@ -77,7 +68,7 @@ def mock_parse_args():
     """
     patcher = mock.patch("power_shovel.runner.parse_args")
     mock_parse_args = patcher.start()
-    mock_parse_args.return_value = build_test_args()
+    mock_parse_args.return_value = fake.build_test_args()
     yield mock_parse_args
     patcher.stop()
 
@@ -88,46 +79,46 @@ def mock_parse_args():
 
 
 @pytest.fixture
-def task(mock_environment):
+def mock_task(mock_environment):
     """Create a single mock task"""
-    yield mock_task()
+    yield fake.mock_task()
     clear_task_registry()
 
 
 @pytest.fixture
-def nested_tasks():
+def mock_nested_tasks():
     """Create a single mock task"""
-    yield mock_nested_single_dependency_nodes()
+    yield fake.mock_nested_single_dependency_nodes()
     clear_task_registry()
 
 
 @pytest.fixture
-def tasks_with_cleaners():
+def mock_tasks_with_cleaners():
     """nested tasks all with mocked cleaner functions"""
-    yield mock_tasks_with_clean_functions()
+    yield fake.mock_tasks_with_clean_functions()
     clear_task_registry()
 
 
 @pytest.fixture
-def tasks_with_passing_checkers(request):
+def mock_tasks_with_passing_checkers(request):
     """nested tasks all with mocked cleaner functions"""
-    yield mock_tasks_with_passing_checkers()
+    yield fake.mock_tasks_with_passing_checkers()
     clear_task_registry()
 
 
 @pytest.fixture
-def tasks_that_fail():
+def mock_tasks_that_fail():
     """nested tasks all with mocked cleaner functions"""
-    yield mock_failing_tasks()
+    yield fake.mock_failing_tasks()
     clear_task_registry()
 
 
-@pytest.fixture(params=list(MOCK_TASKS.keys()))
-def task_scenarios(request):
+@pytest.fixture(params=list(fake.MOCK_TASKS.keys()))
+def mock_task_scenarios(request):
     """
     Fixture that iterates through all MOCK_TASKS scenarios
     """
-    yield MOCK_TASKS[request.param]()
+    yield fake.MOCK_TASKS[request.param]()
     clear_task_registry()
 
 
