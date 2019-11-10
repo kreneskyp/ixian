@@ -14,6 +14,29 @@ from power_shovel.test import fake
 
 
 @pytest.fixture
+def mock_logger():
+    """
+    Mock the logging system.
+
+    Modules usually import `logging` as a module. That import can't be mocked generically but the
+    methods inside it can be. Mock the methods individually and return a single mock with them
+    attached.
+    """
+    mock_logger = mock.Mock()
+    patchers = []
+
+    for level in ["error", "warn", "info", "debug"]:
+        patcher = mock.patch(f"power_shovel.logger.{level}")
+        patchers.append(patcher)
+        setattr(mock_logger, level, patcher.start())
+
+    yield mock_logger
+
+    for patcher in patchers:
+        patcher.stop()
+
+
+@pytest.fixture
 def mock_environment():
     """
     Initialize power_shovel with a test environment
