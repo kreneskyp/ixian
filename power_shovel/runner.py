@@ -104,7 +104,7 @@ def get_parser() -> argparse.ArgumentParser:
     """Return an instance of the base argument parser.
 
     The base parser has the internal flags but not tasks.
-    :return:
+    :return: ArgumentParser that can parse args.
     """
     parser = argparse.ArgumentParser(
         prog="power_shovel",

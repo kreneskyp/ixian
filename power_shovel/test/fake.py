@@ -1,9 +1,21 @@
 import uuid
 from unittest import mock
 
-from power_shovel import Task
+from power_shovel import Task, runner
 from power_shovel.exceptions import ExecuteFailed
 from power_shovel.test.mock_checker import PassingCheck
+
+
+def build_test_args(**extra):
+    """
+    Build list of args for a test. `extra` args are combined with `DEFAULT_ARGS`
+    :param extra: extra args to add
+    :return: list of args to pass to a TaskRunner
+    """
+    args = runner.DEFAULT_ARGS.copy()
+    args["task_args"] = []
+    args.update(extra)
+    return args
 
 
 class MockTaskBase:

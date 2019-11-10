@@ -9,6 +9,10 @@ CLASS_PATH_PATTERN = re.compile(r"(?P<module_path>.*)\.(?P<classname>.+)")
 MODULES = []
 
 
+def clear_modules():
+    MODULES.clear()
+
+
 def load_module(module_path):
     """
     Load module by path.
