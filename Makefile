@@ -18,12 +18,15 @@ test: .image_created .python_version
 	${DOCKER_RUN} tox
 
 
+BLACK_EXCLUDE=--exclude=snapshots/*
+
+
 black: .image_created .python_version
-	${DOCKER_RUN} black .
+	${DOCKER_RUN} black ${BLACK_EXCLUDE} .
 
 
 black-check: .image_created .python_version
-	${DOCKER_RUN} black --check .
+	${DOCKER_RUN} black ${BLACK_EXCLUDE} --check .
 
 
 bash: .image_created .python_version
