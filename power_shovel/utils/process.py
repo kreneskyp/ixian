@@ -46,11 +46,11 @@ def execute(command: str, silent: bool = False) -> int:
     return subprocess.call(args)
 
 
-def get_dev_uid():
+def get_dev_uid() -> int:
     """get dev uid of running process"""
     return int(subprocess.check_output(["id", "-u"])[:-1])
 
 
-def get_dev_gid():
+def get_dev_gid() -> int:
     """get dev gid of running process"""
     return int(subprocess.check_output(["id", "-g"])[:-1])
