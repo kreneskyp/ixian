@@ -22,9 +22,9 @@ def workspace(name: str) -> str:
     :param name: name of workspace
     :return: path to shovel.py
     """
-    import power_shovel.test as power_shovel_test
+    import power_shovel.test.mocks as power_shovel_mocks
 
-    base = os.path.dirname(os.path.realpath(power_shovel_test.__file__))
+    base = os.path.dirname(os.path.realpath(power_shovel_mocks.__file__))
     return f"{base}/workspaces/{name}/shovel.py"
 
 

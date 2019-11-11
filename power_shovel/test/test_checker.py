@@ -84,9 +84,9 @@ class CheckerTests(TestCase):
 
 
 def file_hash_mock_path(path):
-    import power_shovel.test as test_module
+    import power_shovel.test.mocks as mocks_module
 
-    module_dir = os.path.dirname(os.path.realpath(test_module.__file__))
+    module_dir = os.path.dirname(os.path.realpath(mocks_module.__file__))
     return f"{module_dir}/file_hash_mocks/{path}"
 
 

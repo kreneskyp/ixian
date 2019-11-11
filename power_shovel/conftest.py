@@ -42,7 +42,7 @@ def mock_environment():
     Initialize power_shovel with a test environment
     """
     CONFIG.PROJECT_NAME = "unittests"
-    load_modules("power_shovel.modules.core", "power_shovel.test.modules.test")
+    load_modules("power_shovel.modules.core", "power_shovel.test.mocks.modules.test")
     yield
     clear_task_registry()
     clear_modules()
