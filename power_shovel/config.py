@@ -7,33 +7,17 @@ from power_shovel.utils.decorators import classproperty
 
 
 class MissingConfiguration(AssertionError):
-    def __init__(self, value, key):
-        super(MissingConfiguration, self).__init__(
-            "Missing config while rendering %s: %s" % (value, key)
-        )
-
-
-def requires_config(*properties):
-    """Add assertions that make sure """
-    global CONFIG
-
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            for property in properties:
-                value = getattr(CONFIG, property, None)
-                if value is None:
-                    raise MissingConfiguration(func.__name__, property)
-            return func(*args, **kwargs)
-
-        return wrapper
-
-    return decorator
-
-
-def set_config(options):
-    global CONFIG
-    CONFIG.__dict__.update(options)
+    def __init__(self, key, parent=None):
+        """
+        Error thrown when formatting a string but a config value is missing.
+        :param parent: Key being rendered
+        :param key: Key that is missing
+        """
+        if parent:
+            msg = f"Missing config while rendering {parent}: {key}"
+        else:
+            msg = f"Missing config: {key}"
+        super(MissingConfiguration, self).__init__(msg)
 
 
 CONFIG_VARIABLE_PATTERN = re.compile(r"{(?P<var>[a-zA-Z0-9_.]+)}")
@@ -99,7 +83,7 @@ class Config(object):
                         getattr(root, root_key), variable, **kwargs
                     )
                 except AttributeError:
-                    raise MissingConfiguration(key, variable)
+                    raise MissingConfiguration(variable, key)
 
         expanded.update(**kwargs)
         return value.format(**expanded)
