@@ -71,6 +71,10 @@ class Config(object):
         if not isinstance(value, str):
             return value
 
+        # always format strings using the root so the full path is available
+        if self.root:
+            return self.root.format(value, key, **kwargs)
+
         variables = CONFIG_VARIABLE_PATTERN.findall(value)
         expanded = {}
         for variable in variables:
