@@ -109,35 +109,35 @@ def mock_task(mock_environment):
 
 
 @pytest.fixture
-def mock_nested_tasks():
+def mock_nested_tasks(mock_environment):
     """Create a single mock task"""
     yield fake.mock_nested_single_dependency_nodes()
     clear_task_registry()
 
 
 @pytest.fixture
-def mock_tasks_with_cleaners():
+def mock_tasks_with_cleaners(mock_environment):
     """nested tasks all with mocked cleaner functions"""
     yield fake.mock_tasks_with_clean_functions()
     clear_task_registry()
 
 
 @pytest.fixture
-def mock_tasks_with_passing_checkers(request):
+def mock_tasks_with_passing_checkers(mock_environment):
     """nested tasks all with mocked cleaner functions"""
     yield fake.mock_tasks_with_passing_checkers()
     clear_task_registry()
 
 
 @pytest.fixture
-def mock_tasks_that_fail():
+def mock_tasks_that_fail(mock_environment):
     """nested tasks all with mocked cleaner functions"""
     yield fake.mock_failing_tasks()
     clear_task_registry()
 
 
 @pytest.fixture(params=list(fake.MOCK_TASKS.keys()))
-def mock_task_scenarios(request):
+def mock_task_scenarios(request, mock_environment):
     """
     Fixture that iterates through all MOCK_TASKS scenarios
     """
