@@ -3,10 +3,11 @@ from importlib import import_module
 
 from power_shovel import logger
 from power_shovel.config import CONFIG
+from power_shovel.exceptions import ModuleLoadError, InvalidClassPath
 from power_shovel.task import Task, VirtualTarget
 
 CLASS_PATH_PATTERN = re.compile(r"(?P<module_path>.*)\.(?P<classname>.+)")
-MODULES = []
+MODULES = {}
 
 
 def load_module(module_path):
@@ -19,33 +20,37 @@ def load_module(module_path):
     :return:
     """
 
+    # load module and it's options
     module = import_module(module_path)
-    try:
-        MODULE_CONFIG = getattr(module, "MODULE_CONFIG")
-    except AssertionError:
-        MODULE_CONFIG = {}
+    if not hasattr(module, "OPTIONS"):
+        raise ModuleLoadError(f"{module_path}: missing OPTIONS")
+    MODULE_OPTIONS = getattr(module, "OPTIONS")
+
+    # verify required options
+    if "name" not in MODULE_OPTIONS:
+        raise ModuleLoadError(f"{module_path}: OPTIONS is missing 'name'")
 
     # load config
-    config_class_path = MODULE_CONFIG.get("config", False)
+    config_class_path = MODULE_OPTIONS.get("config", False)
     if config_class_path:
         match = CLASS_PATH_PATTERN.match(config_class_path)
         if not match:
-            raise Exception("Config classpath invalid: %s" % config_class_path)
+            raise InvalidClassPath("Config classpath invalid: %s" % config_class_path)
         config_module_path, config_classname = match.groups()
 
         config_module = import_module(config_module_path)
         config_class = getattr(config_module, config_classname)
-        CONFIG.add(MODULE_CONFIG["name"].upper(), config_class())
+        CONFIG.add(MODULE_OPTIONS["name"].upper(), config_class())
 
     # load tasks
-    tasks_module_path = MODULE_CONFIG.get("tasks", False)
+    tasks_module_path = MODULE_OPTIONS.get("tasks", False)
     if tasks_module_path:
         load_tasks(tasks_module_path)
 
     # add config to global so downstream utils/modules may use it
-    MODULES.append(MODULE_CONFIG)
+    MODULES[MODULE_OPTIONS["name"]] = MODULE_OPTIONS
 
-    logger.debug("Loaded Module: {}".format(MODULE_CONFIG["name"]))
+    logger.debug("Loaded Module: {}".format(MODULE_OPTIONS["name"]))
 
 
 def load_tasks(tasks_module_path):

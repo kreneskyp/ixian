@@ -1,1 +1,1 @@
-MODULE_CONFIG = {"name": "CORE", "tasks": "power_shovel.modules.core.tasks"}
+OPTIONS = {"name": "CORE", "tasks": "power_shovel.modules.core.tasks"}

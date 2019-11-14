@@ -1,5 +1,6 @@
+# This is a functional module
 OPTIONS = {
-    "name": "TEST",
-    "tasks": "power_shovel.test.mocks.modules.test.tasks",
-    "config": "power_shovel.test.mocks.modules.test.config.TestConfig",
+    "name": "FUNCTIONAL",
+    "tasks": "power_shovel.test.mocks.modules.functional.tasks",
+    "config": "power_shovel.test.mocks.modules.functional.config.TestConfig",
 }
