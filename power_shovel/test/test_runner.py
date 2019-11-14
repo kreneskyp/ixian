@@ -6,14 +6,8 @@ import pytest
 from power_shovel import logger
 from power_shovel import runner
 from power_shovel.exceptions import MockExit
-from power_shovel.module import load_modules
 from power_shovel.runner import ExitCodes
 from power_shovel.test.fake import build_test_args
-
-
-def init_failure_unknown_module():
-    """Initialize with intentional error: unknown module"""
-    load_modules("power_shovel.modules.unknown")
 
 
 def workspace(name: str) -> str:

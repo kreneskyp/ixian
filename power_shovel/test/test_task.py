@@ -4,7 +4,7 @@ from unittest import mock
 import pytest
 
 from power_shovel.exceptions import AlreadyComplete, ExecuteFailed
-from power_shovel.task import clear_task_registry, Task, TaskRunner
+from power_shovel.task import Task, TaskRunner
 
 
 CALL = mock.call()
@@ -255,10 +255,8 @@ class TestTaskTree:
         snapshot.assert_match(tree)
 
 
+@pytest.mark.usefixtures("mock_environment")
 class TestTaskHelp:
-    def teardown_method(self):
-        clear_task_registry()
-
     def test_render_help(self, snapshot):
         class MockTask(Task):
             """This is a mock test"""

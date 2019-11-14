@@ -10,10 +10,6 @@ from power_shovel.utils.color_codes import BOLD_WHITE, ENDC, GRAY, OK_GREEN
 TASKS = {}
 
 
-def clear_task_registry():
-    TASKS.clear()
-
-
 class TaskRunner(object):
     """
     A task is a wrapper around functions that adds in various functionality

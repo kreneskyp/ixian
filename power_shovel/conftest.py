@@ -3,9 +3,9 @@ from unittest import mock
 
 from power_shovel.config import CONFIG
 from power_shovel.exceptions import MockExit
-from power_shovel.module import load_modules, clear_modules
+from power_shovel.module import load_module, MODULES
 from power_shovel.runner import ExitCodes
-from power_shovel.task import clear_task_registry
+from power_shovel.task import TASKS
 from power_shovel.test import fake
 
 # =================================================================================================
@@ -42,10 +42,10 @@ def mock_environment():
     Initialize power_shovel with a test environment
     """
     CONFIG.PROJECT_NAME = "unittests"
-    load_modules("power_shovel.modules.core", "power_shovel.test.mocks.modules.test")
+    load_module("power_shovel.modules.core")
     yield
-    clear_task_registry()
-    clear_modules()
+    TASKS.clear()
+    MODULES.clear()
 
 
 @pytest.fixture
@@ -105,35 +105,30 @@ def mock_parse_args():
 def mock_task(mock_environment):
     """Create a single mock task"""
     yield fake.mock_task()
-    clear_task_registry()
 
 
 @pytest.fixture
 def mock_nested_tasks(mock_environment):
     """Create a single mock task"""
     yield fake.mock_nested_single_dependency_nodes()
-    clear_task_registry()
 
 
 @pytest.fixture
 def mock_tasks_with_cleaners(mock_environment):
     """nested tasks all with mocked cleaner functions"""
     yield fake.mock_tasks_with_clean_functions()
-    clear_task_registry()
 
 
 @pytest.fixture
 def mock_tasks_with_passing_checkers(mock_environment):
     """nested tasks all with mocked cleaner functions"""
     yield fake.mock_tasks_with_passing_checkers()
-    clear_task_registry()
 
 
 @pytest.fixture
 def mock_tasks_that_fail(mock_environment):
     """nested tasks all with mocked cleaner functions"""
     yield fake.mock_failing_tasks()
-    clear_task_registry()
 
 
 @pytest.fixture(params=list(fake.MOCK_TASKS.keys()))
@@ -142,7 +137,6 @@ def mock_task_scenarios(request, mock_environment):
     Fixture that iterates through all MOCK_TASKS scenarios
     """
     yield fake.MOCK_TASKS[request.param]()
-    clear_task_registry()
 
 
 # =================================================================================================

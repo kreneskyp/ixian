@@ -9,10 +9,6 @@ CLASS_PATH_PATTERN = re.compile(r"(?P<module_path>.*)\.(?P<classname>.+)")
 MODULES = []
 
 
-def clear_modules():
-    MODULES.clear()
-
-
 def load_module(module_path):
     """
     Load module by path.
@@ -70,14 +66,3 @@ def load_tasks(tasks_module_path):
             except:
                 logger.error("Error loading task: %s" % module_attribute)
                 raise
-
-
-def load_modules(*module_paths):
-    """Load module including it's config and tasks
-
-    Args:
-        *module_paths: paths as dot notation string.
-
-    """
-    for module_path in module_paths:
-        load_module(module_path)
