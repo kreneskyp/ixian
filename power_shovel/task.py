@@ -18,6 +18,7 @@ class TaskRunner(object):
 
     def __init__(
         self,
+        task,
         func=None,
         category=None,
         check=None,
@@ -29,6 +30,7 @@ class TaskRunner(object):
         short_description=None,
         description=None,
     ):
+        self.task = task
         self.func = func
         self._depends = depends or []
         self.category = category.upper() if category else None
@@ -464,6 +466,7 @@ class Task(object):
 
         if cls.__task__ is None:
             cls.__task__ = TaskRunner(
+                task=instance,
                 func=instance.__func__,
                 name=instance.name,
                 category=getattr(instance, "category", None),
@@ -474,6 +477,14 @@ class Task(object):
                 parent=getattr(instance, "parent", None),
                 short_description=getattr(instance, "short_description", None),
                 description=cls.__doc__,
+            )
+        else:
+            # In practice task classes should never need to be instantiated more than once.
+            # Unloading tasks isn't supported at this time, but tests may do that. When that
+            # happens subsequent tests may see this fail. This msg helps show that happened.
+            # hopefully this is fixed in a better way when task loading/tree is refactored.
+            logger.warn(
+                f"Task {instance.name} instantiated but an instance already exists"
             )
 
         return instance

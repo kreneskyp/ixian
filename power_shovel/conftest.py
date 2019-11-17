@@ -44,6 +44,10 @@ def mock_environment():
     CONFIG.PROJECT_NAME = "unittests"
     load_module("power_shovel.modules.core")
     yield
+    # Clear reference to runner else subsequent loads won't properly setup the tasks
+    # TODO: this needs to be cleaned up when task loading is simplified
+    for runner in TASKS.values():
+        type(runner.task).__task__ = None
     TASKS.clear()
     MODULES.clear()
 
