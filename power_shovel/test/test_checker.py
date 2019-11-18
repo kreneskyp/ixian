@@ -1,10 +1,10 @@
+import os
+import pytest
 import uuid
-from unittest import TestCase
+
 from unittest.mock import Mock
 
-import os
-
-from power_shovel.check.checker import Checker
+from power_shovel.check.checker import Checker, MultiValueChecker
 from power_shovel.modules.filesystem.file_hash import FileHash, get_flags
 
 
@@ -17,6 +17,8 @@ class MockChecker(Checker):
             self.check = Mock(return_value=True)
 
         self.mocked_state = 1
+
+        # random id so tests so filename is unique and tests dont leak
         self.id = uuid.uuid4()
 
     def state(self):
@@ -34,6 +36,15 @@ class MockChecker(Checker):
         return instance
 
 
+class MockMultiValueChecker(MultiValueChecker):
+    def __init__(self, *args):
+        self.mocked_state = 100
+        super(MockMultiValueChecker, self).__init__(*args)
+
+    def state(self):
+        return {"mock": self.mocked_state}
+
+
 class FailingCheck(MockChecker):
     """A checker that always fails the check"""
 
@@ -48,39 +59,50 @@ class PassingCheck(MockChecker):
     pass
 
 
-class CheckerTests(TestCase):
+class TestChecker:
     """Core Checker tests"""
 
     @property
     def checker(self):
         return MockChecker(mock_save=False, mock_check=False)
 
-    def test_cache(self):
+    def test_cache(self, temp_builder):
         """Test reading and writing from hash cache"""
         checker = self.checker
 
-        self.assertEqual(checker.saved_state(), None)
+        assert checker.saved_state() is None
         checker.save()
-        self.assertEqual(checker.saved_state(), checker.state())
+        assert checker.saved_state() == checker.state()
 
-    def test_check_never_run(self):
+    def test_check_never_run(self, temp_builder):
         """Check should return False if task has never been run"""
         checker = self.checker
-        self.assertEqual(checker.saved_state(), None)
-        self.assertFalse(checker.check())
+        assert checker.saved_state() is None
+        assert not checker.check()
 
-    def test_check_hash_match(self):
+    def test_check_hash_match(self, temp_builder):
         """Check should return True if hash matches"""
         checker = self.checker
         checker.save()
-        self.assertTrue(checker.check())
+        assert checker.check()
 
-    def test_check_hash_mismatch(self):
+    def test_check_hash_mismatch(self, temp_builder):
         """Check should return False if hash does not match"""
         checker = self.checker
         checker.save()
         checker.mocked_state += 1
-        self.assertFalse(checker.check())
+        assert not checker.check()
+
+
+class TestMultiValueChecker(TestChecker):
+    @property
+    def checker(self):
+        # random key so tests don't leak
+        return MockMultiValueChecker(str(uuid.uuid4()))
+
+    def test_requires_at_least_one_key(self):
+        with pytest.raises(AssertionError, match="At least one key must be given"):
+            MockMultiValueChecker()
 
 
 def file_hash_mock_path(path):
@@ -90,7 +112,7 @@ def file_hash_mock_path(path):
     return f"{module_dir}/file_hash_mocks/{path}"
 
 
-class FileHashTests(TestCase):
+class TestFileHash:
     """Tests for the FileHash checker"""
 
     MOCK_DIR = "dir"
@@ -131,7 +153,7 @@ class FileHashTests(TestCase):
     def assert_paths(self, path_1, path_2, expected):
         checker_1 = FileHash(path_1)
         checker_2 = FileHash(path_2)
-        self.assertEqual(expected, (checker_1 == checker_2))
+        assert expected == (checker_1 == checker_2)
 
     # File Tests
 
@@ -139,10 +161,10 @@ class FileHashTests(TestCase):
         """Test hashing a single file"""
         path = file_hash_mock_path(self.MOCK_FILE_1)
         checker_1 = FileHash(path)
-        self.assertEqual(
-            checker_1.state(),
-            {path: "529208ab580d05f4e081d2da2cde8b80da46c39ae8f0a31d20b905057bf2f2bc"},
-        )
+        expected = {
+            path: "529208ab580d05f4e081d2da2cde8b80da46c39ae8f0a31d20b905057bf2f2bc"
+        }
+        assert checker_1.state() == expected
 
     def test_file_permission_change(self):
         """Changing permission on file changes it's hash"""
@@ -156,11 +178,11 @@ class FileHashTests(TestCase):
         file_1 = file_hash_mock_path(self.MOCK_FILE_1)
         file_2 = file_hash_mock_path(self.MOCK_FILE_1_RENAMED)
         # make sure flags are identical
-        self.assertEqual(get_flags(file_1), get_flags(file_2))
+        assert get_flags(file_1) == get_flags(file_2)
         checker_1 = FileHash(file_1)
         checker_2 = FileHash(file_2)
-        self.assertEqual(
-            list(checker_1.state().values())[0], list(checker_2.state().values())[0]
+        assert (
+            list(checker_1.state().values())[0] == list(checker_2.state().values())[0]
         )
 
     def test_file_contents_change(self):
@@ -187,17 +209,17 @@ class FileHashTests(TestCase):
         """Test hashing a directory"""
         path = file_hash_mock_path(self.MOCK_DIR)
         checker_1 = FileHash(path)
-        self.assertEqual(
-            checker_1.state(),
-            {path: "f443aa643743df88ff39648d3cc04973813be298bee1c29372a9e103ad20fb47"},
-        )
+        expected = {
+            path: "f443aa643743df88ff39648d3cc04973813be298bee1c29372a9e103ad20fb47"
+        }
+        assert checker_1.state() == expected
 
     def test_dir_rename(self):
         """Test changing a directory's name"""
         checker_1 = FileHash(file_hash_mock_path(self.MOCK_DIR))
         checker_2 = FileHash(file_hash_mock_path(self.MOCK_DIR_COPY))
-        self.assertEqual(
-            list(checker_1.state().values())[0], list(checker_2.state().values())[0]
+        assert (
+            list(checker_1.state().values())[0] == list(checker_2.state().values())[0]
         )
 
     def test_dir_permission_change(self):

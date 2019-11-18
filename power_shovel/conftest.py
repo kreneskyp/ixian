@@ -1,3 +1,6 @@
+import os
+import shutil
+
 import pytest
 from unittest import mock
 
@@ -98,6 +101,20 @@ def mock_parse_args():
     mock_parse_args.return_value = fake.build_test_args()
     yield mock_parse_args
     patcher.stop()
+
+
+@pytest.fixture
+def temp_builder():
+    """
+    Fixture that creates a builder dir in /tmp and then removes it afterwards. Intended for use
+    with tests that aren't mocking writes/reads from the builder cache.
+    """
+    CONFIG.BUILDER = "/tmp/.builder"
+    if os.path.exists(CONFIG.BUILDER):
+        shutil.rmtree(CONFIG.BUILDER)
+    yield
+    if os.path.exists(CONFIG.BUILDER):
+        shutil.rmtree(CONFIG.BUILDER)
 
 
 # =================================================================================================
