@@ -87,6 +87,7 @@ class MultiValueChecker(Checker):
     """Checker that checks multiple keys."""
 
     def __init__(self, *keys):
+        assert len(keys) != 0, "At least one key must be given"
         self._keys = keys
 
     @property
