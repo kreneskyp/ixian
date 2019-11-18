@@ -13,7 +13,7 @@ from power_shovel import logger
 from power_shovel.config import CONFIG
 from power_shovel.logger import DEFAULT_LOG_LEVEL
 from power_shovel.module import load_module
-from power_shovel.modules.filesystem import utils as file_utils
+from power_shovel.utils import filesystem as file_utils
 from power_shovel.exceptions import AlreadyComplete, ExecuteFailed
 from power_shovel.task import TASKS, TaskRunner
 from power_shovel.utils.color_codes import RED, ENDC

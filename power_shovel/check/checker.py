@@ -4,7 +4,7 @@ import json
 import os
 
 from power_shovel.config import CONFIG
-from power_shovel.modules.filesystem.utils import mkdir
+from power_shovel.utils.filesystem import mkdir
 
 
 def hash_object(obj):
