@@ -5,9 +5,15 @@ from power_shovel.utils.decorators import classproperty, cached_property
 
 
 class Foo:
+    _bar = "success"
+
     @classproperty
     def bar(self):
         return "success"
+
+    @bar.setter
+    def bar(self, value):
+        self._bar = value
 
 
 class TestClassProperty:
