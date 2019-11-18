@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 
 import argcomplete
@@ -62,7 +63,11 @@ class ExitCodes(Enum):
 
 def shovel_path() -> str:
     """Return path to shovel.py"""
-    return f"{file_utils.pwd()}/shovel.py"
+    env_value = os.getenv("POWER_SHOVEL_CONFIG", None)
+    if env_value:
+        return env_value
+    else:
+        return f"{file_utils.pwd()}/shovel.py"
 
 
 def import_shovel():

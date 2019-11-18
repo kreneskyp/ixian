@@ -6,7 +6,7 @@ import pytest
 from power_shovel import logger
 from power_shovel import runner
 from power_shovel.exceptions import MockExit
-from power_shovel.runner import ExitCodes
+from power_shovel.runner import ExitCodes, shovel_path
 from power_shovel.test.fake import build_test_args
 
 
@@ -20,6 +20,40 @@ def workspace(name: str) -> str:
 
     base = os.path.dirname(os.path.realpath(power_shovel_mocks.__file__))
     return f"{base}/workspaces/{name}/shovel.py"
+
+
+class TestExitCodes:
+    def test_properties(self):
+        ExitCodes.errors
+        ExitCodes.init_errors
+        ExitCodes.run_errors
+
+    def test_is_success(self):
+        assert ExitCodes.SUCCESS.is_success
+        assert not ExitCodes.ERROR_COMPLETE.is_success
+        assert not ExitCodes.ERROR_UNKNOWN_TASK.is_success
+        assert not ExitCodes.ERROR_NO_INIT.is_success
+        assert not ExitCodes.ERROR_NO_SHOVEL_PY.is_success
+        assert not ExitCodes.ERROR_TASK.is_success
+
+    def test_is_error(self):
+        assert not ExitCodes.SUCCESS.is_error
+        assert ExitCodes.ERROR_COMPLETE.is_error
+        assert ExitCodes.ERROR_UNKNOWN_TASK.is_error
+        assert ExitCodes.ERROR_NO_INIT.is_error
+        assert ExitCodes.ERROR_NO_SHOVEL_PY.is_error
+        assert ExitCodes.ERROR_TASK.is_error
+
+
+class TestShovelPath:
+    def test_default_shovel_path(self):
+        # shovel.py is in the PWD by default if POWER_SHOVEL_CONFIG isn't set.
+        assert shovel_path() == "/opt/power_shovel/shovel.py"
+
+    def test_overridden_path(self):
+        # config file path may be overridden by setting POWER_SHOVEL_CONFIG
+        with mock.patch("power_shovel.runner.os.getenv", return_value="/tmp/config.py"):
+            assert shovel_path() == "/tmp/config.py"
 
 
 class TestInit:
