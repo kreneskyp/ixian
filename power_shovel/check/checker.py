@@ -83,20 +83,6 @@ class Checker(object):
         raise NotImplementedError
 
 
-class SingleKeyChecker(Checker):
-    """Checker that checks a single key"""
-
-    def __init__(self, key):
-        self.key = key
-
-    def filename(self):
-        """"Generate file path using keys of the data dict."""
-        return hashlib.sha256(self.key).hexdigest()
-
-    def clone(self):
-        return type(self)(self.key)
-
-
 class MultiValueChecker(Checker):
     """Checker that checks multiple keys."""
 
