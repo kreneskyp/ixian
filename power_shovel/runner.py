@@ -213,8 +213,12 @@ def parse_args(args: str = None) -> dict:
 
     compiled_args["log"] = logger.LogLevels[compiled_args["log"]]
 
-    # if --help flag is given then run that task.
+    # if --help flag is given then run the "help" task. "--help <task>" and "help <task>" should
+    # be treated the same.
     if parsed_args.help:
+        # When --help is used the first arg is the task to show help for. The parser always saves
+        # the first arg as "task". --help should always run "help" as the task. Move the task
+        # into `task_args` so it is passed to the help task.
         if compiled_args["task"] and compiled_args["task"] != "help":
             compiled_args["task_args"] = [compiled_args["task"]]
         compiled_args["task"] = "help"

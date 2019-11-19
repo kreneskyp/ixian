@@ -133,6 +133,7 @@ class TestParser:
 
     def test_help_task(self):
         self.assertArgs(["help", "foo"], task="help", task_args=["foo"])
+        self.assertArgs(["--help", "foo"], help=True, task="help", task_args=["foo"])
 
     def test_task_args(self):
         """
