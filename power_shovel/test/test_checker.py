@@ -104,6 +104,15 @@ class TestMultiValueChecker(TestChecker):
         with pytest.raises(AssertionError, match="At least one key must be given"):
             MockMultiValueChecker()
 
+    def test_clone(self):
+        checker = self.checker
+        clone = checker.clone()
+        assert checker.keys == clone.keys
+        assert checker.filename() == clone.filename()
+        assert checker.file_path() == clone.file_path()
+        assert checker.state() == clone.state()
+        assert checker.saved_state() == clone.saved_state()
+
 
 def file_hash_mock_path(path):
     import power_shovel.test.mocks as mocks_module
