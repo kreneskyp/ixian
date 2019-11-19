@@ -5,7 +5,7 @@ import pytest
 
 from power_shovel import logger
 from power_shovel import runner
-from power_shovel.exceptions import MockExit
+from power_shovel.exceptions import MockExit, AlreadyComplete, ExecuteFailed
 from power_shovel.runner import ExitCodes, shovel_path
 from power_shovel.test.fake import build_test_args
 
@@ -195,6 +195,16 @@ class TestRun:
     def test_unknown_task(self, mock_environment, mock_parse_args):
         mock_parse_args.return_value = build_test_args(task="unknown_task")
         assert runner.run() == ExitCodes.ERROR_UNKNOWN_TASK
+
+    def test_already_complete(self, mock_task, mock_parse_args):
+        mock_parse_args.return_value = build_test_args(task="mock_task")
+        mock_task.mock.side_effect = AlreadyComplete
+        assert runner.run() == ExitCodes.ERROR_COMPLETE
+
+    def test_execute_failed(self, mock_task, mock_parse_args):
+        mock_parse_args.return_value = build_test_args(task="mock_task")
+        mock_task.mock.side_effect = ExecuteFailed
+        assert runner.run() == ExitCodes.ERROR_TASK
 
 
 class TestCLI:
