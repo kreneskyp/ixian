@@ -279,12 +279,12 @@ class TaskRunner(object):
 
                 task_line = f'{spacer}{icon} {node["name"]}\n'
                 buffer.write(task_line)
-                indent += 1
+                indent += 2
 
             for dependency in node["dependencies"]:
                 render_task(dependency, indent=indent)
 
-        render_task(self.status(), indent=2)
+        render_task(self.status(), indent=0)
 
     def tree(self, dedupe: bool = True, flatten: bool = True) -> dict:
         """
