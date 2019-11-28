@@ -4,8 +4,8 @@ from unittest import mock
 import pytest
 
 from power_shovel.exceptions import AlreadyComplete, ExecuteFailed
-from power_shovel.task import Task, TaskRunner
-
+from power_shovel.task import Task, TaskRunner, VirtualTarget, TASKS
+from power_shovel.test import fake
 
 CALL = mock.call()
 DEPENDENT_CALL = mock.call(**{"clean-all": False, "force-all": False})
@@ -217,6 +217,135 @@ class TestTask:
 
         root.mock.assert_has_calls([])
         child.mock.assert_has_calls([])
+
+    def test_task_superseding_explicit_virtual_target(self, mock_environment):
+        """
+        If a VirtualTask may be explicitly or implicitly defined. The latter happens when a task
+        has a parent that is not registered yet. In both cases if a Task with the same name is
+        loaded, it will supersede the task. The Task will take the place of the VirtualTask and
+        it will assume the VirtualTask's dependencies
+        """
+
+        class MockVirtualTarget(VirtualTarget):
+            name = "mock_virtual_target"
+
+        MockVirtualTarget()
+
+        mock_task = fake.mock_task(name="mock_virtual_target")
+
+        # the explicit virtual task should now be registered under the key
+        runner = TASKS["mock_virtual_target"]
+        assert runner == mock_task.__task__
+
+        # running the task should call the mock_task, since it should now be a dependency
+        runner()
+        mock_task.mock.assert_called_with()
+
+    def test_virtual_task_superseding_implicit_virtual_target(self, mock_environment):
+        """
+        If a VirtualTask may be explicitly or implicitly defined. The latter happens when a task
+        has a parent that is not registered yet. In both cases if a Task with the same name is
+        loaded, it will supersede the task. The Task will take the place of the VirtualTask and
+        it will assume the VirtualTask's dependencies
+
+        The same hold for a VirtualTask that may replace an implicit virtual task
+        """
+        mock_task = fake.mock_task(parent="mock_virtual_target")
+
+        class MockVirtualTarget(VirtualTarget):
+            name = "mock_virtual_target"
+
+        MockVirtualTarget()
+
+        # the explicit virtual task should now be registered under the key
+        runner = TASKS["mock_virtual_target"]
+        assert runner == MockVirtualTarget.__task__
+
+        # running the task should call the mock_task, since it should now be a dependency
+        runner()
+        mock_task.mock.assert_called_with()
+
+    def test_task_superseding_implicit_virtual_target(self, mock_environment):
+        """
+        If a VirtualTask may be explicitly or implicitly defined. The latter happens when a task
+        has a parent that is not registered yet. In both cases if a Task with the same name is
+        loaded, it will supersede the task. The Task will take the place of the VirtualTask and
+        it will assume the VirtualTask's dependencies
+        """
+        fake.mock_task(parent="mock_virtual_target")
+        mock_task = fake.mock_task(name="mock_virtual_target")
+
+        # the explicit virtual task should now be registered under the key
+        runner = TASKS["mock_virtual_target"]
+        assert runner == mock_task.__task__
+
+        # running the task should call the mock_task, since it should now be a dependency
+        runner()
+        mock_task.mock.assert_called_with()
+
+    def test_virtual_target_with_dependencies(self, mock_task):
+        """Test running a virtual target that has dependencies"""
+
+        class MockVirtualTarget(VirtualTarget):
+            name = "mock_virtual_target"
+            depends = ["mock_task"]
+
+        task = MockVirtualTarget()
+        task()
+
+        mock_task.mock.assert_called_with()
+
+    def test_explicit_virtual_target(self, mock_environment):
+        """"""
+
+        class MockVirtualTarget(VirtualTarget):
+            name = "mock_virtual_target"
+
+        task = MockVirtualTarget()
+
+        # run virtual, it shouldn't do anything.
+        task()
+
+    def test_implicit_virtual_target(self, mock_environment):
+        """
+        If a task defines a parent that does not exist, a VirtualTarget will automatically be
+        created. This VirtualTarget may be run as if it were explicitly defined.
+        """
+        task = fake.mock_task(parent="implicit_virtual_task")
+
+        assert "implicit_virtual_task" in TASKS
+        assert type(TASKS["implicit_virtual_task"]) == TaskRunner
+        TASKS["implicit_virtual_task"]()
+
+        # calling the virtual target should call the mock task since it's a dependency
+        task()
+        task.mock.assert_has_calls([])
+
+    def test_check_setup(self):
+        """
+        Task.check may by undefined, None, a checker, or a list:
+        - if undefined it will be converted to None
+        - if a non-list it will be converted to a list
+        """
+        mock_checker = mock.MagicMock()
+
+        task = fake.mock_task(check=None)
+        assert task.__task__.checkers == None
+
+        task = fake.mock_task(check=mock_checker)
+        assert task.__task__.checkers == [mock_checker]
+
+        task = fake.mock_task(check=[mock_checker])
+        assert task.__task__.checkers == [mock_checker]
+
+    def test_str_representations(self, mock_task, snapshot):
+        """
+        Sanity test of __str__, __unicode__, __repr__
+        """
+        runner = mock_task.__task__
+        runner.__str__()
+        runner.__unicode__()
+        runner.__repr__()
 
 
 class TestTaskTree:
