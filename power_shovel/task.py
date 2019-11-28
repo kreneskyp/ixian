@@ -16,9 +16,11 @@ class TaskRunner(object):
     such as dependencies and check functions.
     """
 
+    checkers = None
+
     def __init__(
         self,
-        task,
+        task=None,
         func=None,
         category=None,
         check=None,
@@ -41,21 +43,11 @@ class TaskRunner(object):
         # determine task name
         if name is not None:
             self.name = name
-        elif func is not None:
-            self.name = func.__name__
-        else:
-            raise Exception("Either func or name must be given.")
 
         # determine description
-        if name is not None:
-            self.description = description
-        elif func is not None and hasattr(func, "__doc__"):
-            self.description = func.__doc__
-        else:
-            self.description = ""
+        self.description = description
 
-        # Add task to global registry. Merge virtual target's dependencies if
-        # they exist.
+        # Add task to global registry. Merge virtual target's dependencies if they exist.
         if self.name in TASKS:
             task_instance = TASKS[self.name]
             # The task is virtual if there is no func, replace it.
@@ -79,8 +71,6 @@ class TaskRunner(object):
                 self.checkers = check
             else:
                 self.checkers = [check]
-        else:
-            self.checkers = None
 
     def __str__(self):
         return f"<{type(self).__name__}@{id(self)} func={self.name}>"
