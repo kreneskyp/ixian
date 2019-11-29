@@ -88,7 +88,7 @@ class TestTask:
         child_checker.check.assert_not_called()
         grandchild_checker.check.assert_not_called()
         root.assert_no_calls()
-        root.assert_no_checker_save_calls()
+        root.assert_no_checkers_saved()
         root.reset_mocks()
 
         with pytest.raises(AlreadyComplete):
@@ -97,7 +97,7 @@ class TestTask:
         child_checker.check.assert_not_called()
         grandchild_checker.check.assert_not_called()
         root.assert_no_calls()
-        root.assert_no_checker_save_calls()
+        root.assert_no_checkers_saved()
         root.reset_mocks()
 
         with pytest.raises(AlreadyComplete):
@@ -106,7 +106,7 @@ class TestTask:
         child_checker.check.assert_not_called()
         grandchild_checker.check.assert_not_called()
         root.assert_no_calls()
-        root.assert_no_checker_save_calls()
+        root.assert_no_checkers_saved()
         root.reset_mocks()
 
     def test_run_checkers_not_complete(self, mock_tasks_with_failing_checkers):
@@ -146,23 +146,22 @@ class TestTask:
         root, child, grandchild = mock_tasks_with_passing_checkers.mock_tasks.values()
 
         root(force=True)
-        root.assert_no_checker_calls()
+        root.assert_checkers_ran(child=True, grandchild=True)
         root.assert_tasks_ran(root=True)
+        root.assert_checkers_saved(root=True)
         root.reset_mocks()
 
         child(force=True)
-        root.assert_no_checker_calls()
+        root.assert_checkers_ran(grandchild=True)
         root.assert_tasks_ran(child=True)
+        root.assert_checkers_saved(child=True)
         root.reset_mocks()
 
         grandchild(force=True)
-        root.assert_no_checker_calls()
+        root.assert_no_checkers_ran()
         root.assert_tasks_ran(grandchild=True)
+        root.assert_checkers_saved(grandchild=True)
         root.reset_mocks()
-
-        # TODO: dependency checkers should still run
-        # TODO: dependency checkers that ran should save
-        raise NotImplementedError
 
     def test_run_force_all(self, mock_tasks_with_passing_checkers):
         """
@@ -175,21 +174,21 @@ class TestTask:
 
         root(force_all=True)
         root.assert_all_tasks_ran()
-        root.assert_no_checker_calls()
+        root.assert_no_checkers_ran()
+        root.assert_all_checkers_saved()
         root.reset_mocks()
 
         child(force_all=True)
-        root.assert_no_checker_calls()
+        root.assert_no_checkers_ran()
+        root.assert_checkers_saved(child=True, grandchild=True)
         root.assert_tasks_ran(child=True, grandchild=True)
         root.reset_mocks()
 
         grandchild(force_all=True)
         root.assert_tasks_ran(grandchild=True)
-        root.assert_no_checker_calls()
+        root.assert_no_checkers_ran()
+        root.assert_checkers_saved(grandchild=True)
         root.reset_mocks()
-
-        # TODO: need to check for save calls
-        raise NotImplementedError
 
     def test_execute_failure(self, mock_tasks_that_fail):
         """

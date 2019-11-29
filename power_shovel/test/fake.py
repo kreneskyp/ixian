@@ -85,11 +85,17 @@ class MockTaskBase:
     def assert_no_calls(self):
         self.assert_tasks_ran(default=False)
 
-    def assert_no_checker_save_calls(self):
-        self.assert_checkers_saved(default=False)
+    def assert_all_checkers_ran(self):
+        self.assert_checkers_ran(default=True)
 
-    def assert_no_checker_calls(self):
+    def assert_no_checkers_ran(self):
         self.assert_checkers_ran(default=False)
+
+    def assert_all_checkers_saved(self):
+        return self.assert_checkers_saved(default=True)
+
+    def assert_no_checkers_saved(self):
+        self.assert_checkers_saved(default=False)
 
 
 def mock_task(
