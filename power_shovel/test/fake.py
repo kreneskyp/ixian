@@ -44,15 +44,15 @@ class MockTaskBase:
 
     def assert_no_calls(self):
         for mock_task in self.mock_tasks:
-            mock_task.mock.assert_has_calls([])
+            mock_task.mock.assert_not_called()
 
     def assert_no_checker_save_calls(self):
         for mock_task in self.mock_tasks:
-            mock_task.__task__.checkers[0].save.assert_has_calls([])
+            mock_task.__task__.checkers[0].save.assert_not_called()
 
     def assert_no_checker_calls(self):
         for mock_task in self.mock_tasks:
-            mock_task.__task__.checkers[0].save.assert_has_calls([])
+            mock_task.__task__.checkers[0].save.assert_not_called()
 
 
 def mock_task(
