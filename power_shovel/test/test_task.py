@@ -6,6 +6,7 @@ import pytest
 from power_shovel.exceptions import AlreadyComplete, ExecuteFailed
 from power_shovel.task import Task, TaskRunner, VirtualTarget, TASKS
 from power_shovel.test import fake
+from power_shovel.test.mock_checker import FailingCheck, PassingCheck
 
 CALL = mock.call()
 DEPENDENT_CALL = mock.call(**{"clean-all": False, "force-all": False})
@@ -123,8 +124,33 @@ class TestTask:
         root.assert_checkers_saved(grandchild=True)
         root.reset_mocks()
 
-    def only_save_dependency_checker_if_ran(self):
-        raise NotImplementedError
+    def test_run_if_dependency_runs(self, mock_environment):
+        """
+        Task should always run if one of it's dependencies run. The assumption is that if a prior
+        step executes, then future ones must be run. All checks still run because they may be
+        independent of the dependencies
+        """
+
+        # Tests where the lowest dependency always runs.
+        root = fake.mock_nested_single_dependency_nodes(
+            {"check": [PassingCheck("root")]},
+            {"check": [PassingCheck("child")]},
+            {"check": [FailingCheck("grandchild")]},
+        )
+
+        # nested dependency
+        root()
+        root.assert_all_tasks_ran()
+        root.assert_all_checkers_ran()
+        root.assert_all_checkers_saved()
+        root.reset_mocks()
+
+        # direct dependency
+        root.child()
+        root.assert_tasks_ran(child=True, grandchild=True)
+        root.assert_checkers_saved(child=True, grandchild=True)
+        root.assert_checkers_saved(child=True, grandchild=True)
+        root.reset_mocks()
 
     def test_run_force(self, mock_tasks_with_passing_checkers):
         """

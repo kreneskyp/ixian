@@ -148,6 +148,11 @@ def mock_tasks_with_passing_checkers(mock_environment):
 
 
 @pytest.fixture
+def mock_tasks_with_failing_checkers(mock_environment):
+    yield fake.mock_tasks_with_failing_checkers()
+
+
+@pytest.fixture
 def mock_tasks_that_fail(mock_environment):
     """nested tasks all with mocked cleaner functions"""
     yield fake.mock_failing_tasks()
