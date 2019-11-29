@@ -20,94 +20,62 @@ class TestTask:
 
     def test_run_dependency(self, mock_nested_tasks):
         """Test running dependant tasks"""
-        root, child, grandchild = mock_nested_tasks.mock_tasks
+        root, child, grandchild = mock_nested_tasks.mock_tasks.values()
 
         root()
-        root.mock.assert_has_calls([CALL])
-        child.mock.assert_has_calls([CALL])
-        grandchild.mock.assert_has_calls([CALL])
-        root.reset_task_mocks()
+        root.assert_all_tasks_ran()
+        root.reset_mocks()
 
         child()
-        root.mock.assert_not_called()
-        child.mock.assert_has_calls([CALL])
-        grandchild.mock.assert_has_calls([CALL])
-        root.reset_task_mocks()
+        root.assert_tasks_ran(child=True, grandchild=True)
+        root.reset_mocks()
 
         grandchild()
-        root.mock.assert_not_called()
-        child.mock.assert_not_called()
-        grandchild.mock.assert_has_calls([CALL])
+        root.assert_tasks_ran(grandchild=True)
 
     def test_run_clean(self, mock_tasks_with_cleaners):
         """Test forcing clean of task"""
-        root, child, grandchild = mock_tasks_with_cleaners.mock_tasks
+        root, child, grandchild = mock_tasks_with_cleaners.mock_tasks.values()
 
         root(clean=True)
-        root.__task__.clean.assert_has_calls([CALL])
-        child.__task__.clean.assert_not_called()
-        grandchild.__task__.clean.assert_not_called()
-        root.mock.assert_has_calls([CALL])
-        child.mock.assert_has_calls([CALL])
-        grandchild.mock.assert_has_calls([CALL])
-        root.reset_task_mocks()
-        root.reset_task_clean_mocks()
+        root.assert_all_tasks_ran()
+        root.assert_cleaners_ran(root=True)
+        root.reset_mocks()
 
         child(clean=True)
-        root.__task__.clean.assert_not_called()
-        child.__task__.clean.assert_has_calls([CALL])
-        grandchild.__task__.clean.assert_not_called()
-        root.mock.assert_not_called()
-        child.mock.assert_has_calls([CALL])
-        grandchild.mock.assert_has_calls([CALL])
-        root.reset_task_mocks()
-        root.reset_task_clean_mocks()
+        root.assert_tasks_ran(child=True, grandchild=True)
+        root.assert_cleaners_ran(child=True)
+        root.reset_mocks()
 
         grandchild(clean=True)
-        root.__task__.clean.assert_not_called()
-        child.__task__.clean.assert_not_called()
-        grandchild.__task__.clean.assert_has_calls([CALL])
-        root.mock.assert_not_called()
-        child.mock.assert_not_called()
-        grandchild.mock.assert_has_calls([CALL])
+        root.assert_tasks_ran(grandchild=True)
+        root.assert_cleaners_ran(grandchild=True)
 
     def test_run_clean_all(self, mock_tasks_with_cleaners):
         """Test forcing clean of entire dependency tree before run"""
-        root, child, grandchild = mock_tasks_with_cleaners.mock_tasks
+        root, child, grandchild = mock_tasks_with_cleaners.mock_tasks.values()
 
         root(clean_all=True)
-        root.__task__.clean.assert_has_calls([CALL])
-        child.__task__.clean.assert_has_calls([CALL])
-        grandchild.__task__.clean.assert_has_calls([CALL])
-        root.mock.assert_has_calls([CALL])
-        child.mock.assert_has_calls([CALL])
-        grandchild.mock.assert_has_calls([CALL])
-        root.reset_task_mocks()
-        root.reset_task_clean_mocks()
+        root.assert_all_cleaners_ran()
+        root.assert_all_tasks_ran()
+        root.reset_mocks()
+        root.assert_cleaners_ran()
 
         child(clean_all=True)
-        root.__task__.clean.assert_not_called()
-        child.__task__.clean.assert_has_calls([CALL])
-        grandchild.__task__.clean.assert_has_calls([CALL])
-        root.mock.assert_not_called()
-        child.mock.assert_has_calls([CALL])
-        grandchild.mock.assert_has_calls([CALL])
-        root.reset_task_mocks()
-        root.reset_task_clean_mocks()
+        root.assert_cleaners_ran(child=True, grandchild=True)
+        root.assert_tasks_ran(child=True, grandchild=True)
+        root.reset_mocks()
 
         grandchild(clean_all=True)
-        root.__task__.clean.assert_not_called()
-        child.__task__.clean.assert_not_called()
-        grandchild.__task__.clean.assert_has_calls([CALL])
-        root.mock.assert_not_called()
-        child.mock.assert_not_called()
-        grandchild.mock.assert_has_calls([CALL])
+        root.assert_cleaners_ran(grandchild=True)
+        root.assert_tasks_ran(grandchild=True)
+        root.reset_mocks()
 
     def test_run_checkers_already_complete(self, mock_tasks_with_passing_checkers):
         """
         Test passing checkers - the checkers should raise AlreadyComplete and skip running.
         """
-        root, child, grandchild = mock_tasks_with_passing_checkers.mock_tasks
+        root, child, grandchild = mock_tasks_with_passing_checkers.mock_tasks.values()
 
         root_checker = root.__task__.checkers[0]
         child_checker = child.__task__.checkers[0]
@@ -121,7 +89,7 @@ class TestTask:
         grandchild_checker.check.assert_not_called()
         root.assert_no_calls()
         root.assert_no_checker_save_calls()
-        root.reset_task_checkers_check()
+        root.reset_mocks()
 
         with pytest.raises(AlreadyComplete):
             child()
@@ -130,7 +98,7 @@ class TestTask:
         grandchild_checker.check.assert_not_called()
         root.assert_no_calls()
         root.assert_no_checker_save_calls()
-        root.reset_task_checkers_check()
+        root.reset_mocks()
 
         with pytest.raises(AlreadyComplete):
             grandchild()
@@ -139,81 +107,96 @@ class TestTask:
         grandchild_checker.check.assert_not_called()
         root.assert_no_calls()
         root.assert_no_checker_save_calls()
-        root.reset_task_checkers_check()
+        root.reset_mocks()
+
+    def test_run_checkers_not_complete(self, mock_tasks_with_failing_checkers):
+        """
+        If the task is not complete and then completes successfully, checkers should save the state
+        """
+        root, child, grandchild = mock_tasks_with_failing_checkers.mock_tasks.values()
+
+        root()
+        root.assert_all_tasks_ran()
+        root.assert_all_checkers_ran()
+        root.assert_all_checkers_saved()
+        root.reset_mocks()
+
+        child()
+        root.assert_tasks_ran(child=True, grandchild=True)
+        root.assert_checkers_ran(child=True, grandchild=True)
+        root.assert_checkers_saved(child=True, grandchild=True)
+        root.reset_mocks()
+
+        grandchild()
+        root.assert_tasks_ran(grandchild=True)
+        root.assert_checkers_ran(grandchild=True)
+        root.assert_checkers_saved(grandchild=True)
+        root.reset_mocks()
+
+    def only_save_dependency_checker_if_ran(self):
+        raise NotImplementedError
 
     def test_run_force(self, mock_tasks_with_passing_checkers):
-        """Test forcing run of task"""
-        root, child, grandchild = mock_tasks_with_passing_checkers.mock_tasks
-
-        root_checker = root.__task__.checkers[0]
-        child_checker = child.__task__.checkers[0]
-        grandchild_checker = grandchild.__task__.checkers[0]
+        """
+        Test forcing run of task
+        - checkers are skipped when forced
+        - force doesnt cascade
+        - only the task directly called should run
+        """
+        root, child, grandchild = mock_tasks_with_passing_checkers.mock_tasks.values()
 
         root(force=True)
-        root_checker.check.assert_not_called()
-        child_checker.check.assert_not_called()
-        grandchild_checker.check.assert_not_called()
-        root.mock.assert_has_calls([CALL])
-        child.mock.assert_not_called()
-        grandchild.mock.assert_not_called()
-        root.reset_task_checkers_check()
-        root.reset_task_mocks()
+        root.assert_no_checker_calls()
+        root.assert_tasks_ran(root=True)
+        root.reset_mocks()
 
         child(force=True)
-        root_checker.check.assert_not_called()
-        child_checker.check.assert_not_called()
-        grandchild_checker.check.assert_not_called()
-        root.mock.assert_not_called()
-        child.mock.assert_has_calls([CALL])
-        grandchild.mock.assert_not_called()
-        root.reset_task_checkers_check()
-        root.reset_task_mocks()
+        root.assert_no_checker_calls()
+        root.assert_tasks_ran(child=True)
+        root.reset_mocks()
 
         grandchild(force=True)
-        root_checker.check.assert_not_called()
-        child_checker.check.assert_not_called()
-        grandchild_checker.check.assert_not_called()
-        root.mock.assert_not_called()
-        child.mock.assert_not_called()
-        grandchild.mock.assert_has_calls([CALL])
-        root.reset_task_checkers_check()
-        root.reset_task_mocks()
+        root.assert_no_checker_calls()
+        root.assert_tasks_ran(grandchild=True)
+        root.reset_mocks()
+
+        # TODO: dependency checkers should still run
+        # TODO: dependency checkers that ran should save
+        raise NotImplementedError
 
     def test_run_force_all(self, mock_tasks_with_passing_checkers):
         """
         Test forcing run of entire dependency tree
-
-        Checkers should be skipped since they are forced. all methods should run.
+        - Checkers should be skipped since they are forced.
+        - all checkers should save.
+        - all tasks should run.
         """
-        root, child, grandchild = mock_tasks_with_passing_checkers.mock_tasks
+        root, child, grandchild = mock_tasks_with_passing_checkers.mock_tasks.values()
 
         root(force_all=True)
+        root.assert_all_tasks_ran()
         root.assert_no_checker_calls()
-        root.mock.assert_has_calls([CALL])
-        child.mock.assert_has_calls([CALL])
-        grandchild.mock.assert_has_calls([CALL])
-        root.reset_task_mocks()
+        root.reset_mocks()
 
         child(force_all=True)
         root.assert_no_checker_calls()
-        root.mock.assert_not_called()
-        child.mock.assert_has_calls([CALL])
-        grandchild.mock.assert_has_calls([CALL])
-        root.reset_task_mocks()
+        root.assert_tasks_ran(child=True, grandchild=True)
+        root.reset_mocks()
 
         grandchild(force_all=True)
+        root.assert_tasks_ran(grandchild=True)
         root.assert_no_checker_calls()
-        root.mock.assert_not_called()
-        child.mock.assert_not_called()
-        grandchild.mock.assert_has_calls([CALL])
-        root.reset_task_mocks()
+        root.reset_mocks()
+
+        # TODO: need to check for save calls
+        raise NotImplementedError
 
     def test_execute_failure(self, mock_tasks_that_fail):
         """
         If a task fails the execution chain should stop.
         :return:
         """
-        root, child, grandchild = mock_tasks_that_fail.mock_tasks
+        root, child, grandchild = mock_tasks_that_fail.mock_tasks.values()
 
         with pytest.raises(ExecuteFailed):
             grandchild()

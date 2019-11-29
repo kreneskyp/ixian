@@ -3,7 +3,7 @@ from unittest import mock
 
 from power_shovel import Task, runner
 from power_shovel.exceptions import ExecuteFailed
-from power_shovel.test.mock_checker import PassingCheck
+from power_shovel.test.mock_checker import PassingCheck, FailingCheck
 
 
 def build_test_args(**extra):
@@ -20,39 +20,76 @@ def build_test_args(**extra):
 
 class MockTaskBase:
     def __init__(self):
-        self.mock = mock.Mock()
-        self.mock_tasks = []
+        self.mock = mock.Mock(f"{self.name}-execute")
+        self.mock_tasks = {}
 
     def execute(self, *args, **kwargs):
         self.mock(*args, **kwargs)
 
-    def reset_task_mocks(self):
-        for mock_task in self.mock_tasks:
+    def reset_mocks(self):
+        """
+        Reset all mock functions for all mocked tasks:
+        - task execute
+        - checker check
+        - checker save
+        """
+        for mock_task in self.mock_tasks.values():
             mock_task.mock.reset_mock()
+            mock_task.reset_checkers()
+            print("clean?", mock_task.__task__.clean, type(mock_task.__task__.clean))
+            if isinstance(mock_task.__task__.clean, mock.Mock):
+                mock_task.__task__.clean.reset_mock()
 
-    def reset_task_clean_mocks(self):
-        for mock_task in self.mock_tasks:
-            mock_task.__task__.clean.reset_mock()
+    def reset_checkers(self):
+        """Reset any mock checkers"""
+        for checker in self.__task__.checkers or []:
+            if isinstance(checker.check, mock.Mock):
+                checker.check.reset_mock()
+            if isinstance(checker.save, mock.Mock):
+                checker.save.reset_mock()
 
-    def reset_task_checkers_save(self):
-        for mock_task in self.mock_tasks:
-            mock_task.__task__.checkers[0].save.reset_mock()
+    def assert_tasks_ran(self, default=False, **expected):
+        for key, task in self.mock_tasks.items():
+            if expected.get(key, default):
+                task.mock.assert_called_once_with()
+            else:
+                task.mock.assert_not_called()
 
-    def reset_task_checkers_check(self):
-        for mock_task in self.mock_tasks:
-            mock_task.__task__.checkers[0].check.reset_mock()
+    def assert_checkers_ran(self, default=False, **expected):
+        for key, task in self.mock_tasks.items():
+            if expected.get(key, default):
+                task.__task__.checkers[0].check.assert_called_once_with()
+            else:
+                task.__task__.checkers[0].check.assert_not_called()
+
+    def assert_checkers_saved(self, default=False, **expected):
+        for key, task in self.mock_tasks.items():
+            if expected.get(key, default):
+                task.__task__.checkers[0].save.assert_called_once_with()
+            else:
+                task.__task__.checkers[0].save.assert_not_called()
+
+    def assert_cleaners_ran(self, default=False, **expected):
+        for key, task in self.mock_tasks.items():
+            if expected.get(key, default):
+                task.__task__.clean.assert_called_once_with()
+            else:
+                task.__task__.clean.assert_not_called()
+
+    def assert_all_tasks_ran(self):
+        self.assert_tasks_ran(default=True)
+
+    def assert_all_cleaners_ran(self):
+        self.assert_cleaners_ran(default=True)
 
     def assert_no_calls(self):
-        for mock_task in self.mock_tasks:
-            mock_task.mock.assert_not_called()
+        self.assert_tasks_ran(default=False)
 
     def assert_no_checker_save_calls(self):
-        for mock_task in self.mock_tasks:
-            mock_task.__task__.checkers[0].save.assert_not_called()
+        self.assert_checkers_saved(default=False)
 
     def assert_no_checker_calls(self):
-        for mock_task in self.mock_tasks:
-            mock_task.__task__.checkers[0].save.assert_not_called()
+        self.assert_checkers_ran(default=False)
 
 
 def mock_task(
@@ -98,11 +135,11 @@ def mock_nested_single_dependency_nodes(
     root.grandchild = mock_task(
         name="grandchild", parent="child", **grandchild_kwargs or {}
     )
-    root.mock_tasks = [
-        root,
-        root.child,
-        root.grandchild,
-    ]
+    root.mock_tasks = {
+        "root": root,
+        "child": root.child,
+        "grandchild": root.grandchild
+    }
 
     return root
 
@@ -113,15 +150,25 @@ def mock_tasks_with_clean_functions():
     """
 
     return mock_nested_single_dependency_nodes(
-        {"clean": mock.Mock()}, {"clean": mock.Mock()}, {"clean": mock.Mock()},
+        {"clean": mock.Mock(name="root-clean")},
+        {"clean": mock.Mock(name="child-clean")},
+        {"clean": mock.Mock(name="grandchild-clean")},
     )
 
 
 def mock_tasks_with_passing_checkers():
     return mock_nested_single_dependency_nodes(
-        {"check": [PassingCheck()]},
-        {"check": [PassingCheck()]},
-        {"check": [PassingCheck()]},
+        {"check": [PassingCheck("root")]},
+        {"check": [PassingCheck("child")]},
+        {"check": [PassingCheck("grandchild")]},
+    )
+
+
+def mock_tasks_with_failing_checkers():
+    return mock_nested_single_dependency_nodes(
+        {"check": [FailingCheck("root")]},
+        {"check": [FailingCheck("child")]},
+        {"check": [FailingCheck("grandchild")]},
     )
 
 

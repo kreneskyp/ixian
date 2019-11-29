@@ -5,12 +5,13 @@ from power_shovel.check.checker import Checker
 
 
 class MockChecker(Checker):
-    def __init__(self, mock_save=True, mock_check=True, *args, **kwargs):
+    def __init__(self, name, mock_save=True, mock_check=True, *args, **kwargs):
+        self.name = name
         self.mock_save = mock_save
         if mock_save:
-            self.save = mock.Mock()
+            self.save = mock.Mock(name=f"{name}-save")
         if mock_check:
-            self.check = mock.Mock(return_value=True)
+            self.check = mock.Mock(name=f"{name}-check", return_value=True)
 
         self.mocked_state = 1
         self.id = uuid.uuid4()
