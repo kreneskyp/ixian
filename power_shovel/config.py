@@ -33,11 +33,7 @@ class Config(object):
         :param key: key to get
         :return: value if exists.
         """
-        try:
-            value = super(Config, self).__getattribute__(key)
-        except ValueError:
-            if self.root:
-                return getattr(self.root, key)
+        value = super(Config, self).__getattribute__(key)
 
         if key == "reserved" or key in self.reserved:
             return value
