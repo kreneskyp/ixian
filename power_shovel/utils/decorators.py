@@ -5,14 +5,14 @@ class ClassPropertyDescriptor(object):
 
     def __get__(self, obj, klass=None):
         if klass is None:
-            klass = type(obj)
+            klass = type(obj)  # pragma: no cover
         return self.fget.__get__(obj, klass)()
 
     def __set__(self, obj, value):
-        if not self.fset:
-            raise AttributeError("can't set attribute")
-        type_ = type(obj)
-        return self.fset.__get__(obj, type_)(value)
+        if not self.fset:  # pragma: no cover
+            raise AttributeError("can't set attribute")  # pragma: no cover
+        type_ = type(obj)  # pragma: no cover
+        return self.fset.__get__(obj, type_)(value)  # pragma: no cover
 
     def setter(self, func):
         if not isinstance(func, (classmethod, staticmethod)):
@@ -49,6 +49,6 @@ class cached_property:
         instead of calling cached_property.__get__().
         """
         if instance is None:
-            return self
+            return self  # pragma: no cover
         res = instance.__dict__[self.name] = self.func(instance)
         return res
