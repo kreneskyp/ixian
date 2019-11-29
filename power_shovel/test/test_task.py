@@ -77,35 +77,25 @@ class TestTask:
         """
         root, child, grandchild = mock_tasks_with_passing_checkers.mock_tasks.values()
 
-        root_checker = root.__task__.checkers[0]
-        child_checker = child.__task__.checkers[0]
-        grandchild_checker = grandchild.__task__.checkers[0]
-
         with pytest.raises(AlreadyComplete):
             root()
 
-        root_checker.check.assert_not_called()
-        child_checker.check.assert_not_called()
-        grandchild_checker.check.assert_not_called()
         root.assert_no_calls()
+        root.assert_all_checkers_ran()
         root.assert_no_checkers_saved()
         root.reset_mocks()
 
         with pytest.raises(AlreadyComplete):
             child()
-        root_checker.check.assert_not_called()
-        child_checker.check.assert_not_called()
-        grandchild_checker.check.assert_not_called()
         root.assert_no_calls()
+        root.assert_checkers_ran(child=True, grandchild=True)
         root.assert_no_checkers_saved()
         root.reset_mocks()
 
         with pytest.raises(AlreadyComplete):
             grandchild()
-        root_checker.check.assert_not_called()
-        child_checker.check.assert_not_called()
-        grandchild_checker.check.assert_not_called()
         root.assert_no_calls()
+        root.assert_checkers_ran(grandchild=True)
         root.assert_no_checkers_saved()
         root.reset_mocks()
 
