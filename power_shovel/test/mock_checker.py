@@ -8,6 +8,7 @@ class MockChecker(Checker):
     def __init__(self, name, mock_save=True, mock_check=True, *args, **kwargs):
         self.name = name
         self.mock_save = mock_save
+        self.mock_check = mock_check
         if mock_save:
             self.save = mock.Mock(name=f"{name}-save")
         if mock_check:
@@ -23,11 +24,13 @@ class MockChecker(Checker):
         return "mock-%s" % str(self.id)
 
     def clone(self):
-        instance = type(self)(self.mock_save)
+        instance = type(self)(self.mock_save, self.mock_check)
         instance.mocked_state = self.mocked_state
         instance.id = self.id
         if self.mock_save:
             instance.save = self.save
+        if self.mock_check:
+            instance.check = self.check
         return instance
 
 
