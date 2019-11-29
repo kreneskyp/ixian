@@ -171,7 +171,8 @@ class TaskRunner(object):
 
                 else:
                     return_value = runner.func(*args or [])
-                    # save checker only after function has completed successfully
+                    # save checker only after function has completed successfully. Save should be
+                    # called even if force=True
                     if checkers:
                         for checker in checkers:
                             checker.save()
@@ -188,13 +189,12 @@ class TaskRunner(object):
         :param force: override the check and return True if True.
         :return:
         """
-        checkers = None
+        checkers = [checker.clone() for checker in self.checkers] if self.checkers else None
         passes = False
         if self.checkers:
             if force:
                 passes = False
-            elif self.checkers:
-                checkers = [checker.clone() for checker in self.checkers]
+            else:
                 checks = [checker.check() for checker in checkers]
                 passes = all(checks)
         return passes, checkers
