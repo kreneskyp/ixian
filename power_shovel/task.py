@@ -189,7 +189,9 @@ class TaskRunner(object):
         :param force: override the check and return True if True.
         :return:
         """
-        checkers = [checker.clone() for checker in self.checkers] if self.checkers else None
+        checkers = (
+            [checker.clone() for checker in self.checkers] if self.checkers else None
+        )
         passes = False
         if self.checkers:
             if force:
