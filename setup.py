@@ -31,6 +31,8 @@ setup(
     include_package_data=True,
     entry_points={"console_scripts": ["s2 = power_shovel:cli"]},
     install_requires=requirements,
+    setup_requires=['pbr'],
+    pbr=True,
     zip_safe=False,
     classifiers=[
         "License :: OSI Approved :: MIT License",
