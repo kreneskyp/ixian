@@ -1,5 +1,1 @@
-VERSION = "0.1"
-
-
-from power_shovel.task import Task, VirtualTarget
-from power_shovel.runner import cli
+from power_shovel.version import VERSION
