@@ -456,7 +456,7 @@ class Task(object):
     def __new__(cls, *args, **kwargs):
         instance = super(Task, cls).__new__(cls, *args, **kwargs)
 
-        if cls.__task__ is None:
+        if instance.name not in TASKS:
             cls.__task__ = TaskRunner(
                 task=instance,
                 func=instance.__func__,
