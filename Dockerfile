@@ -18,6 +18,7 @@ RUN apt-get update --fix-missing && \
         libsqlite3-dev \
         libssl-dev \
         python3 \
+        python3-dev \
         python3-pip \
         python3-setuptools \
         build-essential \
