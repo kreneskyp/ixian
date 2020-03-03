@@ -4,7 +4,7 @@ from pip._internal.download import PipSession
 from pip._internal.req import parse_requirements
 from setuptools import setup
 
-from power_shovel import VERSION
+from power_shovel.version import VERSION
 
 
 DIR = os.path.dirname(os.path.realpath(__file__))

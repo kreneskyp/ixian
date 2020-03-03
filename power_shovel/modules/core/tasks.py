@@ -1,6 +1,6 @@
 import io
 
-from power_shovel import Task, VirtualTarget
+from power_shovel.task import Task, VirtualTarget
 
 
 class Lint(VirtualTarget):
