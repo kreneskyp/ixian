@@ -166,7 +166,7 @@ class TaskRunner(object):
             if runner and runner.func:
                 passes, checkers = runner.check(force)
                 if dependencies_complete and passes:
-                    logger.debug(f"[skip] {self.name}, already complete.")
+                    logger.debug(f"[skip] {node['name']}, already complete.")
                     raise AlreadyComplete()
 
                 else:
