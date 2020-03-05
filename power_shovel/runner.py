@@ -1,5 +1,7 @@
+import logging
 import os
 from enum import Enum
+from logging.config import dictConfig
 
 import argcomplete
 import argparse
@@ -10,15 +12,16 @@ import types
 import sys
 from collections import defaultdict
 
-from power_shovel import logger
 from power_shovel.config import CONFIG
-from power_shovel.logger import DEFAULT_LOG_LEVEL
 from power_shovel.module import load_module
 from power_shovel.utils import filesystem as file_utils
 from power_shovel.exceptions import AlreadyComplete, ExecuteFailed
 from power_shovel.task import TASKS, TaskRunner
 from power_shovel.utils.color_codes import RED, ENDC
 from power_shovel.utils.decorators import classproperty
+
+
+logger = logging.getLogger()
 
 
 class ExitCodes(Enum):
@@ -138,7 +141,10 @@ def build_epilog() -> str:
 def init_logging() -> None:
     """Initialize logging system."""
     args = parse_args()
-    logger.set_level(args["log"])
+
+    root = logging.getLogger()
+    dictConfig(CONFIG.LOGGING_CONFIG)
+    root.setLevel(args["log"])
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -162,7 +168,7 @@ def get_parser() -> argparse.ArgumentParser:
         "--log",
         type=str,
         help="Log level (DEBUG|INFO|WARN|ERROR|NONE)",
-        default=DEFAULT_LOG_LEVEL.name,
+        default="DEBUG",
     )
     parser.add_argument("--force", help="force task execution", action="store_true")
     parser.add_argument(
@@ -189,7 +195,7 @@ DEFAULT_ARGS = {
     "clean_all": False,
     "force": False,
     "force_all": False,
-    "log": logger.LogLevels.DEBUG,
+    "log": "DEBUG",
     "task": "help",
     "task_args": None,
     "help": False,
@@ -211,7 +217,7 @@ def parse_args(args: str = None) -> dict:
         compiled_args["task"] = "help"
         compiled_args["task_args"] = []
 
-    compiled_args["log"] = logger.LogLevels[compiled_args["log"]]
+    compiled_args["log"] = compiled_args["log"]
 
     # if --help flag is given then run the "help" task. "--help <task>" and "help <task>" should
     # be treated the same.

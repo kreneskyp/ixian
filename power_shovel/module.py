@@ -1,11 +1,13 @@
+import logging
 import re
 from importlib import import_module
 
-from power_shovel import logger
 from power_shovel.config import CONFIG
 from power_shovel.exceptions import ModuleLoadError, InvalidClassPath
 from power_shovel.task import Task, VirtualTarget
 
+
+logger = logging.getLogger()
 CLASS_PATH_PATTERN = re.compile(r"(?P<module_path>.*)\.(?P<classname>.+)")
 MODULES = {}
 

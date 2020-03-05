@@ -1,48 +1,53 @@
-from enum import Enum
+import logging
+from stringcolor import cs
 
 from power_shovel.utils import color_codes as COLOR
 
 
-class LogLevels(Enum):
-    NONE = -1
-    ERROR = 0
-    WARN = 1
-    INFO = 2
-    DEBUG = 3
+DEFAULT_COLORS = {
+    "DEBUG": "white",
+    "INFO": "white",
+    "WARNING": "yellow",
+    "ERROR": "red",
+    "CRITICAL": "red",
+}
 
 
-DEFAULT_LOG_LEVEL = LogLevels.DEBUG
-__LEVEL = DEFAULT_LOG_LEVEL
+DEFAULT_COLOR = "silver"
 
 
-def set_level(level):
-    """Set the log level"""
-    global __LEVEL
-    __LEVEL = level
+class ColoredFormatter(logging.Formatter):
+    """
+    A formatter that allows colors to be placed in the format string.
 
+    Intended to help in creating more readable logging output.
+    """
 
-def _print(txt):
-    print(txt)
+    def __init__(self, fmt=None, datefmt=None, style="%", log_colors=None):
+        self.log_colors = log_colors or DEFAULT_COLORS
+        super(ColoredFormatter, self).__init__(fmt=fmt, datefmt=datefmt, style=style)
 
+    def format(self, record):
+        message = logging.Formatter.format(self, record)
 
-def error(txt):
-    if __LEVEL.value >= LogLevels.ERROR.value:
-        _print(COLOR.red(txt))
+        config = self.log_colors.get(record.levelname, DEFAULT_COLOR)
+        if isinstance(config, str):
+            config = {
+                "color": config,
+                "background": None,
+                "underline": False,
+                "bold": False,
+            }
 
+        elif not isinstance(config, dict):
+            raise ValueError("color setting must be a string or dict")
 
-def warn(txt):
-    if __LEVEL.value >= LogLevels.WARN.value:
-        _print(COLOR.yellow(txt))
+        message = cs(
+            message, config.get("color", DEFAULT_COLOR), config.get("background", None)
+        )
+        if config.get("underline", False):
+            message = message.underline()
+        if config.get("bold", False):
+            message = message.bold()
 
-
-def info(txt):
-    if __LEVEL.value >= LogLevels.INFO.value:
-        _print(txt)
-
-
-def debug(txt):
-    if __LEVEL.value >= LogLevels.DEBUG.value:
-        _print(COLOR.gray(txt))
-
-
-__all__ = [LogLevels, set_level, error, warn, info, debug]
+        return message

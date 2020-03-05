@@ -1,4 +1,5 @@
 import functools
+import logging
 import os
 import re
 
@@ -111,6 +112,37 @@ class Config(object):
     # Local store for task runtime data.
     BUILDER_DIR = ".builder"
     BUILDER = "{PWD}/{BUILDER_DIR}"
+
+    LOG_LEVEL = "DEBUG"
+    FORMATTER = "console"
+    LOGGING_CONFIG = {
+        "version": 1,
+        "formatters": {
+            "detailed": {
+                "class": "logging.Formatter",
+                "format": "%(asctime)s %(levelname)-8s %(message)s",
+            },
+            "console": {
+                "()": "power_shovel.logger.ColoredFormatter",
+                "format": "%(asctime)s %(message)s",
+                "log_colors": {
+                    "DEBUG": "grey",
+                    "INFO": "silver",
+                    "WARNING": "yellow",
+                    "ERROR": "red",
+                    "CRITICAL": {"color": "red", "background": "white"},
+                },
+            },
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "formatter": FORMATTER,
+                "level": "DEBUG",
+            }
+        },
+        "root": {"level": "DEBUG", "handlers": [FORMATTER]},
+    }
 
 
 CONFIG = Config()

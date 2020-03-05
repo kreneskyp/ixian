@@ -1,9 +1,12 @@
+import logging
 import os
 import subprocess
 
-from power_shovel import logger
 from power_shovel.config import CONFIG
 from power_shovel.exceptions import ExecuteFailed
+
+
+logger = logging.getLogger()
 
 
 def raise_for_status(code: int) -> None:

@@ -1,12 +1,11 @@
-import io
+import logging
 
-from power_shovel.config import CONFIG
-from power_shovel import logger
 from power_shovel.config import CONFIG
 from power_shovel.exceptions import AlreadyComplete
 from power_shovel.utils.color_codes import BOLD_WHITE, ENDC, GRAY, OK_GREEN
 
 
+logger = logging.getLogger()
 TASKS = {}
 
 
