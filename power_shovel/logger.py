@@ -50,4 +50,4 @@ class ColoredFormatter(logging.Formatter):
         if config.get("bold", False):
             message = message.bold()
 
-        return message
+        return str(message)
