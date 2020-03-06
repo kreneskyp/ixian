@@ -39,3 +39,4 @@ class TestHelp:
         assert help("clean") == 0
         out, err = capsys.readouterr()
         snapshot.assert_match(out)
+        snapshot.assert_match(err)

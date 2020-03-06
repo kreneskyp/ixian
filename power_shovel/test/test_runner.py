@@ -77,22 +77,6 @@ class TestInit:
         assert runner.init() == ExitCodes.SUCCESS
 
 
-class TestLogging:
-    def test_init_logging_default(self):
-        # sanity check for exceptions
-        runner.init_logging()
-
-    @mock.patch("power_shovel.runner.parse_args")
-    def test_log_level(self, parse_args):
-        for level in logger.LogLevels:
-            parse_args.return_value = build_test_args(log=level)
-            runner.init_logging()
-            logger.warn("warn")
-            logger.info("info")
-            logger.error("error")
-            logger.debug("debug")
-
-
 class TestParser:
     """
     Test that cli will parse args appropriately
