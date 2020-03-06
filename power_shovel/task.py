@@ -54,7 +54,7 @@ class TaskRunner(object):
                 self.add_dependency(*task_instance._depends)
                 task_instance = self
             else:
-                logger.warn("Duplicate task definition: {}".format(self.name))
+                logger.warning("Duplicate task definition: {}".format(self.name))
         else:
             task_instance = self
         TASKS[self.name] = task_instance
@@ -474,7 +474,7 @@ class Task(object):
             # Unloading tasks isn't supported at this time, but tests may do that. When that
             # happens subsequent tests may see this fail. This msg helps show that happened.
             # hopefully this is fixed in a better way when task loading/tree is refactored.
-            logger.warn(
+            logger.warning(
                 f"Task {instance.name} instantiated but an instance already exists"
             )
 

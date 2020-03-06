@@ -278,7 +278,7 @@ def run() -> ExitCodes:
     try:
         task.execute(formatted_task_args, **args)
     except AlreadyComplete:
-        logger.warn("Already complete. Override with --force or --force-all")
+        logger.warning("Already complete. Override with --force or --force-all")
         return ExitCodes.ERROR_COMPLETE
     except ExecuteFailed as e:
         logger.error(str(e))
