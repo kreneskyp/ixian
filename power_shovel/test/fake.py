@@ -1,7 +1,8 @@
 import uuid
 from unittest import mock
 
-from power_shovel import Task, runner
+from power_shovel import runner
+from power_shovel.task import Task
 from power_shovel.exceptions import ExecuteFailed
 from power_shovel.test.mock_checker import PassingCheck, FailingCheck
 

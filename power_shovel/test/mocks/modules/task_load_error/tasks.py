@@ -1,4 +1,4 @@
-from power_shovel import Task
+from power_shovel.task import Task
 
 
 class TestTask(Task):
