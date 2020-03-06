@@ -7,8 +7,7 @@ from pysnap import Snapshot
 
 snapshots = Snapshot()
 
-snapshots['TestHelp.test_general_help 1'] = '''\x1b[90m[exec] help() force=False clean=False\x1b[0m
-usage: power_shovel [--help] [--log LOG] [--force] [--force-all] [--clean]
+snapshots['TestHelp.test_general_help 1'] = '''usage: power_shovel [--help] [--log LOG] [--force] [--force-all] [--clean]
                     [--clean-all]
                     ...
 
@@ -38,11 +37,9 @@ Available subcommands:
 
 \x1b[91m[ Misc ]\x1b[0m
   help     This help message or help <task> for task help
-\x1b[90m[fini] help\x1b[0m
 '''
 
-snapshots['TestHelp.test_task_help 1'] = '''\x1b[90m[exec] help(clean) force=False clean=False\x1b[0m
-\x1b[1mNAME
+snapshots['TestHelp.test_task_help 1'] = '''\x1b[1mNAME
 \x1b[0m    clean -- Run all clean tasks.
 \x1b[1m
 DESCRIPTION
@@ -51,5 +48,6 @@ DESCRIPTION
 STATUS
 \x1b[0m\x1b[90m○\x1b[0m clean
 
-\x1b[90m[fini] help\x1b[0m
 '''
+
+snapshots['TestHelp.test_task_help 2'] = ''

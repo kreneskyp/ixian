@@ -142,8 +142,8 @@ def init_logging() -> None:
     """Initialize logging system."""
     args = parse_args()
 
-    root = logging.getLogger()
     dictConfig(CONFIG.LOGGING_CONFIG)
+    root = logging.getLogger()
     root.setLevel(args["log"])
 
 

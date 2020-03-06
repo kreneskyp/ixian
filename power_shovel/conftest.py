@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 
@@ -25,18 +26,13 @@ def mock_logger():
     methods inside it can be. Mock the methods individually and return a single mock with them
     attached.
     """
-    mock_logger = mock.Mock()
-    patchers = []
 
-    for level in ["error", "warn", "info", "debug"]:
-        patcher = mock.patch(f"power_shovel.logger.{level}")
-        patchers.append(patcher)
-        setattr(mock_logger, level, patcher.start())
+    patcher = mock.patch(f"logging.getLogger")
+    mock_logger = patcher.start()
 
     yield mock_logger
 
-    for patcher in patchers:
-        patcher.stop()
+    patcher.stop()
 
 
 @pytest.fixture
@@ -45,6 +41,23 @@ def mock_environment():
     Initialize power_shovel with a test environment
     """
     CONFIG.PROJECT_NAME = "unittests"
+    CONFIG.LOGGING_CONFIG = {
+        "version": 1,
+        "formatters": {
+            "stdout": {
+                "class": "logging.Formatter",
+                "format": "%(message)s",
+            },
+        },
+        "handlers": {
+            "stdout": {
+                "class": "logging.StreamHandler",
+                "formatter": "stdout",
+                "level": "DEBUG",
+            }
+        },
+        "root": {"level": "DEBUG", "handlers": ["stdout"]},
+    }
     load_module("power_shovel.modules.core")
     yield
     # Clear reference to runner else subsequent loads won't properly setup the tasks
