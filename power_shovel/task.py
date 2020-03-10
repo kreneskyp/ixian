@@ -169,6 +169,8 @@ class TaskRunner(object):
                     raise AlreadyComplete()
 
                 else:
+                    # set tasks force attribute so it's setup the same as if it were run directly.
+                    runner.task.__task__.force = force
                     return_value = runner.func(*args or [])
                     # save checker only after function has completed successfully. Save should be
                     # called even if force=True
