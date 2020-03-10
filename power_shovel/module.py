@@ -29,7 +29,7 @@ def load_module(module_path):
     MODULE_OPTIONS = getattr(module, "OPTIONS")
 
     # verify required options
-    if "name" not in MODULE_OPTIONS:
+    if "name" not in MODULE_OPTIONS and not hasattr(MODULE_OPTIONS, "name"):
         raise ModuleLoadError(f"{module_path}: OPTIONS is missing 'name'")
 
     # load config
