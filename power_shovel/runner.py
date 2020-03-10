@@ -21,7 +21,7 @@ from power_shovel.utils.color_codes import RED, ENDC
 from power_shovel.utils.decorators import classproperty
 
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 class ExitCodes(Enum):

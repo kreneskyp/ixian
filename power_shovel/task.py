@@ -5,7 +5,7 @@ from power_shovel.exceptions import AlreadyComplete
 from power_shovel.utils.color_codes import BOLD_WHITE, ENDC, GRAY, OK_GREEN
 
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 TASKS = {}
 
 

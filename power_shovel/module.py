@@ -7,7 +7,7 @@ from power_shovel.exceptions import ModuleLoadError, InvalidClassPath
 from power_shovel.task import Task, VirtualTarget
 
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 CLASS_PATH_PATTERN = re.compile(r"(?P<module_path>.*)\.(?P<classname>.+)")
 MODULES = {}
 

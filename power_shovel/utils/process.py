@@ -6,7 +6,7 @@ from power_shovel.config import CONFIG
 from power_shovel.exceptions import ExecuteFailed
 
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def raise_for_status(code: int) -> None:
