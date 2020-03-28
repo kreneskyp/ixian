@@ -26,6 +26,8 @@ class Checker(object):
     determine whether the task should run.
     """
 
+    contribute_to_task_state = True
+
     def check(self):
         return self.state() == self.saved_state()
 
@@ -45,6 +47,9 @@ class Checker(object):
         :return: state dict
         """
         raise NotImplementedError
+
+    def hash(self):
+        return hash_object(self.state())
 
     def saved_state(self):
         """

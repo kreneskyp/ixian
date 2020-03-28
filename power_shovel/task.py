@@ -1,5 +1,7 @@
 import logging
+import typing
 
+from power_shovel.check.checker import hash_object
 from power_shovel.config import CONFIG
 from power_shovel.exceptions import AlreadyComplete
 from power_shovel.utils.color_codes import BOLD_WHITE, ENDC, GRAY, OK_GREEN
@@ -201,6 +203,48 @@ class TaskRunner(object):
                 checks = [checker.check() for checker in checkers]
                 passes = all(checks)
         return passes, checkers
+
+    def state(self, shallow: bool = True) -> typing.Optional[dict]:
+        """
+        Calculates a dict of state generated from the tasks checkers.
+
+        :param shallow: only return hash for dependencies
+        :return: dict of state returned from checkers
+        """
+        if self.checkers is None and self.depends is None:
+            return None
+
+        checkers = (
+            [
+                checker.clone()
+                for checker in self.checkers
+                if checker.contribute_to_task_state
+            ]
+            if self.checkers
+            else None
+        )
+
+        depends = {}
+        for dependency in self.depends:
+            name = dependency.name
+            if shallow:
+                depends[name] = dependency.hash()
+            else:
+                depends[name] = dependency.state()
+
+        return {
+            "depends": depends,
+            "checks": [
+                {
+                    "class": f"{type(checker).__module__}.{type(checker).__name__}",
+                    "state": checker.state(),
+                }
+                for checker in checkers
+            ],
+        }
+
+    def hash(self):
+        return hash_object(self.state(shallow=True))
 
     def add_dependency(self, *tasks):
         self._depends.extend(tasks)

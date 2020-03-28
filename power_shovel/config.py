@@ -144,5 +144,41 @@ class Config(object):
         "root": {"level": "DEBUG", "handlers": [FORMATTER]},
     }
 
+    @classproperty
+    def TASKS(self):
+        return TasksConfig()
+
+
+class TasksConfig:
+    reserved = {"reversed", "root", "__dict__"}
+
+    def __getattribute__(self, key):
+        """
+        Overloaded to implement recursive lazy evaluation of properties.
+        :param key: key to get
+        :return: value if exists.
+        """
+        from power_shovel.task import TASKS
+
+        formatted_key = key.lower()
+        if formatted_key in TASKS:
+            task = TASKS[formatted_key]
+            return TaskConfig(task)
+        else:
+            return super(TasksConfig, self).__getattribute__(key)
+
+
+class TaskConfig:
+    def __init__(self, task):
+        self.task = task
+
+    @property
+    def STATE(self):
+        return self.task.state()
+
+    @property
+    def HASH(self):
+        return self.task.hash()
+
 
 CONFIG = Config()
