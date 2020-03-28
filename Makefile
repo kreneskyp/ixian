@@ -14,21 +14,25 @@ PYENV_DIR=/opt/pyenv
 	${DOCKER_RUN} cp ${PYENV_DIR}/.python-version ${PROJECT_DIR}
 
 
+.PHONY: test
 test: .image_created .python_version
-	${DOCKER_RUN} tox
+	${DOCKER_RUN} tox -v
 
 
 BLACK_EXCLUDE=--exclude=snapshots/*
 
 
+.PHONY: black
 black: .image_created .python_version
 	${DOCKER_RUN} black ${BLACK_EXCLUDE} .
 
 
+.PHONY: black-check
 black-check: .image_created .python_version
 	${DOCKER_RUN} black ${BLACK_EXCLUDE} --check .
 
 
+.PHONY: bash
 bash: .image_created .python_version
 	${DOCKER_RUN} /bin/bash
 
