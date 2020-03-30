@@ -89,6 +89,12 @@ class Config(object):
         expanded.update(**kwargs)
         return value.format(**expanded)
 
+    def resolve(self, path):
+        value = self
+        for key in path.split("."):
+            value = getattr(value, key)
+        return value
+
     # =========================================================================
     #  Base config
     # =========================================================================
