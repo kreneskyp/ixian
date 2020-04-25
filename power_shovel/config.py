@@ -1,10 +1,12 @@
-import functools
 import logging
 import os
 import re
 
 from power_shovel.utils.filesystem import pwd
 from power_shovel.utils.decorators import classproperty
+
+
+logger = logging.getLogger(__name__)
 
 
 class MissingConfiguration(AssertionError):

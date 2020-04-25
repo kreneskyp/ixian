@@ -44,10 +44,7 @@ def mock_environment():
     CONFIG.LOGGING_CONFIG = {
         "version": 1,
         "formatters": {
-            "stdout": {
-                "class": "logging.Formatter",
-                "format": "%(message)s",
-            },
+            "stdout": {"class": "logging.Formatter", "format": "%(message)s",},
         },
         "handlers": {
             "stdout": {

@@ -259,7 +259,9 @@ class TaskRunner(object):
     @property
     def depends(self) -> list:
         return [
-            dependency if isinstance(dependency, TaskRunner) else TASKS[dependency]
+            dependency
+            if isinstance(dependency, TaskRunner)
+            else TASKS[CONFIG.format(dependency)]
             for dependency in self._depends
         ]
 
