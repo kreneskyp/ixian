@@ -40,7 +40,7 @@ setup(
     packages=["power_shovel"],
     package_dir={"power_shovel": "power_shovel"},
     include_package_data=True,
-    entry_points={"console_scripts": ["s2 = power_shovel:cli"]},
+    entry_points={"console_scripts": ["s2 = power_shovel.runner:cli"]},
     install_requires=requirements,
     setup_requires=["pbr"],
     pbr=True,
