@@ -119,7 +119,9 @@ def build_epilog() -> str:
     if TASKS:
         categories = defaultdict(list)
         for task in TASKS.values():
-            categories[task.category].append(task)
+            # only list tasks for the current context
+            if task.in_context:
+                categories[task.category].append(task)
         padding = max(len(task.name) for task in TASKS.values())
         output.write(
             """Type 's2 help <subcommand>' for help on a specific """
@@ -253,9 +255,18 @@ def resolve_task(key: str) -> TaskRunner:
     :return: TaskRunner instance
     """
     try:
-        return TASKS[key]
+        task = TASKS[key]
     except KeyError:
         logger.error('Unknown task "%s", run with --help for list of commands' % key)
+    else:
+        if task.in_context:
+            return task
+        else:
+            logger.debug(
+                f"RUN_CONTEXT ({CONFIG.RUN_CONTEXT}) does not match task config ({task.task.contexts})"
+            )
+
+
 
 
 def run() -> ExitCodes:

@@ -82,6 +82,13 @@ class TaskRunner(object):
     def __repr__(self):
         return f"<{type(self).__name__}@{id(self)} func={self.name}>"
 
+    @property
+    def in_context(self):
+        if not self.task:
+            return False
+
+        return self.task.contexts is True or CONFIG.RUN_CONTEXT in self.task.contexts
+
     def add_to_parent(self, name: str):
         """Add a task to as a dependency of a another task.
 
@@ -486,6 +493,7 @@ class Task(object):
     """
 
     __task__ = None
+    contexts = ["cli"]
 
     @property
     def __func__(self):

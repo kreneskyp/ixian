@@ -115,6 +115,9 @@ class Config(object):
     # ENV - build environment PRODUCTION or DEV
     ENV = "DEV"
 
+    # RUN_CONTEXT - run context, by default this is the cli
+    RUN_CONTEXT = "cli"
+
     # Local store for task runtime data.
     BUILDER_DIR = ".builder"
     BUILDER = "{PWD}/{BUILDER_DIR}"
