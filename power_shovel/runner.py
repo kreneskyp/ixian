@@ -267,6 +267,17 @@ def resolve_task(key: str) -> TaskRunner:
             )
 
 
+def load_environment():
+    """
+    Loads environment variables and updates CONFIG with them.
+    """
+    for key, value in os.environ.items():
+        if key.startswith(CONFIG.ENV_PREFIX):
+            parts = key[len(CONFIG.ENV_PREFIX) :].split("__")
+            current = CONFIG
+            for part in parts[:-1]:
+                current = getattr(current, part)
+            setattr(current, parts[-1], value)
 
 
 def run() -> ExitCodes:
@@ -281,6 +292,10 @@ def run() -> ExitCodes:
     task_name = args.pop("task")
     task_args = args.pop("task_args")
     formatted_task_args = [CONFIG.format(arg) for arg in task_args]
+
+    # TODO: load environment here for now. Eventually move this into init() so env is available
+    #       as modules load. Dynamic loading like that is more complex
+    load_environment()
 
     task = resolve_task(task_name)
     if not task:

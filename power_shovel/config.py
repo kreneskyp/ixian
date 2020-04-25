@@ -115,6 +115,9 @@ class Config(object):
     # ENV - build environment PRODUCTION or DEV
     ENV = "DEV"
 
+    # Prefix for environment variables to autoload
+    ENV_PREFIX = "JT_"
+
     # RUN_CONTEXT - run context, by default this is the cli
     RUN_CONTEXT = "cli"
 
