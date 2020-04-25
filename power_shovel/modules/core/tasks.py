@@ -39,6 +39,7 @@ class Help(Task):
 
     name = "help"
     short_description = "This help message or help <task> for task help"
+    contexts = True
 
     def execute(self, task_name=None):
         from power_shovel import runner
