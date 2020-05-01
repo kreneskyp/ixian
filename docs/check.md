@@ -20,7 +20,7 @@ Custom checkers may be created by subclassing `Checker` and implementing
 `state`, `filename`, and `clone`.
 
 ```python
-from power_shovel.checker import Checker
+from ixian.checker import Checker
 
 
 class MyChecker(Checker):
@@ -70,7 +70,7 @@ state file doesn't exist a task is incomplete.
 a single input (key). 
 
 ```python
-from power_shovel.checker import SingleKeyChecker
+from ixian.checker import SingleKeyChecker
 
 class MyChecker(SingleKeyChecker):
 
@@ -96,7 +96,7 @@ inputs of the same type. For example, it is used by [FileHash](#FileHash) to
 support multiple paths. 
 
 ```python
-from power_shovel.checker import MultiValueChecker
+from ixian.checker import MultiValueChecker
 
 class MyChecker(MultiValueChecker):
 
@@ -122,7 +122,7 @@ FileHash checks the sha256 hash for a set of file paths. Paths may point to
 files or directories.
 
 ```
-from power_shovel.check import FileHash
+from ixian.check import FileHash
 
 Checker(
    '/path/to/my/file',

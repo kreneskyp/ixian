@@ -1,4 +1,0 @@
-#! /Users/pkrenesky/_wrk/led_prototyper_service/.venv/bin/python
-# PYTHON_ARGCOMPLETE_OK
-from power_shovel.runner import cli
-cli()

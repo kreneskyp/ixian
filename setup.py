@@ -15,7 +15,7 @@ except ImportError:
         from pip.download import PipSession
         from pip.req import parse_requirements
 
-from power_shovel.version import VERSION
+from ixian.version import VERSION
 
 
 DIR = os.path.dirname(os.path.realpath(__file__))
@@ -27,18 +27,20 @@ requirements = [
 
 
 setup(
-    name="power_shovel",
-    version=VERSION,
+    name="ixian",
+    VERSION="0.0.1",
+    description="Task tool with make-like features.",
     author="Peter Krenesky",
     author_email="kreneskyp@gmail.com",
     maintainer="Peter Krenesky",
     maintainer_email="kreneskyp@gmail.com",
-    description="Task tool with make-like features.",
-    keywords="tasks, shovel, power_shovel, rake, make",
+    keywords="tasks, shovel, rake, make, ixian, ix",
     long_description=open("%s/README.md" % DIR, "r").read(),
-    url="https://github.com",
-    packages=["power_shovel"],
-    package_dir={"power_shovel": "power_shovel"},
+    #long_description="Task tool with make-like features.",
+    long_description_content_type="text/markdown",
+    url="https://github.com/kreneskyp/ixian",
+    packages=["ixian"],
+    package_dir={"ixian": "ixian"},
     include_package_data=True,
     entry_points={"console_scripts": ["s2 = power_shovel.runner:cli"]},
     install_requires=requirements,

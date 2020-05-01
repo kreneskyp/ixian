@@ -1,17 +1,14 @@
-# Powershovel
+# Ixian
 
-Powershovel is a modular task tool written in python3. It is intended to be a
+Ixian is a modular task tool written in python3. It is intended to be a
 replacement for Make, emulating and expanding on some of it's most useful 
 features.
 
 
 ## Installation
 
-
-TODO: Not in pypi yet but eventually...
-
 ``` 
-pip install powershovel
+pip install ixian
 ```
 
 ## Basic Usage
@@ -19,10 +16,10 @@ pip install powershovel
 #### Create a task 
 
 Tasks are created by decorating a python function. The task should be in or 
- imported by `shovel.py` in the working directory.
+ imported by `ixian.py` in the working directory.
 
 ```
-from powershovel import task
+from ixian import task
 
 @task()
 def my_task(*args, **kwargs):
@@ -35,7 +32,7 @@ Arguments and flags are passed as `args` and `kwargs`.
 
 
 ```
-$ shovel my_task arg1 arg2 --flag --flag=2
+$ ix my_task arg1 arg2 --flag --flag=2
 ```
 
 

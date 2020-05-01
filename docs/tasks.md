@@ -3,7 +3,7 @@
 ## Usage
 
 ```
-shovel my_task
+ix my_task
 ```
 
 ### Common options
@@ -31,14 +31,6 @@ Clean up all dependencies before running the dependencies. This implies
 
 Display the dependency tree including which tasks pass their checks.
 
-##### --zhelp 
-
-Display task docstring and other information about the task.
-
-**deprecation:** shovel catches the `--help` flag hence the naming of this flag. 
-Eventually shovel will be replaced and `--zhelp` with be deprecated
-
-
 
 ### Arguments and Flags
 
@@ -48,7 +40,7 @@ task.
 An example and the equivilant call in python.
 
 ```
-$ shovel my_task arg1 arg2 --flag --two=2
+$ ix my_task arg1 arg2 --flag --two=2
 ```
 
 ```python
@@ -72,8 +64,8 @@ are built-in checkers and support for custom checkers.
 Checkers are specified with the decorator. 
 
 ```python
-from power_shovel import task
-from power_shovel.modules.filesystem.file_hash import FileHash
+from ixian import task
+from ixian.modules.filesystem.file_hash import FileHash
 
 @task(check=[
     FileHash('/input_file'), 
@@ -94,7 +86,7 @@ task must be run then that part of the dependency tree will be re-run.
 
 
 ```python
-from power_shovel import task
+from ixian import task
 
 @task()
 def my_task():

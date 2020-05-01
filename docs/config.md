@@ -1,6 +1,6 @@
 # Configuration
 
-Powershovel includes a configuration system to configure builds. Configuration
+Ixian includes a configuration system to configure builds. Configuration
 is modular so that modules may provide options without additionally setup.
 
 ## Using Config
@@ -10,7 +10,7 @@ instance of `Config`. Tasks and other code can reference this instance directly
 to simplify module setup.
 
 ```python
-from power_shovel.config import CONFIG
+from ixian.config import CONFIG
 
 print(CONFIG.POWER_SHOVEL)
 ```
@@ -26,7 +26,7 @@ as static variables or with properties. Properties allow for caching and
 runtime calculations. 
 
 ```python
-from power_shovel.config import Config
+from ixian.config import Config
 
 class MyConfig(Config):
     
@@ -42,7 +42,7 @@ or as part of a [module](modules.md).
 
 ```python
 
-from power_shovel.config import CONFIG
+from ixian.config import CONFIG
 CONFIG.add('MY_CONFIG', MyConfig)
 print(CONFIG.MY_CONFIG.ONE)
 ```
@@ -67,7 +67,7 @@ be defined relatively.
 
 ```python
 
-from power_shovel.config import Config
+from ixian.config import Config
 
 class MyConfig(Config):
     ROOT = '/my/directory/' 
@@ -102,15 +102,15 @@ CONFIG.format('{MY_CONFIG.ROOT}/{foo}', foo='extra_value')
 The properties are built into the base Config class and `CONFIG`.
 
 #### POWER_SHOVEL
-The directory where power_shovel is installed.
+The directory where ixian is installed.
 
 #### PWD
-The present working directory. This is the directory power_shovel was run from.
+The present working directory. This is the directory ixian was run from.
 
 #### PROJECT_NAME
 The name of the project. The default value is `None`, this should be set by
 the project during setup.
 
 #### BUILDER
-The local store used by power_shovel. This is where state and any other files
+The local store used by ixian. This is where state and any other files
 used during builds should persist. Defaults to `{PWD}/.builder`.

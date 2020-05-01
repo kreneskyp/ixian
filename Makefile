@@ -1,4 +1,4 @@
-PROJECT_NAME=power_shovel
+PROJECT_NAME=ixian
 IMAGE=chang_tests
 PROJECT_DIR=/opt/${PROJECT_NAME}
 DOCKER_RUN=docker run -it -v `pwd`:${PROJECT_DIR} ${IMAGE}

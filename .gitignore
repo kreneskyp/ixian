@@ -13,7 +13,7 @@ venv
 # Compiled package output
 /build/
 /dist/
-/power_shovel.egg-info/
+/ixian.egg-info/
 .builder
 .image_created
 .tox

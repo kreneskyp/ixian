@@ -1,5 +1,5 @@
 FROM phusion/baseimage:0.11
-ENV PROJECT_NAME power_shovel
+ENV PROJECT_NAME ixian
 
 # =============================================================================
 # Platform Installation
