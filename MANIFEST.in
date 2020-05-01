@@ -1,0 +1,6 @@
+include AUTHORS
+include LICENSE.rst
+include README.md
+include requirements*.txt
+prune myriad_django_jwt/tests
+exclude Makefile
