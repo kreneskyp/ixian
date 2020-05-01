@@ -45,17 +45,19 @@ RUN pip3 install -r $PROJECT_DIR/requirements-setup.txt
 RUN pip3 install -r $PROJECT_DIR/requirements-dev.txt
 
 # setup pyenv
-ENV PYENV_3_6=3.6.9 \
-    PYENV_3_7=3.7.4
-ENV PYENV_VERSIONS "$PYENV_3_6 $PYENV_3_7"
-RUN curl https://pyenv.run | bash
+ENV PYENV_3_6=3.6.10 \
+    PYENV_3_7=3.7.7 \
+    PYENV_3_8=3.8.2
+ENV PYENV_VERSIONS "$PYENV_3_6 $PYENV_3_7 $PYENV_3_8"
 ENV PATH "/root/.pyenv/bin:$PATH"
+RUN curl https://pyenv.run | bash
 RUN eval "$(pyenv init -)" \
  && eval "$(pyenv virtualenv-init -)"
 
 # install python versions
 RUN pyenv install $PYENV_3_6 \
  && pyenv install $PYENV_3_7 \
+ && pyenv install $PYENV_3_8 \
  && pyenv local $PYENV_VERSIONS
 
 WORKDIR $PROJECT_DIR
