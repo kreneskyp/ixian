@@ -1,5 +1,5 @@
 [run]
-omit = ixian/test/*, .tox/*, ixian/conftest.py
+omit = ixian/test/*, .tox/*, ixian/tests/conftest.py
 
 [report]
 show_missing = True

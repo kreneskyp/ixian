@@ -24,7 +24,7 @@ from ixian.exceptions import MockExit
 from ixian.module import load_module, MODULES
 from ixian.runner import ExitCodes
 from ixian.task import TASKS
-from ixian.test import fake
+from ixian.tests import fake
 
 # =================================================================================================
 # Environment and system components
@@ -52,7 +52,7 @@ def mock_logger():
 @pytest.fixture
 def mock_environment():
     """
-    Initialize ixian with a test environment
+    Initialize ixian with a tests environment
     """
     CONFIG.PROJECT_NAME = "unittests"
     CONFIG.LOGGING_CONFIG = {

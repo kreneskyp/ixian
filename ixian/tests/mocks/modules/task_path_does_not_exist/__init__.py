@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This is a functional module
 OPTIONS = {
-    "name": "EMPTY_TASKS_MODULE",
-    # this is a valid tasks module, but it doesn't have any tasks in it
-    "tasks": "ixian.test.mocks.modules.empty_tasks_module.tasks",
-    "config": "ixian.test.mocks.modules.empty_tasks_module.config.TestConfig",
+    "name": "TASK_PATH_DOES_NOT_EXIST",
+    "tasks": "ixian.tests.mocks.modules.task_path_does_not_exist.tasks",
+    "config": "ixian.tests.mocks.modules.task_path_does_not_exist.config.TestConfig",
 }

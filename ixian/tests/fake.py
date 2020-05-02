@@ -18,7 +18,7 @@ from unittest import mock
 from ixian import runner
 from ixian.task import Task
 from ixian.exceptions import ExecuteFailed
-from ixian.test.mock_checker import PassingCheck, FailingCheck
+from ixian.tests.mock_checker import PassingCheck, FailingCheck
 
 
 def build_test_args(**extra):

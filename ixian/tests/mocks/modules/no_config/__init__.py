@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This module does not contain a config class
 OPTIONS = {
-    "name": "TASK_LOAD_ERROR",
-    "tasks": "ixian.test.mocks.modules.task_load_error.tasks",
-    "config": "ixian.test.mocks.modules.task_load_error.config.TestConfig",
+    "name": "NO_CONFIG",
+    "tasks": "ixian.tests.mocks.modules.no_config.tasks",
 }

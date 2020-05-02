@@ -21,7 +21,7 @@ from ixian import logger
 from ixian import runner
 from ixian.exceptions import MockExit, AlreadyComplete, ExecuteFailed
 from ixian.runner import ExitCodes, ixian_path
-from ixian.test.fake import build_test_args
+from ixian.tests.fake import build_test_args
 
 
 def workspace(name: str) -> str:
@@ -30,7 +30,7 @@ def workspace(name: str) -> str:
     :param name: name of workspace
     :return: path to ixian.py
     """
-    import ixian.test.mocks as ixian_mocks
+    import ixian.tests.mocks as ixian_mocks
 
     base = os.path.dirname(os.path.realpath(ixian_mocks.__file__))
     return f"{base}/workspaces/{name}/ixian.py"

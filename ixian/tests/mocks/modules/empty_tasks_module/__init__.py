@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This module does not contain a config class
 OPTIONS = {
-    "name": "NO_CONFIG",
-    "tasks": "ixian.test.mocks.modules.no_config.tasks",
+    "name": "EMPTY_TASKS_MODULE",
+    # this is a valid tasks module, but it doesn't have any tasks in it
+    "tasks": "ixian.tests.mocks.modules.empty_tasks_module.tasks",
+    "config": "ixian.tests.mocks.modules.empty_tasks_module.config.TestConfig",
 }

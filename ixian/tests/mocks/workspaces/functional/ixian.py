@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is a functional module
-OPTIONS = {
-    "name": "TASK_PATH_DOES_NOT_EXIST",
-    "tasks": "ixian.test.mocks.modules.task_path_does_not_exist.tasks",
-    "config": "ixian.test.mocks.modules.task_path_does_not_exist.config.TestConfig",
-}
+from ixian.config import CONFIG
+from ixian.module import load_module
+
+
+def init():
+    """Initialize with test config"""
+    CONFIG.PROJECT_NAME = "unittests"
+    load_module("ixian.modules.core")
+    load_module("ixian.tests.mocks.modules.functional")

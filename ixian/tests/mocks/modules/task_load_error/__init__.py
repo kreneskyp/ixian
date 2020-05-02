@@ -13,7 +13,7 @@
 # limitations under the License.
 
 OPTIONS = {
-    "name": "TEST",
-    "tasks": "ixian.test.mocks.modules.test.tasks",
-    "config": "ixian.test.mocks.modules.test.config.TestConfig",
+    "name": "TASK_LOAD_ERROR",
+    "tasks": "ixian.tests.mocks.modules.task_load_error.tasks",
+    "config": "ixian.tests.mocks.modules.task_load_error.config.TestConfig",
 }

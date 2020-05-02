@@ -129,7 +129,7 @@ class TestMultiValueChecker(TestChecker):
 
 
 def file_hash_mock_path(path):
-    import ixian.test.mocks as mocks_module
+    import ixian.tests.mocks as mocks_module
 
     module_dir = os.path.dirname(os.path.realpath(mocks_module.__file__))
     return f"{module_dir}/file_hash_mocks/{path}"

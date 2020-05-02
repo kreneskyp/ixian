@@ -19,8 +19,8 @@ import pytest
 
 from ixian.exceptions import AlreadyComplete, ExecuteFailed
 from ixian.task import Task, TaskRunner, VirtualTarget, TASKS
-from ixian.test import fake
-from ixian.test.mock_checker import FailingCheck, PassingCheck
+from ixian.tests import fake
+from ixian.tests.mock_checker import FailingCheck, PassingCheck
 
 CALL = mock.call()
 DEPENDENT_CALL = mock.call(**{"clean-all": False, "force-all": False})
