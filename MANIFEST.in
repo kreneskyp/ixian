@@ -2,7 +2,7 @@ include AUTHORS
 include LICENSE-2.0.txt
 include NOTICE
 include README.md
-include requirements*.txt
+include requirements.txt
 prune ixian/tests
 exclude Makefile
 exclude Dockerfile
