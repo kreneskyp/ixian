@@ -15,8 +15,6 @@
 import logging
 from stringcolor import cs
 
-from ixian.utils import color_codes as COLOR
-
 
 DEFAULT_COLORS = {
     "DEBUG": "white",
