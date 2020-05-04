@@ -45,7 +45,7 @@ class ExitCodes(Enum):
     ERROR_COMPLETE = -1  # task is already complete
     ERROR_UNKNOWN_TASK = -2  # task isn't registered
     ERROR_NO_INIT = -3  # ixian.py does not contain an init flag
-    ERROR_NO_SHOVEL_PY = -4  # ixian.py does not exist
+    ERROR_NO_IXIAN_PY = -4  # ixian.py does not exist
     ERROR_TASK = -5  # task did not complete
 
     @classproperty
@@ -56,7 +56,7 @@ class ExitCodes(Enum):
     def init_errors(cls):
         """Errors that init can raise"""
         return [
-            cls.ERROR_NO_SHOVEL_PY,
+            cls.ERROR_NO_IXIAN_PY,
             cls.ERROR_NO_INIT,
         ]
 
@@ -111,7 +111,7 @@ def init() -> ExitCodes:
         ixian_module = import_ixian()
     except FileNotFoundError as e:
         logger.error(str(e))
-        return ExitCodes.ERROR_NO_SHOVEL_PY
+        return ExitCodes.ERROR_NO_IXIAN_PY
 
     try:
         module_init = ixian_module.init

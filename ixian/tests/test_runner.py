@@ -47,7 +47,7 @@ class TestExitCodes:
         assert not ExitCodes.ERROR_COMPLETE.is_success
         assert not ExitCodes.ERROR_UNKNOWN_TASK.is_success
         assert not ExitCodes.ERROR_NO_INIT.is_success
-        assert not ExitCodes.ERROR_NO_SHOVEL_PY.is_success
+        assert not ExitCodes.ERROR_NO_IXIAN_PY.is_success
         assert not ExitCodes.ERROR_TASK.is_success
 
     def test_is_error(self):
@@ -55,7 +55,7 @@ class TestExitCodes:
         assert ExitCodes.ERROR_COMPLETE.is_error
         assert ExitCodes.ERROR_UNKNOWN_TASK.is_error
         assert ExitCodes.ERROR_NO_INIT.is_error
-        assert ExitCodes.ERROR_NO_SHOVEL_PY.is_error
+        assert ExitCodes.ERROR_NO_IXIAN_PY.is_error
         assert ExitCodes.ERROR_TASK.is_error
 
 
@@ -75,7 +75,7 @@ class TestInit:
     def test_no_ixian_py(self, ixian_path):
         """Test workspace without ixian.py"""
         ixian_path.return_value = workspace("missing_ixian_py")
-        assert runner.init() == ExitCodes.ERROR_NO_SHOVEL_PY
+        assert runner.init() == ExitCodes.ERROR_NO_IXIAN_PY
 
     @mock.patch("ixian.runner.ixian_path")
     def test_no_init_method(self, ixian_path):
