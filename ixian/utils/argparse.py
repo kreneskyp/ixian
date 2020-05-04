@@ -53,7 +53,7 @@ def argunparse(options: dict, parser: argparse.ArgumentParser) -> List[str]:
             value = options[argument["dest"]]
         else:
             for flag in argument["args"]:
-                flag_stripped = flag.lstrip("-")
+                flag_stripped = flag.lstrip("-").replace("-", "_")
                 if flag_stripped in options:
                     value = options[flag_stripped]
                     break
