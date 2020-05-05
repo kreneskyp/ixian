@@ -4,36 +4,68 @@ Ixian is a modular task tool written in python3. It is intended to be a
 replacement for Make, emulating and expanding on some of it's most useful 
 features.
 
-
 ## Installation
 
 ``` 
 pip install ixian
 ```
 
-## Basic Usage
+## Setup
 
-#### Create a task 
+Create an `ixian.py` file where you intend to call `ix` from. Optionally set `IXIAN_CONFIG` to tell
+ixian where to find it.
 
-Tasks are created by decorating a python function. The task should be in or 
- imported by `ixian.py` in the working directory.
+Within that file create an `init` method that loads modules and configures settings.
+
+```python
+from ixian.config import CONFIG
+from ixian.module import load_module
+
+
+def init():
+    # Load modules which contain tasks
+    load_module('ixian.modules.core')
+
+    # Update settings
+    CONFIG.PROJECT_NAME = 'testing'
+```
+
+## Create a task 
+
+Tasks are created by extending the task class. 
+
+```python
+from ixian.task import Task
+
+class MyTask(Task):
+    """
+    The docstring will be used as help text.
+    """
+
+    name = 'my_task'
+    short_description = 'description will be shown in general help'
+
+    def execute(self, *args, **kwargs)
+        print(args, kwargs)
+```
+
+## Run a task
+The task may then be called using the `ix` runner. 
 
 ```
-from ixian import task
-
-@task()
-def my_task(*args, **kwargs):
-    print(args, kwargs)
+ix my_task
 ```
 
-#### Run a task
-
-Arguments and flags are passed as `args` and `kwargs`.
-
-
+Args passed to the runner are passed to the task as `args`
 ```
-$ ix my_task arg1 arg2 --flag --flag=2
+ix my_task arg1 arg2
 ```
+
+## Builtin help
+A list of available commands is available by calling `ix` or `ix --help`.
+ 
+Access built-in help for any task by calling `ix help my_task`. Builtin help should display how to
+use the task, enumerate any relevent environment variables, and display the status of any checks.
 
 
 ## Advanced Usage
