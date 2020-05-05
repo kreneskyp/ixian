@@ -1078,7 +1078,7 @@ snapshots['TestTaskHelp.test_render_help 1'] = '''
 DESCRIPTION
 \x1b[0mThis is a mock test\x1b[1m
 CONFIGURATION
-\x1b[0m    - POWER_SHOVEL:  /opt/ixian/ixian
+\x1b[0m    - IXIAN:  /opt/ixian/ixian
     - PROJECT_NAME:  unittests
 \x1b[1m
 
@@ -1093,7 +1093,7 @@ snapshots['TestTaskHelp.test_render_help_no_docstring 1'] = '''
 DESCRIPTION
 \x1b[0m\x1b[1m
 CONFIGURATION
-\x1b[0m    - POWER_SHOVEL:  /opt/ixian/ixian
+\x1b[0m    - IXIAN:  /opt/ixian/ixian
     - PROJECT_NAME:  unittests
 \x1b[1m
 

@@ -59,7 +59,7 @@ class TestExitCodes:
         assert ExitCodes.ERROR_TASK.is_error
 
 
-class TestShovelPath:
+class TestIxianPath:
     def test_default_ixian_path(self):
         # ixian.py is in the PWD by default if IXIAN_CONFIG isn't set.
         assert ixian_path() == "/opt/ixian/ixian.py"

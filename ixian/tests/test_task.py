@@ -406,7 +406,7 @@ class TestTaskHelp:
             """This is a mock test"""
 
             name = "mock_test"
-            config = ["{POWER_SHOVEL}", "{PROJECT_NAME}"]
+            config = ["{IXIAN}", "{PROJECT_NAME}"]
 
             def execute(self, *args, **kwargs):
                 pass
@@ -426,7 +426,7 @@ class TestTaskHelp:
 
         class MockTask(Task):
             name = "mock_test"
-            config = ["{POWER_SHOVEL}", "{PROJECT_NAME}"]
+            config = ["{IXIAN}", "{PROJECT_NAME}"]
 
             def execute(self, *args, **kwargs):
                 pass

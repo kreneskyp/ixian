@@ -101,7 +101,7 @@ CONFIG.format('{MY_CONFIG.ROOT}/{foo}', foo='extra_value')
 
 The properties are built into the base Config class and `CONFIG`.
 
-#### POWER_SHOVEL
+#### IXIAN
 The directory where ixian is installed.
 
 #### PWD
