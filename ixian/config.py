@@ -115,7 +115,7 @@ class Config(object):
     #  Base config
     # =========================================================================
     @classproperty
-    def POWER_SHOVEL(cls):
+    def IXIAN(cls):
         """Directory where ixian is installed"""
         import ixian
 

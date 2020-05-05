@@ -97,7 +97,7 @@ class TestConfig:
     def test_variables(self):
         """Test default values for config"""
         config = Config()
-        assert config.POWER_SHOVEL == "/opt/ixian/ixian"
+        assert config.IXIAN == "/opt/ixian/ixian"
         assert config.PWD == "/opt/ixian"
         assert config.PROJECT_NAME is None
         assert config.ENV == "DEV"

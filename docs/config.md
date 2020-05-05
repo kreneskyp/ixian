@@ -12,7 +12,7 @@ to simplify module setup.
 ```python
 from ixian.config import CONFIG
 
-print(CONFIG.POWER_SHOVEL)
+print(CONFIG.IXIAN)
 ```
 
 Other config classes may be added as children of a config instance. Modules add
