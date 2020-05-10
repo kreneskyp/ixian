@@ -14,10 +14,12 @@ venv
 /build/
 /dist/
 /ixian.egg-info/
+/docs/build/
 .builder
 .image_created
 .tox
 .python-version
+.eggs
 
 # Emacs
 .\#*
