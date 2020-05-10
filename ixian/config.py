@@ -96,9 +96,7 @@ class Config(object):
                     root_key = variable.split(".")[0]
                     root = self.root if self.root else self
 
-                    expanded[root_key] = self.format(
-                        getattr(root, root_key), variable, **kwargs
-                    )
+                    expanded[root_key] = self.format(getattr(root, root_key), variable, **kwargs)
                 except AttributeError:
                     raise MissingConfiguration(variable, key)
 

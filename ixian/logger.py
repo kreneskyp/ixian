@@ -54,9 +54,7 @@ class ColoredFormatter(logging.Formatter):
         elif not isinstance(config, dict):
             raise ValueError("color setting must be a string or dict")
 
-        message = cs(
-            message, config.get("color", DEFAULT_COLOR), config.get("background", None)
-        )
+        message = cs(message, config.get("color", DEFAULT_COLOR), config.get("background", None))
         if config.get("underline", False):
             message = message.underline()
         if config.get("bold", False):

@@ -40,12 +40,8 @@ def argunparse(options: dict, parser: argparse.ArgumentParser) -> List[str]:
     """
     args = []
     for argument in parser.arguments:
-        single_dash_name = next(
-            (arg for arg in argument["args"] if arg.startswith("-")), None
-        )
-        double_dash_name = next(
-            (arg for arg in argument["args"] if arg.startswith("--")), None
-        )
+        single_dash_name = next((arg for arg in argument["args"] if arg.startswith("-")), None)
+        double_dash_name = next((arg for arg in argument["args"] if arg.startswith("--")), None)
         has_double_dash = bool(double_dash_name)
         flag_name = double_dash_name if has_double_dash else single_dash_name
 
@@ -69,13 +65,9 @@ def argunparse(options: dict, parser: argparse.ArgumentParser) -> List[str]:
             # flags with values
             else:
                 if has_double_dash and not argument.get("nargs", None):
-                    arg_template = "{flag}={value}".format(
-                        flag=flag_name, value="{value}"
-                    )
+                    arg_template = "{flag}={value}".format(flag=flag_name, value="{value}")
                 else:
-                    arg_template = "{flag} {value}".format(
-                        flag=flag_name, value="{value}"
-                    )
+                    arg_template = "{flag} {value}".format(flag=flag_name, value="{value}")
 
                 if not isinstance(value, list):
                     as_args = [arg_template.format(value=value)]

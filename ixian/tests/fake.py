@@ -153,9 +153,7 @@ def mock_nested_single_dependency_nodes(
 
     root = mock_task(name="root", **root_kwargs or {})
     root.child = mock_task(name="child", parent="root", **child_kwargs or {})
-    root.grandchild = mock_task(
-        name="grandchild", parent="child", **grandchild_kwargs or {}
-    )
+    root.grandchild = mock_task(name="grandchild", parent="child", **grandchild_kwargs or {})
     root.mock_tasks = {"root": root, "child": root.child, "grandchild": root.grandchild}
 
     return root

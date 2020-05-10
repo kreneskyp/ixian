@@ -146,9 +146,7 @@ class TestParser:
         self.assertArgs(["foo", "help"], task="foo", task_args=["help"])
         self.assertArgs(["foo", "bar"], task="foo", task_args=["bar"])
         self.assertArgs(["foo", "bar", "xoo"], task="foo", task_args=["bar", "xoo"])
-        self.assertArgs(
-            ["foo", "bar", "--help"], task="foo", task_args=["bar", "--help"]
-        )
+        self.assertArgs(["foo", "bar", "--help"], task="foo", task_args=["bar", "--help"])
         self.assertArgs(["foo", "bar", "-h"], task="foo", task_args=["bar", "-h"])
 
 
@@ -173,17 +171,13 @@ class TestRun:
         self.assertRan(mock_task, mock_parse_args, task="mock_task", clean=True)
 
     def test_clean_all(self, mock_task, mock_parse_args):
-        self.assertRan(
-            mock_task, mock_parse_args, task="mock_task", **{"clean_all": True}
-        )
+        self.assertRan(mock_task, mock_parse_args, task="mock_task", **{"clean_all": True})
 
     def test_force(self, mock_task, mock_parse_args):
         self.assertRan(mock_task, mock_parse_args, task="mock_task", force=True)
 
     def test_force_all(self, mock_task, mock_parse_args):
-        self.assertRan(
-            mock_task, mock_parse_args, task="mock_task", **{"force_all": True}
-        )
+        self.assertRan(mock_task, mock_parse_args, task="mock_task", **{"force_all": True})
 
     def test_run(self, mock_task, mock_parse_args):
         self.assertRan(mock_task, mock_parse_args, task="mock_task")

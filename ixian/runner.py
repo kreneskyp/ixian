@@ -138,8 +138,7 @@ def build_epilog() -> str:
                 categories[task.category].append(task)
         padding = max(len(task.name) for task in TASKS.values())
         output.write(
-            """Type 'ix help <subcommand>' for help on a specific """
-            """subcommand.\n\n"""
+            """Type 'ix help <subcommand>' for help on a specific """ """subcommand.\n\n"""
         )
         output.write("""Available subcommands:\n\n""")
 
@@ -177,32 +176,19 @@ def get_parser() -> argparse.ArgumentParser:
         epilog=build_epilog(),
     )
     # TODO: try to fix formatting for choices
+    parser.add_argument("--help", help="show this help message and exit", action="store_true")
     parser.add_argument(
-        "--help", help="show this help message and exit", action="store_true"
-    )
-    parser.add_argument(
-        "--log",
-        type=str,
-        help="Log level (DEBUG|INFO|WARN|ERROR|NONE)",
-        default="DEBUG",
+        "--log", type=str, help="Log level (DEBUG|INFO|WARN|ERROR|NONE)", default="DEBUG",
     )
     parser.add_argument("--force", help="force task execution", action="store_true")
     parser.add_argument(
-        "--force-all",
-        help="force execution including task dependencies",
-        action="store_true",
+        "--force-all", help="force execution including task dependencies", action="store_true",
     )
+    parser.add_argument("--clean", help="clean before running task", action="store_true")
     parser.add_argument(
-        "--clean", help="clean before running task", action="store_true"
+        "--clean-all", help="clean all dependencies before running task", action="store_true",
     )
-    parser.add_argument(
-        "--clean-all",
-        help="clean all dependencies before running task",
-        action="store_true",
-    )
-    parser.add_argument(
-        "remainder", nargs=argparse.REMAINDER, help="arguments for task."
-    )
+    parser.add_argument("remainder", nargs=argparse.REMAINDER, help="arguments for task.")
     return parser
 
 

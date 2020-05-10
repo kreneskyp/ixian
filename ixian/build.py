@@ -13,7 +13,6 @@
 # limitations under the License.
 
 
-
 def write_file(path, data):
     with open(path, "w") as file:
         file.write(data)

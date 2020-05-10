@@ -71,10 +71,7 @@ class TestConfig:
 
     def test_format_extra_kwargs(self, mock_nested_config):
         """Extra kwargs are formatted just like str.format()"""
-        assert (
-            mock_nested_config.format("{CHILD.BAR} {EXTRA}", EXTRA="extra")
-            == "bar extra"
-        )
+        assert mock_nested_config.format("{CHILD.BAR} {EXTRA}", EXTRA="extra") == "bar extra"
 
     def test_format_missing_config(self):
         """Config object may be used to format strings"""
@@ -90,9 +87,7 @@ class TestConfig:
         # If a nested reference is missing, key is the variable that references the missing key
         with pytest.raises(MissingConfiguration) as exec_info:
             config.format("{NESTED}")
-        assert str(exec_info.value) == str(
-            MissingConfiguration("DOES_NOT_EXIST", "NESTED")
-        )
+        assert str(exec_info.value) == str(MissingConfiguration("DOES_NOT_EXIST", "NESTED"))
 
     def test_variables(self):
         """Test default values for config"""

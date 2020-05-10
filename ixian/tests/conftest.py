@@ -57,15 +57,9 @@ def mock_environment():
     CONFIG.PROJECT_NAME = "unittests"
     CONFIG.LOGGING_CONFIG = {
         "version": 1,
-        "formatters": {
-            "stdout": {"class": "logging.Formatter", "format": "%(message)s",},
-        },
+        "formatters": {"stdout": {"class": "logging.Formatter", "format": "%(message)s",},},
         "handlers": {
-            "stdout": {
-                "class": "logging.StreamHandler",
-                "formatter": "stdout",
-                "level": "DEBUG",
-            }
+            "stdout": {"class": "logging.StreamHandler", "formatter": "stdout", "level": "DEBUG",}
         },
         "root": {"level": "DEBUG", "handlers": ["stdout"]},
     }

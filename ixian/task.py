@@ -175,9 +175,7 @@ class TaskRunner(object):
         self.force = True
 
         args_as_str = CONFIG.format(" ".join([str(arg) for arg in args]))
-        logger.debug(
-            f"[exec] {self.name}({args_as_str}) force={force_root} clean={clean_root}"
-        )
+        logger.debug(f"[exec] {self.name}({args_as_str}) force={force_root} clean={clean_root}")
 
         def execute_node(node, clean, force, args=None):
             runner = TASKS[node["name"]]
@@ -224,9 +222,7 @@ class TaskRunner(object):
         :param force: override the check and return True if True.
         :return:
         """
-        checkers = (
-            [checker.clone() for checker in self.checkers] if self.checkers else None
-        )
+        checkers = [checker.clone() for checker in self.checkers] if self.checkers else None
         passes = False
         if self.checkers:
             if force:
@@ -247,11 +243,7 @@ class TaskRunner(object):
             return None
 
         checkers = (
-            [
-                checker.clone()
-                for checker in self.checkers
-                if checker.contribute_to_task_state
-            ]
+            [checker.clone() for checker in self.checkers if checker.contribute_to_task_state]
             if self.checkers
             else None
         )
@@ -284,9 +276,7 @@ class TaskRunner(object):
     @property
     def depends(self) -> list:
         return [
-            dependency
-            if isinstance(dependency, TaskRunner)
-            else TASKS[CONFIG.format(dependency)]
+            dependency if isinstance(dependency, TaskRunner) else TASKS[CONFIG.format(dependency)]
             for dependency in self._depends
         ]
 
@@ -557,9 +547,7 @@ class Task(object):
             # Unloading tasks isn't supported at this time, but tests may do that. When that
             # happens subsequent tests may see this fail. This msg helps show that happened.
             # hopefully this is fixed in a better way when task loading/tree is refactored.
-            logger.warning(
-                f"Task {instance.name} instantiated but an instance already exists"
-            )
+            logger.warning(f"Task {instance.name} instantiated but an instance already exists")
 
         return instance
 

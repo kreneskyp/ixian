@@ -184,9 +184,7 @@ class TestFileHash:
         """Test hashing a single file"""
         path = file_hash_mock_path(self.MOCK_FILE_1)
         checker_1 = FileHash(path)
-        expected = {
-            path: "529208ab580d05f4e081d2da2cde8b80da46c39ae8f0a31d20b905057bf2f2bc"
-        }
+        expected = {path: "529208ab580d05f4e081d2da2cde8b80da46c39ae8f0a31d20b905057bf2f2bc"}
         assert checker_1.state() == expected
 
     def test_file_permission_change(self):
@@ -204,9 +202,7 @@ class TestFileHash:
         assert get_flags(file_1) == get_flags(file_2)
         checker_1 = FileHash(file_1)
         checker_2 = FileHash(file_2)
-        assert (
-            list(checker_1.state().values())[0] == list(checker_2.state().values())[0]
-        )
+        assert list(checker_1.state().values())[0] == list(checker_2.state().values())[0]
 
     def test_file_contents_change(self):
         """Changing file contents should change file and parent dir hash"""
@@ -232,18 +228,14 @@ class TestFileHash:
         """Test hashing a directory"""
         path = file_hash_mock_path(self.MOCK_DIR)
         checker_1 = FileHash(path)
-        expected = {
-            path: "f443aa643743df88ff39648d3cc04973813be298bee1c29372a9e103ad20fb47"
-        }
+        expected = {path: "f443aa643743df88ff39648d3cc04973813be298bee1c29372a9e103ad20fb47"}
         assert checker_1.state() == expected
 
     def test_dir_rename(self):
         """Test changing a directory's name"""
         checker_1 = FileHash(file_hash_mock_path(self.MOCK_DIR))
         checker_2 = FileHash(file_hash_mock_path(self.MOCK_DIR_COPY))
-        assert (
-            list(checker_1.state().values())[0] == list(checker_2.state().values())[0]
-        )
+        assert list(checker_1.state().values())[0] == list(checker_2.state().values())[0]
 
     def test_dir_permission_change(self):
         """Changing permissions on a dir changes it's hash"""

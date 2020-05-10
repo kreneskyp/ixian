@@ -474,8 +474,6 @@ class TestTaskHelp:
         """
         self.assert_render_status(snapshot, mock_task_scenarios.__task__)
 
-    def test_render_status_passing_checks(
-        self, snapshot, mock_tasks_with_passing_checkers
-    ):
+    def test_render_status_passing_checks(self, snapshot, mock_tasks_with_passing_checkers):
         # mock checkers for the tree and test when tree is passing
         self.assert_render_status(snapshot, mock_tasks_with_passing_checkers.__task__)
