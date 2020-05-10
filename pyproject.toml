@@ -1,8 +1,10 @@
 [tool.black]
 line-length = 99
 exclude = '''(
-    wet_arms/settings
-  | manage.py
-  | wet_arms/.*/migrations
+    /opt/ixian/dist/*
+  | /opt/ixian/.tox/*
+  | /opt/ixian/.eggs/*
+  | /opt/ixian/venv/*
+  | snapshots/*
   )
 '''
