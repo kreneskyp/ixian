@@ -1,7 +1,7 @@
 PROJECT_NAME=ixian
 IMAGE=ixian_tests
 PROJECT_DIR=/home/runner/work/ixian/${PROJECT_NAME}
-DOCKER_RUN=docker run -it -v `pwd`:${PROJECT_DIR} ${IMAGE}
+DOCKER_RUN=docker run -it -e IX_TEST_CONTEXT=LOCAL -v `pwd`:${PROJECT_DIR} ${IMAGE}
 PYENV_DIR=/home/runner/work/ixian/pyenv
 
 

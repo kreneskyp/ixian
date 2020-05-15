@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import pytest
 
 from ixian.exceptions import ExecuteFailed
@@ -71,8 +72,20 @@ class TestExecute:
 
 
 def test_get_dev_uid():
-    assert get_dev_uid() == 0
+    ix_test_context = os.getenv("IX_TEST_CONTEXT", "LOCAL")
+    if ix_test_context == "LOCAL":
+        expected = 0
+    else:
+        # uid used by github actions
+        expected = 1001
+    assert get_dev_uid() == expected
 
 
 def test_get_dev_gid():
-    assert get_dev_gid() == 0
+    ix_test_context = os.getenv("IX_TEST_CONTEXT", "LOCAL")
+    if ix_test_context == "LOCAL":
+        expected = 0
+    else:
+        # gid used by github actions
+        expected = 16
+    assert get_dev_gid() == expected
