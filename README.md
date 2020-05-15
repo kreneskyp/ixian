@@ -1,3 +1,5 @@
+[![Documentation Status](https://readthedocs.org/projects/docs/badge/?version=latest)](https://remix.readthedocs.io/en/latest/)
+
 # Ixian
 
 Ixian is a modular task tool written in python3. It is intended to be a
@@ -68,9 +70,4 @@ Access built-in help for any task by calling `ix help my_task`. Builtin help sho
 use the task, enumerate any relevent environment variables, and display the status of any checks.
 
 
-## Advanced Usage
 
-* [Tasks](docs/tasks.md)
-* [Config](docs/config.md)
-* [Checks](docs/check.md)
-* [Modules](docs/modules.md)
