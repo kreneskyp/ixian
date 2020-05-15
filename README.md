@@ -1,3 +1,4 @@
+![test](https://github.com/kreneskyp/ixian/workflows/test/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/docs/badge/?version=latest)](https://ixian.readthedocs.io/en/latest/)
 
 # Ixian
