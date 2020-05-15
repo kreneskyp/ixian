@@ -92,12 +92,12 @@ class TestConfig:
     def test_variables(self):
         """Test default values for config"""
         config = Config()
-        assert config.IXIAN == "/home/runner/work/ixian/ixian"
-        assert config.PWD == "/home/runner/work/ixian"
+        assert config.IXIAN == "/home/runner/work/ixian/ixian/ixian"
+        assert config.PWD == "/home/runner/work/ixian/ixian"
         assert config.PROJECT_NAME is None
         assert config.ENV == "DEV"
         assert config.BUILDER_DIR == ".builder"
-        assert config.BUILDER == "/home/runner/work/ixian/.builder"
+        assert config.BUILDER == "/home/runner/work/ixian/ixian/.builder"
 
     def test_config_instance(self):
         """Test that global config object was created"""

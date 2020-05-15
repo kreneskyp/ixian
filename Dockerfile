@@ -26,7 +26,7 @@ RUN apt-get update --fix-missing && \
 
 
 # Project directories
-ENV PROJECT_DIR /home/runner/work/$PROJECT_NAME
+ENV PROJECT_DIR /home/runner/work/ixian/$PROJECT_NAME
 ENV SRC_ROOT $PROJECT_DIR/$PROJECT_NAME
 ENV ROOT_MODULE $PROJECT_NAME
 
@@ -34,7 +34,7 @@ ENV ROOT_MODULE $PROJECT_NAME
 ADD . $PROJECT_DIR
 
 # Python
-ENV PYENV_DIR=/home/runner/work/pyenv
+ENV PYENV_DIR=/home/runner/work/ixian/pyenv
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8s
 RUN mkdir -p $PYENV_DIR
