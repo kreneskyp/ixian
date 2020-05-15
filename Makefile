@@ -33,18 +33,27 @@ black-check: .image_created .python_version
 bash: .image_created .python_version
 	${DOCKER_RUN} /bin/bash
 
+.PHONY: dist
 dist:
 	${DOCKER_RUN} python3 setup.py sdist bdist_wheel
 
+.PHONY: dist-check
 dist-check:
 	${DOCKER_RUN} twine check dist/*
 
+.PHONY: docs
+docs: docs/Makefile
+	${DOCKER_RUN} tox -e docs
+
+.PHONY: publish
 publish:
 	${DOCKER_RUN} twine upload dist/*
 
+.PHONY: publish-test
 publish-test:
 	${DOCKER_RUN} twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
+.PHONY: clean
 clean:
 	rm -rf .tox
 	rm -rf .coverage
@@ -52,6 +61,7 @@ clean:
 	rm -rf dist
 	rm -rf build
 
+.PHONY: teardown
 teardown: clean
 	rm -rf .image_created
 	rm -rf .python-version
