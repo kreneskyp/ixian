@@ -1,4 +1,4 @@
-[![Documentation Status](https://readthedocs.org/projects/docs/badge/?version=latest)](https://remix.readthedocs.io/en/latest/)
+[![Documentation Status](https://readthedocs.org/projects/docs/badge/?version=latest)](https://ixian.readthedocs.io/en/latest/)
 
 # Ixian
 
