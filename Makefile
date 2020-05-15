@@ -1,8 +1,8 @@
 PROJECT_NAME=ixian
 IMAGE=ixian_tests
-PROJECT_DIR=/opt/${PROJECT_NAME}
+PROJECT_DIR=/home/runner/work/${PROJECT_NAME}
 DOCKER_RUN=docker run -it -v `pwd`:${PROJECT_DIR} ${IMAGE}
-PYENV_DIR=/opt/pyenv
+PYENV_DIR=/home/runner/work/pyenv
 
 
 .image_created: Dockerfile requirements*.txt

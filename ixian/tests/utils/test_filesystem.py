@@ -34,4 +34,4 @@ def test_mkdir():
 
 
 def test_pwd():
-    assert filesystem.pwd() == "/opt/ixian"
+    assert filesystem.pwd() == "/home/runner/work/ixian"

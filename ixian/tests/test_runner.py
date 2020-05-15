@@ -62,7 +62,7 @@ class TestExitCodes:
 class TestIxianPath:
     def test_default_ixian_path(self):
         # ixian.py is in the PWD by default if IXIAN_CONFIG isn't set.
-        assert ixian_path() == "/opt/ixian/ixian.py"
+        assert ixian_path() == "/home/runner/work/ixian/ixian.py"
 
     def test_overridden_path(self):
         # config file path may be overridden by setting IXIAN_CONFIG
