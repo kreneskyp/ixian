@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import hashlib
-import inspect
 import json
 
 import os

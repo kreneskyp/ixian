@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 from unittest import mock
 
 from ixian.utils.decorators import classproperty, cached_property
