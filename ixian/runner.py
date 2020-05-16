@@ -264,7 +264,8 @@ def resolve_task(key: str) -> TaskRunner:
             return task
         else:
             logger.debug(
-                f"RUN_CONTEXT ({CONFIG.RUN_CONTEXT}) does not match task config ({task.task.contexts})"
+                f"RUN_CONTEXT ({CONFIG.RUN_CONTEXT}) does not match task config"
+                f"({task.task.contexts})"
             )
 
 
@@ -274,7 +275,7 @@ def load_environment():
     """
     for key, value in os.environ.items():
         if key.startswith(CONFIG.ENV_PREFIX):
-            parts = key[len(CONFIG.ENV_PREFIX) :].split("__")
+            parts = key[len(CONFIG.ENV_PREFIX) :].split("__")  # noqa: E203
             current = CONFIG
             for part in parts[:-1]:
                 current = getattr(current, part)

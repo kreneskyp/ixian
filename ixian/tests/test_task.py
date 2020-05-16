@@ -345,7 +345,7 @@ class TestTask:
         mock_checker = mock.MagicMock()
 
         task = fake.mock_task(check=None)
-        assert task.__task__.checkers == None
+        assert task.__task__.checkers is None
 
         task = fake.mock_task(check=mock_checker)
         assert task.__task__.checkers == [mock_checker]

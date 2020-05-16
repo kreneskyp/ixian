@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
 import shutil
 
@@ -41,7 +40,7 @@ def mock_logger():
     attached.
     """
 
-    patcher = mock.patch(f"logging.getLogger")
+    patcher = mock.patch("logging.getLogger")
     mock_logger = patcher.start()
 
     yield mock_logger
@@ -57,9 +56,15 @@ def mock_environment():
     CONFIG.PROJECT_NAME = "unittests"
     CONFIG.LOGGING_CONFIG = {
         "version": 1,
-        "formatters": {"stdout": {"class": "logging.Formatter", "format": "%(message)s",},},
+        "formatters": {
+            "stdout": {"class": "logging.Formatter", "format": "%(message)s",},  # noqa:E231
+        },
         "handlers": {
-            "stdout": {"class": "logging.StreamHandler", "formatter": "stdout", "level": "DEBUG",}
+            "stdout": {
+                "class": "logging.StreamHandler",
+                "formatter": "stdout",
+                "level": "DEBUG",
+            }  # noqa:E231
         },
         "root": {"level": "DEBUG", "handlers": ["stdout"]},
     }

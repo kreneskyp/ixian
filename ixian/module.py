@@ -84,6 +84,6 @@ def load_tasks(tasks_module_path):
         ):
             try:
                 module_attribute()
-            except:
+            except:  # noqa: E722
                 logger.error("Error loading task: %s" % module_attribute)
                 raise

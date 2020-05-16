@@ -17,7 +17,6 @@ from unittest import mock
 
 import pytest
 
-from ixian import logger
 from ixian import runner
 from ixian.exceptions import MockExit, AlreadyComplete, ExecuteFailed
 from ixian.runner import ExitCodes, ixian_path

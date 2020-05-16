@@ -17,7 +17,6 @@ import pytest
 from ixian.config import CONFIG
 from ixian.module import MODULES
 from ixian.runner import resolve_task
-from ixian.task import TASKS
 
 
 def test_load(mock_environment):
