@@ -87,5 +87,5 @@ def test_get_dev_gid():
         expected = 0
     else:
         # gid used by github actions
-        expected = 16
+        expected = 116
     assert get_dev_gid() == expected
