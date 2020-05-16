@@ -72,7 +72,7 @@ class TestExecute:
 
 
 def test_get_dev_uid():
-    ix_test_context = os.getenv("IX_TEST_CONTEXT", "LOCAL")
+    ix_test_context = os.getenv("IX_TEST_CONTEXT", "UNKNOWN")
     if ix_test_context == "LOCAL":
         expected = 0
     else:
@@ -82,7 +82,7 @@ def test_get_dev_uid():
 
 
 def test_get_dev_gid():
-    ix_test_context = os.getenv("IX_TEST_CONTEXT", "LOCAL")
+    ix_test_context = os.getenv("IX_TEST_CONTEXT", "UNKNOWN")
     if ix_test_context == "LOCAL":
         expected = 0
     else:
