@@ -19,6 +19,11 @@ test: .image_created .python_version
 	${DOCKER_RUN} tox -v
 
 
+.PHONY: lint
+lint: .image_created .python_version
+	${DOCKER_RUN} tox -e lint
+
+
 .PHONY: black
 black: .image_created .python_version
 	${DOCKER_RUN} black .
