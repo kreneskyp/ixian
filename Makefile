@@ -38,6 +38,10 @@ black-check: .image_created .python_version
 bash: .image_created .python_version
 	${DOCKER_RUN} /bin/bash
 
+.PHONY: version
+version: .image_created .python_version
+	${DOCKER_RUN} python3 setup.py --version
+
 .PHONY: dist
 dist:
 	${DOCKER_RUN} python3 setup.py sdist bdist_wheel
