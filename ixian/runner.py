@@ -16,6 +16,7 @@ import logging
 import os
 from enum import Enum
 from logging.config import dictConfig
+from typing import List
 
 import argcomplete
 import argparse
@@ -204,7 +205,7 @@ DEFAULT_ARGS = {
 }
 
 
-def parse_args(args: str = None) -> dict:
+def parse_args(args: List[str] = None) -> dict:
     """Parse args from command line input"""
     parser = get_parser()
     compiled_args = DEFAULT_ARGS.copy()
@@ -289,8 +290,8 @@ def run() -> ExitCodes:
     :return: 0 if successful or an error code
     """
 
-    # parse args
-    args = parse_args()
+    # parse args - manually grab from sys.argv so mock_cli can mock it.
+    args = parse_args(sys.argv[1:])
     task_name = args.pop("task")
     task_args = args.pop("task_args")
     formatted_task_args = [CONFIG.format(arg) for arg in task_args]
