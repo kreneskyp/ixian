@@ -45,11 +45,11 @@ class TestWritePath:
         """
         Assert that file can be written and read back from filesystem
         """
-        print("path: ", path)
+        full_path = builder.get_path(path)
         assert not builder.exists(path)
-        filesystem.write_file(builder.get_path(path), data)
+        filesystem.write_file(full_path, data)
         assert builder.exists(path)
-        assert filesystem.read_file(path) == data
+        assert filesystem.read_file(full_path) == data
 
     def test_path_exists(self, temp_builder):
         """
