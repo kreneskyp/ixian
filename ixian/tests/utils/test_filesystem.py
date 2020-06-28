@@ -15,6 +15,9 @@
 import os
 import shutil
 
+from ixian import builder
+from ixian.config import CONFIG
+
 from ixian.utils import filesystem
 
 
@@ -35,3 +38,35 @@ def test_mkdir():
 
 def test_pwd():
     assert filesystem.pwd() == "/home/runner/work/ixian/ixian"
+
+
+class TestWritePath:
+    def assert_read_write_file(self, path, data):
+        """
+        Assert that file can be written and read back from filesystem
+        """
+        print("path: ", path)
+        assert not builder.exists(path)
+        filesystem.write_file(builder.get_path(path), data)
+        assert builder.exists(path)
+        assert filesystem.read_file(path) == data
+
+    def test_path_exists(self, temp_builder):
+        """
+        Test writing to file when the directories already exist
+        """
+        path = f"filesystem.TestReadWrite/test_path_exists"
+        file = f"{path}/file"
+        full_path = builder.get_path(path)
+        filesystem.mkdir(full_path)
+        assert builder.exists(path)
+        self.assert_read_write_file(file, "test_path_exists")
+
+    def test_path_doesnt_exist(self, temp_builder):
+        """
+        Test writing to file when the directories do not exist
+        """
+        path = f"filesystem.TestReadWrite/test_path_doesnt_exist"
+        file = f"{path}/file"
+        assert not builder.exists(path)
+        self.assert_read_write_file(file, "test_path_doesnt_exist")
