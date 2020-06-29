@@ -18,6 +18,7 @@ import uuid
 
 from unittest.mock import Mock
 
+from ixian import builder
 from ixian.check.checker import Checker, MultiValueChecker
 from ixian.modules.filesystem.file_hash import FileHash, get_flags
 
@@ -185,6 +186,7 @@ class TestFileHash:
         path = file_hash_mock_path(self.MOCK_FILE_1)
         print("self.MOCK_FILE_1: ", self.MOCK_FILE_1)
         print("path: ", path)
+        print("contents: ", builder.read_file(path))
         checker_1 = FileHash(path)
         expected = {path: "519962bda8b77c33f5a34cdf5ee16b1f961bc3c6bd54588819b17e4b50127a65"}
         assert checker_1.state() == expected
