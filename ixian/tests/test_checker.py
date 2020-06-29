@@ -183,6 +183,8 @@ class TestFileHash:
     def test_file_hash(self):
         """Test hashing a single file"""
         path = file_hash_mock_path(self.MOCK_FILE_1)
+        print("self.MOCK_FILE_1: ", self.MOCK_FILE_1)
+        print("path: ", path)
         checker_1 = FileHash(path)
         expected = {path: "519962bda8b77c33f5a34cdf5ee16b1f961bc3c6bd54588819b17e4b50127a65"}
         assert checker_1.state() == expected
