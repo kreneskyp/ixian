@@ -184,11 +184,8 @@ class TestFileHash:
     def test_file_hash(self):
         """Test hashing a single file"""
         path = file_hash_mock_path(self.MOCK_FILE_1)
-        print("self.MOCK_FILE_1: ", self.MOCK_FILE_1)
-        print("path: ", path)
-        print("contents: ", builder.read_file(path))
         checker_1 = FileHash(path)
-        expected = {path: "519962bda8b77c33f5a34cdf5ee16b1f961bc3c6bd54588819b17e4b50127a65"}
+        expected = {path: "529208ab580d05f4e081d2da2cde8b80da46c39ae8f0a31d20b905057bf2f2bc"}
         assert checker_1.state() == expected
 
     def test_file_permission_change(self):
@@ -232,7 +229,7 @@ class TestFileHash:
         """Test hashing a directory"""
         path = file_hash_mock_path(self.MOCK_DIR)
         checker_1 = FileHash(path)
-        expected = {path: "a0bdf1f51a00abc11e68c57556c505c3e43162751fbd97520e4fbeb6b3dfa9f8"}
+        expected = {path: "f443aa643743df88ff39648d3cc04973813be298bee1c29372a9e103ad20fb47"}
         assert checker_1.state() == expected
 
     def test_dir_rename(self):
