@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import logging
 import os
 import shutil
+from uuid import uuid4
 
 import pytest
 from unittest import mock
@@ -28,6 +29,7 @@ from ixian.tests import fake
 # =================================================================================================
 # Environment and system components
 # =================================================================================================
+from ixian.utils import filesystem
 
 
 @pytest.fixture
@@ -49,7 +51,7 @@ def mock_logger():
 
 
 @pytest.fixture
-def mock_environment():
+def mock_environment(temp_builder):
     """
     Initialize ixian with a tests environment
     """
@@ -141,17 +143,25 @@ def mock_parse_args():
 
 
 @pytest.fixture
-def temp_builder():
+def temp_builder(caplog):
     """
-    Fixture that creates a builder dir in /tmp and then removes it afterwards. Intended for use
-    with tests that aren't mocking writes/reads from the builder cache.
+    Fixture that creates a temp builder dir. The directory name is randomized to prevent leaks
+    between tests.
     """
-    CONFIG.BUILDER = "/tmp/.builder"
-    if os.path.exists(CONFIG.BUILDER):
-        shutil.rmtree(CONFIG.BUILDER)
+
+    # create a random builder directory so this test doesn't conflict with any other tests
+    CONFIG.BUILDER_ID = uuid4()
+    CONFIG.BUILDER_DIR = "tmp/builder.test/{BUILDER_ID}"
+    filesystem.mkdir(CONFIG.BUILDER_DIR)
+
     yield
-    if os.path.exists(CONFIG.BUILDER):
-        shutil.rmtree(CONFIG.BUILDER)
+
+    # remove builder directory
+    filesystem.rmdir(CONFIG.BUILDER)
+
+    # add debug logging capture
+    caplog.set_level(logging.DEBUG, logger="ixian.utils.filesystem")
+    caplog.set_level(logging.DEBUG, logger="ixian.builder")
 
 
 # =================================================================================================

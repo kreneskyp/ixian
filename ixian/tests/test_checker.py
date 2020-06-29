@@ -18,6 +18,7 @@ import uuid
 
 from unittest.mock import Mock
 
+from ixian import builder
 from ixian.check.checker import Checker, MultiValueChecker
 from ixian.modules.filesystem.file_hash import FileHash, get_flags
 
