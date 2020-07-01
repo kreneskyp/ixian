@@ -16,7 +16,6 @@ import os
 import shutil
 
 from ixian import builder
-from ixian.config import CONFIG
 
 from ixian.utils import filesystem
 

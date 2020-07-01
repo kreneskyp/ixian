@@ -1,8 +1,5 @@
-import os
-
 import pytest
 
-from ixian.config import CONFIG
 from ixian import builder
 from ixian.utils import filesystem
 
@@ -55,7 +52,8 @@ class TestReadWrite:
         """
         path = f"builder.TestReadWrite/test_path_exists"
         file = f"{path}/file"
-        filesystem.mkdir(builder.get_path(path))
+        full_path = builder.get_path(path)
+        filesystem.mkdir(full_path)
         assert builder.exists(path)
         self.assert_read_write_file(file, "test_path_exists")
 

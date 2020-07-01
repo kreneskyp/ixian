@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
-import os
 
 from ixian.config import CONFIG
-from ixian.utils.filesystem import mkdir, empty_dir, write_file, read_file
+from ixian.utils import filesystem
 
 
 logger = logging.getLogger(__name__)
@@ -30,9 +29,8 @@ def write(path: str, data: str):
     Shortcut for writing files to BUILDER. Paths is relative to builder.
     """
     full_path = get_path(path)
-    write_file(full_path, data)
+    filesystem.write_file(full_path, data)
     logger.debug(f"Builder wrote to {path}")
-    print(f"Builder wrote to {path}")
 
 
 def read(path: str):
@@ -40,7 +38,7 @@ def read(path: str):
     Shortcut or reading file from BUILDER. Path is relative to builder.
     """
     full_path = get_path(path)
-    return read_file(full_path)
+    return filesystem.read_file(full_path)
 
 
 def exists(path: str):
@@ -48,11 +46,11 @@ def exists(path: str):
     Returns True if path exists in BUILDER
     """
     full_path = get_path(path)
-    return os.path.exists(full_path)
+    return filesystem.exists(full_path)
 
 
 def reset():
     """
     Delete all files in BUILDER
     """
-    empty_dir(CONFIG.BUILDER)
+    filesystem.empty_dir(CONFIG.BUILDER)

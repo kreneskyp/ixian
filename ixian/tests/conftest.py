@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
-import os
-import shutil
 from uuid import uuid4
 
 import pytest
 from unittest import mock
 
+from ixian.builder import exists
 from ixian.config import CONFIG
 from ixian.exceptions import MockExit
 from ixian.module import load_module, MODULES
@@ -29,7 +28,7 @@ from ixian.tests import fake
 # =================================================================================================
 # Environment and system components
 # =================================================================================================
-from ixian.utils import filesystem
+from ixian.utils.filesystem import read_file, write_file, exists, mkdir, rmdir, empty_dir
 
 
 @pytest.fixture
@@ -143,21 +142,41 @@ def mock_parse_args():
 
 
 @pytest.fixture
-def temp_builder(caplog):
+def temp_builder(caplog, mocker):
     """
-    Fixture that creates a temp builder dir. The directory name is randomized to prevent leaks
-    between tests.
+    Fixture that creates a temp builder dir. This intercepts reads/writes to filesystem so the
+    files may be stored in a temp dir. The temp dir has a random name to prevent leaks
     """
 
+    CONFIG.TEMP_BUILDER_ID = uuid4()
+    CONFIG.TEMP_BUILDER = "/tmp/{TEMP_BUILDER_ID}"
+
+    def convert_func(func):
+        def wrapped(path, *args):
+            # convert path to tmp builder dir
+            if not path.startswith(CONFIG.TEMP_BUILDER):
+                if path[0] == "/":
+                    path = f"{CONFIG.TEMP_BUILDER}/{path[1:]}"
+                else:
+                    path = f"{CONFIG.TEMP_BUILDER}/{path}"
+
+            return func(path, *args)
+
+        return wrapped
+
+    mocker.patch("ixian.utils.filesystem.write_file", side_effect=convert_func(write_file))
+    mocker.patch("ixian.utils.filesystem.read_file", side_effect=convert_func(read_file))
+    mocker.patch("ixian.utils.filesystem.exists", side_effect=convert_func(exists))
+    mocker.patch("ixian.utils.filesystem.mkdir", side_effect=convert_func(mkdir))
+    mocker.patch("ixian.utils.filesystem.empty_dir", side_effect=convert_func(empty_dir))
+
     # create a random builder directory so this test doesn't conflict with any other tests
-    CONFIG.BUILDER_ID = uuid4()
-    CONFIG.BUILDER_DIR = "tmp/builder.test/{BUILDER_ID}"
-    filesystem.mkdir(CONFIG.BUILDER_DIR)
+    mkdir(CONFIG.TEMP_BUILDER)
 
     yield
 
     # remove builder directory
-    filesystem.rmdir(CONFIG.BUILDER)
+    rmdir(CONFIG.TEMP_BUILDER)
 
     # add debug logging capture
     caplog.set_level(logging.DEBUG, logger="ixian.utils.filesystem")
