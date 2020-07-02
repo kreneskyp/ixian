@@ -15,10 +15,8 @@
 import hashlib
 import json
 
-import os
-
+from ixian import builder
 from ixian.config import CONFIG
-from ixian.utils.filesystem import mkdir
 
 
 def hash_object(obj):
@@ -72,9 +70,8 @@ class Checker(object):
         :return: state object
         """
         file_path = self.file_path()
-        if os.path.exists(file_path):
-            with open(file_path) as file:
-                return json.loads(file.read())
+        if builder.exists(file_path):
+            return json.loads(builder.read(file_path))
         else:
             return None
 
@@ -93,10 +90,9 @@ class Checker(object):
         raise NotImplementedError
 
     def save(self):
-        mkdir(CONFIG.format("{BUILDER}/checks/"))
         state = self.state()
-        with open(self.file_path(), "w") as file:
-            file.write(json.dumps(state))
+        data = json.dumps(state)
+        builder.write(self.file_path(), data)
 
     def clone(self):
         raise NotImplementedError
