@@ -54,7 +54,7 @@ class TestWritePath:
         """
         Test writing to file when the directories already exist
         """
-        path = f"filesystem.TestReadWrite/test_path_exists"
+        path = "filesystem.TestReadWrite/test_path_exists"
         file = f"{path}/file"
         full_path = builder.get_path(path)
         filesystem.mkdir(full_path)
@@ -65,7 +65,7 @@ class TestWritePath:
         """
         Test writing to file when the directories do not exist
         """
-        path = f"filesystem.TestReadWrite/test_path_doesnt_exist"
+        path = "filesystem.TestReadWrite/test_path_doesnt_exist"
         file = f"{path}/file"
         assert not builder.exists(path)
         self.assert_read_write_file(file, "test_path_doesnt_exist")
