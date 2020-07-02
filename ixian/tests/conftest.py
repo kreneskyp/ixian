@@ -17,7 +17,6 @@ from uuid import uuid4
 import pytest
 from unittest import mock
 
-from ixian.builder import exists
 from ixian.config import CONFIG
 from ixian.exceptions import MockExit
 from ixian.module import load_module, MODULES
@@ -28,7 +27,15 @@ from ixian.tests import fake
 # =================================================================================================
 # Environment and system components
 # =================================================================================================
-from ixian.utils.filesystem import read_file, write_file, exists, mkdir, rmdir, empty_dir
+from ixian.utils.filesystem import (
+    read_file,
+    write_file,
+    exists,
+    mkdir,
+    rmdir,
+    empty_dir,
+    leading_slash,
+)
 
 
 @pytest.fixture
@@ -155,10 +162,7 @@ def temp_builder(caplog, mocker):
         def wrapped(path, *args):
             # convert path to tmp builder dir
             if not path.startswith(CONFIG.TEMP_BUILDER):
-                if path[0] == "/":
-                    path = f"{CONFIG.TEMP_BUILDER}/{path[1:]}"
-                else:
-                    path = f"{CONFIG.TEMP_BUILDER}/{path}"
+                path = f"{CONFIG.TEMP_BUILDER}{leading_slash(path)}{path}"
 
             return func(path, *args)
 

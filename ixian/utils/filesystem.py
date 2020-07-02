@@ -69,3 +69,11 @@ def read_file(path: str):
 
 def exists(path: str) -> bool:
     return os.path.exists(path)
+
+
+def leading_slash(path: str) -> str:
+    """
+    Simple util for helping to combine paths. It returns a leading slash if the path does not have
+    one, an emptystring if it does.
+    """
+    return "" if path[0] == "/" else "/"

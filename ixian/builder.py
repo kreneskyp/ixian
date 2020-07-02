@@ -15,13 +15,16 @@ import logging
 
 from ixian.config import CONFIG
 from ixian.utils import filesystem
-
+from ixian.utils.filesystem import leading_slash
 
 logger = logging.getLogger(__name__)
 
 
 def get_path(relative_path):
-    return f"{CONFIG.BUILDER}/{relative_path}"
+    if relative_path.startswith(CONFIG.BUILDER):
+        return relative_path
+    else:
+        return f"{CONFIG.BUILDER}{leading_slash(relative_path)}{relative_path}"
 
 
 def write(path: str, data: str):
